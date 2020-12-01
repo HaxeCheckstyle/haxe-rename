@@ -1,0 +1,48 @@
+package refactor.actions;
+
+import refactor.discover.File;
+import refactor.discover.FileList;
+import refactor.discover.Identifier;
+
+class Refactor {
+	public static function refactor(context:RefactorContext) {
+		var file:Null<File> = FileList.getFile(context.what.fileName);
+		if (file == null) {
+			return;
+		}
+
+		var identifier:Identifier = file.getIdentifier(context.what.pos);
+		if (identifier == null) {
+			return;
+		}
+		switch (identifier.type) {
+			case PackageName:
+				RefactorPackageName.refactorPackageName(context, file, identifier);
+			case ImportModul:
+			case ImportAlias:
+				RefactorImportAlias.refactorImportAlias(context, file, identifier);
+			case UsingModul:
+			case Abstract | Class | Enum | Interface | Typedef:
+				RefactorTypeName.refactorTypeName(context, file, identifier);
+			case ModuleLevelStaticVar:
+			case ModuleLevelStaticMethod:
+			case Extends | Implements:
+				return;
+			case AbstractFrom | AbstractTo:
+				return;
+			case Prop:
+			case FieldVar:
+			case Method:
+			case TypedParameter:
+			case TypedefField:
+			case StructureField:
+			case InterfaceField:
+			case TypeHint:
+			case EnumField:
+			case CallOrAccess:
+			case ScopedLocal(scopeEnd):
+				RefactorScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
+			case StringConst:
+		}
+	}
+}

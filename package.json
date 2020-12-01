@@ -1,0 +1,22 @@
+{
+    "name": "refactoring",
+    "version": "1.0.31",
+    "description": "Refactoring tool for Haxe",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/HaxeCheckstyle/haxe-refactoring"
+    },
+    "keywords": [
+        "refactoring",
+        "haxe"
+    ],
+    "author": {
+        "name": "Alexander Blum",
+        "email": "Alexander.Blum@gmail.com"
+    },
+    "devDependencies": {
+        "lix": "^15.10.1"
+    },
+    "bugs": "https://github.com/HaxeCheckstyle/haxe-refactoring/issues",
+    "license": "MIT"
+}

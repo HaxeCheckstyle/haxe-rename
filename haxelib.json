@@ -1,0 +1,17 @@
+{
+	"name": "refactoring",
+	"url": "https://github.com/HaxeCheckstyle/haxe-refactoring",
+	"license": "MIT",
+	"tags": [
+		"cli",
+		"refactoring"
+	],
+	"description": "A code refactoring tool for Haxe",
+	"version": "1.0.0",
+	"releasenote": "inital release",
+	"contributors": [
+		"AlexHaxe"
+	],
+	"dependencies": {},
+	"classPath": "src"
+}

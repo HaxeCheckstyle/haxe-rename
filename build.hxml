@@ -1,0 +1,10 @@
+-cp src
+
+-lib haxeparser
+-lib tokentree
+-lib hxnodejs
+-lib hxargs
+
+-js bin/refactor.js
+
+--main refactor.Cli
