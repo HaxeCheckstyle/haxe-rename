@@ -10,14 +10,12 @@ import refactor.edits.Changelist;
 class RefactorPackageName {
 	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier) {
 		var changelist:Changelist = new Changelist(context);
-		var path:Path = new Path(file.name);
-		var mainTypeName:String = path.file;
+		var mainTypeName:String = file.getMainModulName();
 
 		var packageNamePrefix:String = "";
-		var packageName:String = "";
-		if (file.packageIdentifier != null) {
+		var packageName:String = file.getPackage();
+		if (packageName.length > 0) {
 			packageNamePrefix = file.packageIdentifier.name + ".";
-			packageName = file.packageIdentifier.name;
 			changelist.addChange(file.name, ReplaceText(context.what.toName, file.packageIdentifier.pos));
 		} else {
 			changelist.addChange(file.name, InsertText('package ${context.what.toName};\n', {fileName: file.name, start: 0, end: 0}));
@@ -51,7 +49,7 @@ class RefactorPackageName {
 						// only add once per file
 						continue;
 					}
-					var useFile:Null<File> = FileList.getFile(use.pos.fileName);
+					var useFile:Null<File> = context.fileList.getFile(use.pos.fileName);
 					if (useFile == null) {
 						continue;
 					}
@@ -76,7 +74,7 @@ class RefactorPackageName {
 
 	static function moveFileToPackage(context:RefactorContext, file:File, changelist:Changelist, packageName:String) {
 		var path:Path = new Path(file.name);
-		var mainTypeName:String = path.file;
+		var mainTypeName:String = file.getMainModulName();
 
 		var dotPath:String = path.dir.replace("/", ".").replace("\\", ".");
 

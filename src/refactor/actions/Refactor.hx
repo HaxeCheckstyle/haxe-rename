@@ -1,12 +1,11 @@
 package refactor.actions;
 
 import refactor.discover.File;
-import refactor.discover.FileList;
 import refactor.discover.Identifier;
 
 class Refactor {
 	public static function refactor(context:RefactorContext) {
-		var file:Null<File> = FileList.getFile(context.what.fileName);
+		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
 			return;
 		}
@@ -24,8 +23,8 @@ class Refactor {
 			case UsingModul:
 			case Abstract | Class | Enum | Interface | Typedef:
 				RefactorTypeName.refactorTypeName(context, file, identifier);
-			case ModuleLevelStaticVar:
-			case ModuleLevelStaticMethod:
+			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
+				RefactorModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements:
 				return;
 			case AbstractFrom | AbstractTo:
@@ -43,6 +42,7 @@ class Refactor {
 			case ScopedLocal(scopeEnd):
 				RefactorScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 			case StringConst:
+				return;
 		}
 	}
 }

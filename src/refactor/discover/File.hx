@@ -1,8 +1,11 @@
 package refactor.discover;
 
+import haxe.io.Path;
+
 class File {
 	public var name:String;
 	public var packageIdentifier:Null<Identifier>;
+	public var importHxFile:Null<File>;
 	public var importList:Array<Import>;
 	public var typeList:Array<Identifier>;
 	public var importInsertPos:Int;
@@ -13,6 +16,19 @@ class File {
 		this.importList = importList;
 		this.typeList = typeList;
 		this.importInsertPos = importInsertPos;
+	}
+
+	public function getPackage():String {
+		if (packageIdentifier != null) {
+			return packageIdentifier.name;
+		}
+		return "";
+	}
+
+	public function getMainModulName():String {
+		var path:Path = new Path(name);
+
+		return path.file;
 	}
 
 	public function getIdentifier(pos:Int):Null<Identifier> {

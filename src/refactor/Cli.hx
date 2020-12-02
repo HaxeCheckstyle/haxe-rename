@@ -7,6 +7,7 @@ import sys.io.File;
 import byte.ByteData;
 import refactor.actions.Refactor;
 import refactor.actions.RefactorWhat;
+import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
@@ -92,15 +93,18 @@ class Cli {
 		var usageContext:UsageContext = {
 			fileName: "",
 			usageCollector: new UsageCollector(),
-			nameMap: new NameMap()
+			nameMap: new NameMap(),
+			fileList: new FileList()
 		};
 
 		// var startTime = Timer.stamp();
 		traverseSources(paths, usageContext);
+		usageContext.usageCollector.updateImportHx(usageContext);
 
 		Refactor.refactor({
 			usageCollector: usageContext.usageCollector,
 			nameMap: usageContext.nameMap,
+			fileList: usageContext.fileList,
 			what: what,
 			forRealExecute: forReal,
 			docFactory: EditableDocument.new

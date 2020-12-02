@@ -1,6 +1,7 @@
 package refactor.discover;
 
 import haxe.Exception;
+import haxe.io.Path;
 import byte.ByteData;
 import haxeparser.HaxeLexer;
 import hxparse.ParserError;
@@ -23,7 +24,7 @@ class UsageCollector {
 				t = lexer.token(haxeparser.HaxeLexer.tok);
 			}
 			root = TokenTreeBuilder.buildTokenTree(tokens, content, TypeLevel);
-			FileList.addFile(new File(context.fileName, readPackageName(root, context), readImports(root, context), readTypes(root, context),
+			context.fileList.addFile(new File(context.fileName, readPackageName(root, context), readImports(root, context), readTypes(root, context),
 				findImportInsertPos(root)));
 		} catch (e:ParserError) {
 			throw 'failed to parse ${context.fileName} - ParserError: $e (${e.pos})';
@@ -31,6 +32,26 @@ class UsageCollector {
 			throw 'failed to parse ${context.fileName} - LexerError: ${e.msg} (${e.pos})';
 		} catch (e:Exception) {
 			throw 'failed to parse ${context.fileName} - ${e.details()}';
+		}
+	}
+
+	public function updateImportHx(context:UsageContext) {
+		for (importHxFile in context.fileList.files) {
+			var importHxPath:Path = new Path(importHxFile.name);
+			if (importHxPath.file != "import") {
+				continue;
+			}
+			var importHxFolder:String = importHxPath.dir;
+			for (file in context.fileList.files) {
+				if (file.name == importHxFile.name) {
+					continue;
+				}
+				var path:Path = new Path(file.name);
+				if (!path.dir.startsWith(importHxFolder)) {
+					continue;
+				}
+				file.importHxFile = importHxFile;
+			}
 		}
 	}
 

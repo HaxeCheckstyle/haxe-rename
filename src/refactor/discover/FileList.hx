@@ -1,13 +1,15 @@
 package refactor.discover;
 
 class FileList {
-	public static final files:Array<File> = [];
+	public final files:Array<File> = [];
 
-	public static function addFile(file:File) {
+	public function new() {}
+
+	public function addFile(file:File) {
 		files.push(file);
 	}
 
-	public static function getFile(fileName:String):Null<File> {
+	public function getFile(fileName:String):Null<File> {
 		for (file in files) {
 			if (file.name == fileName) {
 				return file;
