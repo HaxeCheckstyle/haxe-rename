@@ -2,7 +2,6 @@ package refactor.actions;
 
 import haxe.io.Path;
 import refactor.discover.File;
-import refactor.discover.FileList;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
@@ -67,6 +66,8 @@ class RefactorPackageName {
 				}
 			}
 		}
+
+		// TODO prevent duplicate imports / remove redundant imports
 
 		moveFileToPackage(context, file, changelist, packageName);
 		changelist.execute();

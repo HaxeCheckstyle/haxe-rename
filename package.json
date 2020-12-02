@@ -1,6 +1,6 @@
 {
     "name": "refactoring",
-    "version": "1.0.31",
+    "version": "1.0.0",
     "description": "Refactoring tool for Haxe",
     "repository": {
         "type": "git",

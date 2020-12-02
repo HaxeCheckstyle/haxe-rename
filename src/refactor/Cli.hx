@@ -47,7 +47,8 @@ class Cli {
 		var paths:Array<String> = [];
 		var loc:String = "";
 		var toName:String = "";
-		var help = false;
+		var help:Bool = false;
+		var execute:Bool = false;
 		var argHandler = hxargs.Args.generate([
 			@doc("file or directory with .hx files (multiple allowed)")
 			["-s", "--source"] => function(path:String) paths.push(path),
@@ -60,6 +61,10 @@ class Cli {
 
 			// @doc("Print additional information")
 			// ["-v"] => function() verbose = true,
+
+			@doc("perform refactoring operations")
+			["-x"] => function() execute = true,
+
 			@doc("you have a backup and you really, really want to refactor")
 			["--i-have-backups"] => function() forReal = true,
 
@@ -102,11 +107,10 @@ class Cli {
 		usageContext.usageCollector.updateImportHx(usageContext);
 
 		Refactor.refactor({
-			usageCollector: usageContext.usageCollector,
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			what: what,
-			forRealExecute: forReal,
+			forRealExecute: execute && forReal,
 			docFactory: EditableDocument.new
 		});
 

@@ -471,7 +471,7 @@ class UsageCollector {
 			return switch (token.tok) {
 				case Const(CIdent(_)):
 					if (token.parent.tok.match(Dot)) {
-						GoDeeper;
+						return GoDeeper;
 					}
 					identifier.addUse(makeIdentifier(context, token, CallOrAccess));
 					GoDeeper;
