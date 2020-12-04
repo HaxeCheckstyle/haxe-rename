@@ -6,6 +6,7 @@ import sys.FileSystem;
 import sys.io.File;
 import byte.ByteData;
 import refactor.actions.Refactor;
+import refactor.actions.RefactorResult;
 import refactor.actions.RefactorWhat;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
@@ -108,13 +109,25 @@ class Cli {
 		traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 
-		Refactor.refactor({
+		var result:RefactorResult = Refactor.refactor({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			what: what,
 			forRealExecute: execute && forReal,
 			docFactory: EditableDocument.new
 		});
+		switch (result) {
+			case NoChange:
+				Sys.println("nothing to do");
+			case NotFound:
+				Sys.println("could not find identifier at " + loc);
+			case Unsupported:
+				Sys.println("refactoring not supported at " + loc);
+			case DryRun:
+				Sys.println("");
+			case Done:
+				Sys.println("changes were made");
+		}
 
 		// printStats(Timer.stamp() - startTime);
 		Sys.println(Timer.stamp() - startTime);

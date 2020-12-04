@@ -1,12 +1,13 @@
 package refactor.actions;
 
+import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
 
 class RefactorInterfaceField {
-	public static function refactorInterfaceField(context:RefactorContext, file:File, identifier:Identifier) {
+	public static function refactorInterfaceField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 
 		function replaceInType(type:Type, from:String, to:String) {
@@ -42,7 +43,7 @@ class RefactorInterfaceField {
 			// find typehints that use type and rename those
 			checkTypeHints(context, changelist, type, identifier);
 		}
-		changelist.execute();
+		return changelist.execute();
 	}
 
 	static function checkTypeHints(context:RefactorContext, changelist:Changelist, type:Type, identifier:Identifier) {

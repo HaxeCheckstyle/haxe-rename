@@ -1,12 +1,13 @@
 package refactor.actions;
 
+import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RefactorModuleLevelStatic {
-	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier) {
+	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 
 		var packageName:String = file.getPackage();
@@ -32,7 +33,7 @@ class RefactorModuleLevelStatic {
 			}
 			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
 		}
-		changelist.execute();
+		return changelist.execute();
 	}
 
 	static function refactorIdentifier(context:RefactorContext, changelist:Changelist, searchName:String, replaceName:String,

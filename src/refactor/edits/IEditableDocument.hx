@@ -1,7 +1,7 @@
 package refactor.edits;
 
 interface IEditableDocument {
-	function addEdit(edit:FileEdit):Void;
+	function addChange(edit:FileEdit):Void;
 
 	function endEdits():Void;
 }

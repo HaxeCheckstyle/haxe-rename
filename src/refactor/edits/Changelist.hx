@@ -2,6 +2,7 @@ package refactor.edits;
 
 import sys.io.File;
 import refactor.actions.RefactorContext;
+import refactor.actions.RefactorResult;
 import refactor.discover.IdentifierPos;
 
 class Changelist {
@@ -22,24 +23,29 @@ class Changelist {
 		}
 	}
 
-	public function execute() {
+	public function execute():RefactorResult {
 		if (!context.forRealExecute) {
-			dryRun();
-			return;
+			return dryRun();
 		}
+		var hasChanges:Bool = false;
 		for (file => edits in changes) {
 			edits.sort(sortFileEdits);
+			hasChanges = true;
 			var doc:IEditableDocument = context.docFactory(file);
 			for (edit in edits) {
-				doc.addEdit(edit);
+				doc.addChange(edit);
 			}
 			doc.endEdits();
 		}
+		return (hasChanges ? Done : NoChange);
 	}
 
-	function dryRun() {
+	function dryRun():RefactorResult {
+		var hasChanges:Bool = false;
+
 		for (file => edits in changes) {
 			edits.sort(sortFileEdits);
+			hasChanges = true;
 			Sys.println('$file');
 			for (edit in edits) {
 				switch (edit) {
@@ -57,6 +63,7 @@ class Changelist {
 				}
 			}
 		}
+		return (hasChanges ? DryRun : NoChange);
 	}
 
 	function sortFileEdits(a:FileEdit, b:FileEdit):Int {

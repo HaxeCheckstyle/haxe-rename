@@ -1,13 +1,14 @@
 package refactor.actions;
 
 import haxe.io.Path;
+import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RefactorPackageName {
-	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier) {
+	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 		var mainTypeName:String = file.getMainModulName();
 
@@ -70,7 +71,7 @@ class RefactorPackageName {
 		// TODO prevent duplicate imports / remove redundant imports
 
 		moveFileToPackage(context, file, changelist, packageName);
-		changelist.execute();
+		return changelist.execute();
 	}
 
 	static function moveFileToPackage(context:RefactorContext, file:File, changelist:Changelist, packageName:String) {

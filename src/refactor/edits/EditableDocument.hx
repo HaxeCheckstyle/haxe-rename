@@ -19,7 +19,7 @@ class EditableDocument implements IEditableDocument {
 		lastPos = 0;
 	}
 
-	public function addEdit(edit:FileEdit) {
+	public function addChange(edit:FileEdit) {
 		switch (edit) {
 			case Move(newFileName):
 				fileName = newFileName;

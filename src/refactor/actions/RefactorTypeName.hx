@@ -1,13 +1,14 @@
 package refactor.actions;
 
 import haxe.io.Path;
+import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RefactorTypeName {
-	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier) {
+	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var path:Path = new Path(file.name);
 		var changelist:Changelist = new Changelist(context);
 		if (path.file == identifier.name) {
@@ -63,6 +64,6 @@ class RefactorTypeName {
 		}
 
 		// TODO handle duplicate type names
-		changelist.execute();
+		return changelist.execute();
 	}
 }
