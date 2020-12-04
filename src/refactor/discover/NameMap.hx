@@ -7,8 +7,8 @@ class NameMap {
 		names = new Map<String, Array<Identifier>>();
 	}
 
-	public function getIdentifiers(fileName:String):Array<Identifier> {
-		var results:Null<Array<Identifier>> = names.get(fileName);
+	public function getIdentifiers(name:String):Array<Identifier> {
+		var results:Null<Array<Identifier>> = names.get(name);
 		if (results == null) {
 			return [];
 		}

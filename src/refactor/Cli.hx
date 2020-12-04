@@ -69,7 +69,7 @@ class Cli {
 			["--i-have-backups"] => function() forReal = true,
 
 			@doc("display list of options")
-			["--help"] => function() help = true
+			["-h", "--help"] => function() help = true
 		]);
 
 		function printHelp() {
@@ -97,12 +97,14 @@ class Cli {
 
 		var usageContext:UsageContext = {
 			fileName: "",
+			file: null,
 			usageCollector: new UsageCollector(),
 			nameMap: new NameMap(),
-			fileList: new FileList()
+			fileList: new FileList(),
+			type: null
 		};
 
-		// var startTime = Timer.stamp();
+		var startTime = Timer.stamp();
 		traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 
@@ -115,6 +117,7 @@ class Cli {
 		});
 
 		// printStats(Timer.stamp() - startTime);
+		Sys.println(Timer.stamp() - startTime);
 		Sys.exit(exitCode);
 	}
 

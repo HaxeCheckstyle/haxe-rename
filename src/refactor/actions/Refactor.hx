@@ -27,15 +27,16 @@ class Refactor {
 				RefactorModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements:
 				return;
-			case AbstractFrom | AbstractTo:
+			case AbstractOver | AbstractFrom | AbstractTo:
 				return;
-			case Prop:
+			case Property:
 			case FieldVar:
 			case Method:
 			case TypedParameter:
 			case TypedefField:
 			case StructureField:
-			case InterfaceField:
+			case InterfaceProperty | InterfaceVar | InterfaceMethod:
+				RefactorInterfaceField.refactorInterfaceField(context, file, identifier);
 			case TypeHint:
 			case EnumField:
 			case CallOrAccess:

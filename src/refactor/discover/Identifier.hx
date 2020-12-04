@@ -5,11 +5,24 @@ class Identifier {
 	public var name:String;
 	public var pos:IdentifierPos;
 	public var uses:Null<Array<Identifier>>;
+	public var file:File;
+	public var parent:Null<Identifier>;
+	public var defineType:Null<Type>;
 
-	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap) {
+	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>, parent:Null<Identifier>) {
 		this.type = type;
 		this.name = name;
 		this.pos = pos;
+		this.file = file;
+		this.parent = parent;
+		this.defineType = defineType;
+
+		if (defineType != null) {
+			defineType.addIdentifier(this);
+		}
+		if (parent != null) {
+			parent.addUse(this);
+		}
 		nameMap.addIdentifier(this);
 	}
 

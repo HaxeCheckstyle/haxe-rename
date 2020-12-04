@@ -2,16 +2,21 @@
 
 a work-in-progress refactoring tool for Haxe code.
 
+CAUTION: Make sure you have backups before performing any refactor operation!
+
+Note: refactoring uses static code analysis to figure out what places to change in a refactoring operation. if you make heavy use of type inference you might end up with compile errors.
+
 ## features
 
-* move file to a different package
+* move a file to a different package
 * rename an import alias
 * rename a type
 * rename a function parameter
 * rename a local var
 * rename a local function
-* remame a switch/case capture
+* remame a case capture
 * rename module level statics
+* rename interface fields
 
 ## usage
 
@@ -22,7 +27,7 @@ Haxe Refactor 1.0.0
 [-n] <newName>         : new name for all occurences of identifier
 [-x]                   : perform refactoring operations
 [--i-have-backups]     : you have a backup and you really, really want to refactor
-[--help]               : display list of options
+[-h | --help]          : display list of options
 ```
 
 ### dry run

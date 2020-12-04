@@ -21,8 +21,8 @@ class RefactorPackageName {
 		}
 
 		for (type in file.typeList) {
-			var typeName:String = if (mainTypeName == type.name) {
-				type.name;
+			var typeName:String = if (mainTypeName == type.name.name) {
+				type.name.name;
 			} else {
 				mainTypeName + "." + type.name;
 			}
@@ -35,7 +35,7 @@ class RefactorPackageName {
 				}
 			}
 
-			allUses = context.nameMap.getIdentifiers(type.name);
+			allUses = context.nameMap.getIdentifiers(type.name.name);
 			allUses = allUses.concat(context.nameMap.getStartsWith(type.name + "."));
 			var uniqueFiles:Array<String> = [];
 			if (allUses != null) {

@@ -7,15 +7,18 @@ class File {
 	public var packageIdentifier:Null<Identifier>;
 	public var importHxFile:Null<File>;
 	public var importList:Array<Import>;
-	public var typeList:Array<Identifier>;
+	public var typeList:Array<Type>;
 	public var importInsertPos:Int;
 
-	public function new(name:String, packageIdentifier:Null<Identifier>, importList:Array<Import>, typeList:Array<Identifier>, importInsertPos:Int) {
+	public function new(name:String) {
 		this.name = name;
-		this.packageIdentifier = packageIdentifier;
-		this.importList = importList;
-		this.typeList = typeList;
-		this.importInsertPos = importInsertPos;
+	}
+
+	public function init(packageIdent:Null<Identifier>, imports:Array<Import>, types:Array<Type>, posForImport:Int) {
+		packageIdentifier = packageIdent;
+		importList = imports;
+		typeList = types;
+		importInsertPos = posForImport;
 	}
 
 	public function getPackage():String {
@@ -23,6 +26,28 @@ class File {
 			return packageIdentifier.name;
 		}
 		return "";
+	}
+
+	public function importsPackage(packName:String):ImportStatus {
+		if (packName.length <= 0) {
+			return Global;
+		}
+		if (packName == getPackage()) {
+			return SamePackage;
+		}
+		for (importEntry in importList) {
+			if (importEntry.moduleName.name == packName) {
+				if (importEntry.alias != null) {
+					return ImportedWithAlias(importEntry.alias.name);
+				}
+				return Imported;
+			}
+		}
+
+		if (importHxFile == null) {
+			return None;
+		}
+		return importHxFile.importsPackage(packName);
 	}
 
 	public function getMainModulName():String {
@@ -81,4 +106,12 @@ typedef Import = {
 typedef ImportAlias = {
 	var name:String;
 	var pos:IdentifierPos;
+}
+
+enum ImportStatus {
+	None;
+	Global;
+	SamePackage;
+	Imported;
+	ImportedWithAlias(alias:String);
 }

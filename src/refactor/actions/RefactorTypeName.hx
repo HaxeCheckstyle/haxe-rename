@@ -48,7 +48,7 @@ class RefactorTypeName {
 
 			// find all fully qualified modul names of type
 			for (type in file.typeList) {
-				if (type.name == identifier.name) {
+				if (type.name.name == identifier.name) {
 					continue;
 				}
 				var fullSubModulName:String = fullModulName + "." + type.name;
@@ -62,6 +62,7 @@ class RefactorTypeName {
 			}
 		}
 
+		// TODO handle duplicate type names
 		changelist.execute();
 	}
 }
