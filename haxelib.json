@@ -1,10 +1,11 @@
 {
-	"name": "refactoring",
-	"url": "https://github.com/HaxeCheckstyle/haxe-refactoring",
+	"name": "refaxtor",
+	"url": "https://github.com/HaxeCheckstyle/haxe-refaxtor",
 	"license": "MIT",
 	"tags": [
 		"cli",
-		"refactoring"
+		"refactoring",
+		"rename"
 	],
 	"description": "A code refactoring tool for Haxe",
 	"version": "1.0.0",

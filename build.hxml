@@ -5,6 +5,6 @@
 -lib hxnodejs
 -lib hxargs
 
--js bin/refactor.js
+-js bin/refaxtor.js
 
 --main refactor.Cli

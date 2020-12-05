@@ -1,10 +1,10 @@
 {
-    "name": "refactoring",
+    "name": "@haxecheckstyle/haxe-refaxtor",
     "version": "1.0.0",
     "description": "Refactoring tool for Haxe",
     "repository": {
         "type": "git",
-        "url": "https://github.com/HaxeCheckstyle/haxe-refactoring"
+        "url": "https://github.com/HaxeCheckstyle/haxe-refaxtor"
     },
     "keywords": [
         "refactoring",
@@ -17,6 +17,6 @@
     "devDependencies": {
         "lix": "^15.10.1"
     },
-    "bugs": "https://github.com/HaxeCheckstyle/haxe-refactoring/issues",
+    "bugs": "https://github.com/HaxeCheckstyle/haxe-refaxtor/issues",
     "license": "MIT"
 }

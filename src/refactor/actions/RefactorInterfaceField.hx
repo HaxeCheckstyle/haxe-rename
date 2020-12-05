@@ -116,7 +116,7 @@ class RefactorInterfaceField {
 		for (use in allUses) {
 			switch (use.type) {
 				case ImportModul:
-					var search:String = switch (use.file.importsPackage(packName)) {
+					var search:String = switch (use.file.importsPackage(fullModulName)) {
 						case None:
 							continue;
 						case Global | SamePackage | Imported:

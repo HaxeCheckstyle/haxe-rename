@@ -1,0 +1,14 @@
+{
+	"haxe.configurations": [
+		["display.hxml"]
+	],
+	"[haxe]": {
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true,
+	},
+	"haxecheckstyle.sourceFolders": [
+		"src",
+		"test"
+	],
+	"haxe.importsSortOrder": "stdlib -> libs -> project"
+}

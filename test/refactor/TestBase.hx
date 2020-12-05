@@ -10,14 +10,13 @@ import refactor.discover.NameMap;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.FileEdit;
-import refactor.edits.IEditableDocument;
 
 class TestBase implements ITest {
 	var usageContext:UsageContext;
 
 	public function new() {}
 
-	function setupClass() {
+	function setupData(srcFolders:Array<String>) {
 		usageContext = {
 			fileName: "",
 			file: null,
@@ -27,7 +26,7 @@ class TestBase implements ITest {
 			type: null
 		};
 
-		Cli.traverseSources(["testcases/interfaces"], usageContext);
+		Cli.traverseSources(srcFolders, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 	}
 
@@ -39,9 +38,7 @@ class TestBase implements ITest {
 			fileList: usageContext.fileList,
 			what: what,
 			forRealExecute: true,
-			docFactory: function(fileName:String):IEditableDocument {
-				return editList.newDoc(fileName);
-			}
+			docFactory: (fileName) -> editList.newDoc(fileName)
 		});
 		Assert.equals(Done, result, pos);
 		Assert.equals(editList.docCounter, editList.docFinishedCounter, pos);
@@ -64,6 +61,34 @@ class TestBase implements ITest {
 				'InsertText "$text" ${pos.fileName}@${pos.start}-${pos.end}';
 			case RemoveText(pos):
 				'RemoveText ${pos.fileName}@${pos.start}-${pos.end}';
+		}
+	}
+
+	function makeMoveTestEdit(oldFileName:String, newFileName):TestEdit {
+		return {
+			fileName: oldFileName,
+			edit: Move(newFileName)
+		}
+	}
+
+	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int):TestEdit {
+		return {
+			fileName: fileName,
+			edit: ReplaceText(text, {fileName: fileName, start: start, end: end})
+		}
+	}
+
+	function makeInsertTestEdit(fileName:String, text:String, pos:Int):TestEdit {
+		return {
+			fileName: fileName,
+			edit: InsertText(text, {fileName: fileName, start: pos, end: pos})
+		}
+	}
+
+	function makeRemoveTestEdit(fileName:String, start:Int, end:Int):TestEdit {
+		return {
+			fileName: fileName,
+			edit: RemoveText({fileName: fileName, start: start, end: end})
 		}
 	}
 }

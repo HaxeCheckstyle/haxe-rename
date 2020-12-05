@@ -3,73 +3,67 @@ package refactor;
 import refactor.TestEditableDocument.TestEdit;
 
 class InterfacesTest extends TestBase {
+	function setupClass() {
+		setupData(["testcases/interfaces"]);
+	}
+
 	public function testRenameInterface() {
 		var edits:Array<TestEdit> = [
-			{
-				fileName: "testcases/interfaces/IInterface.hx",
-				edit: Move("testcases/interfaces/MyInterface.hx")
-			},
-			{
-				fileName: "testcases/interfaces/IInterface.hx",
-				edit: ReplaceText("MyInterface", {
-					fileName: "testcases/interfaces/IInterface.hx",
-					start: 31,
-					end: 41
-				})
-			},
-			{
-				fileName: "testcases/interfaces/BaseClass.hx",
-				edit: ReplaceText("MyInterface", {
-					fileName: "testcases/interfaces/BaseClass.hx",
-					start: 48,
-					end: 58
-				})
-			}
+			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "interfaces.MyInterface", 38, 59),
+			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "MyInterface", 94, 104),
+			makeMoveTestEdit("testcases/interfaces/IInterface.hx", "testcases/interfaces/MyInterface.hx"),
+			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "MyInterface", 31, 41),
+			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "MyInterface", 48, 58),
 		];
 		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "MyInterface", pos: 36}, edits);
 	}
 
+	public function testMoveInterfacePackage() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "interfaces.pack.sub2.IInterface", 38, 59),
+			makeMoveTestEdit("testcases/interfaces/IInterface.hx", "testcases/interfaces/pack/sub2/IInterface.hx"),
+			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "interfaces.pack.sub2", 8, 18),
+			makeInsertTestEdit("testcases/interfaces/BaseClass.hx", "import interfaces.pack.sub2.IInterface;\n", 21),
+		];
+		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "interfaces.pack.sub2", pos: 13}, edits);
+	}
+
 	public function testRenameInterfaceFieldDoSomething() {
 		var edits:Array<TestEdit> = [
-			{
-				fileName: "testcases/interfaces/IInterface.hx",
-				edit: ReplaceText("doIt", {
-					fileName: "testcases/interfaces/IInterface.hx",
-					start: 75,
-					end: 86
-				})
-			},
-			{
-				fileName: "testcases/interfaces/BaseClass.hx",
-				edit: ReplaceText("doIt", {
-					fileName: "testcases/interfaces/BaseClass.hx",
-					start: 107,
-					end: 118
-				})
-			},
-			{
-				fileName: "testcases/interfaces/BaseClass.hx",
-				edit: ReplaceText("doIt", {
-					fileName: "testcases/interfaces/BaseClass.hx",
-					start: 164,
-					end: 175
-				})
-			}
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 123, 134),
+			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doIt", 75, 86),
+			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 107, 118),
+			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 164, 175),
 		];
 		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "doIt", pos: 78}, edits);
 	}
 
 	public function testRenameAnotherInterfaceFieldDoSomething() {
 		var edits:Array<TestEdit> = [
-			{
-				fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx",
-				edit: ReplaceText("doIt", {
-					fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx",
-					start: 70,
-					end: 81
-				})
-			}
+			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "doIt", 70, 81),
 		];
 		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 78}, edits);
+	}
+
+	public function testRenameAnotherInterfaceFieldDoNothing() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "doIt", 134, 143),
+			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "doIt", 188, 197),
+			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "doIt", 222, 231),
+		];
+		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 139}, edits);
+	}
+
+	public function testRenameInterfaceFieldDoSomethingElse() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "super.doMore", 141, 162),
+			makeReplaceTestEdit("testcases/interfaces/pack/AbstractChild.hx", "this.doMore", 97, 117),
+			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doMore", 105, 120),
+			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "doMore", 84, 99),
+			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "super.doMore", 106, 127),
+			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "doMore", 166, 181),
+			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doMore", 142, 157),
+		];
+		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "doMore", pos: 110}, edits);
 	}
 }

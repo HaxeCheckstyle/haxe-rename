@@ -21,7 +21,7 @@ Note: refactoring uses static code analysis to figure out what places to change 
 ## usage
 
 ```bash
-Haxe Refactor 1.0.0
+Haxe Refaxtor 1.0.0
 [-s | --source] <path> : file or directory with .hx files (multiple allowed)
 [-l] <location>        : location (path + filename and offset from beginning of file) of identifier to refactor - <src/pack/Filename.hx@123>
 [-n] <newName>         : new name for all occurences of identifier
@@ -32,11 +32,11 @@ Haxe Refactor 1.0.0
 
 ### dry run
 
-`node bin/refactor.js -s src -l path/pack/FileName.hx@600 -n newName`
+`node bin/refaxtor.js -s src -l path/pack/FileName.hx@600 -n newName`
 
 ### danger zone
 
-`node bin/refactor.js -s src -l path/pack/FileName.hx@600 -n newName -x --i-have-backups`
+`node bin/refaxtor.js -s src -l path/pack/FileName.hx@600 -n newName -x --i-have-backups`
 
 ## compile
 

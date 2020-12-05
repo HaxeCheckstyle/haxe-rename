@@ -75,7 +75,7 @@ class Cli {
 
 		function printHelp() {
 			var version:String = RefactorVersion.getRefactorVersion();
-			Sys.println('Haxe Refactor ${version}');
+			Sys.println('Haxe Refaxtor ${version}');
 			Sys.println(argHandler.getDoc());
 		}
 
@@ -153,9 +153,10 @@ class Cli {
 		}
 	}
 
-	static public function traverseSources(paths:Array<String>, usageContext:UsageContext) {
+	public static function traverseSources(paths:Array<String>, usageContext:UsageContext) {
 		for (path in paths) {
 			var path:String = StringTools.trim(path);
+
 			if (!FileSystem.exists(path)) {
 				Sys.println('Skipping \'$path\' (path does not exist)');
 				continue;
