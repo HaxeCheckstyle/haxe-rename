@@ -153,7 +153,7 @@ class Cli {
 		}
 	}
 
-	function traverseSources(paths:Array<String>, usageContext:UsageContext) {
+	static public function traverseSources(paths:Array<String>, usageContext:UsageContext) {
 		for (path in paths) {
 			var path:String = StringTools.trim(path);
 			if (!FileSystem.exists(path)) {
@@ -169,7 +169,7 @@ class Cli {
 		}
 	}
 
-	function collectIdentifierData(usageContext:UsageContext) {
+	static function collectIdentifierData(usageContext:UsageContext) {
 		var content:String = File.getContent(usageContext.fileName);
 		usageContext.usageCollector.parseFile(ByteData.ofString(content), usageContext);
 	}

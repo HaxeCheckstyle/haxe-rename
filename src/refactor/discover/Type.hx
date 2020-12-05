@@ -5,10 +5,9 @@ class Type {
 	var uses:Array<Identifier>;
 
 	public var file:File;
-	public var name:Identifier;
+	public var name:Null<Identifier>;
 
-	public function new(file:File, name:Identifier) {
-		this.name = name;
+	public function new(file:File) {
 		this.file = file;
 		nameMap = new NameMap();
 		uses = [];
@@ -24,10 +23,14 @@ class Type {
 	}
 
 	public function findIdentifier(offset:Int):Null<Identifier> {
+		var identifier:Null<Identifier> = name.findIdentifier(offset);
+		if (identifier != null) {
+			return identifier;
+		}
 		for (use in uses) {
-			var identifier:Null<Identifier> = use.findIdentifier(offset);
+			identifier = use.findIdentifier(offset);
 			if (identifier != null) {
-				return use;
+				return identifier;
 			}
 		}
 		return null;
@@ -35,6 +38,9 @@ class Type {
 
 	public function findAllIdentifiers(matcher:IdentifierMatcher):Array<Identifier> {
 		var results:Array<Identifier> = [];
+		if (matcher(name)) {
+			results = [name];
+		}
 		for (use in uses) {
 			if (matcher(use)) {
 				results.push(use);

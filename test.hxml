@@ -1,12 +1,13 @@
 -cp src
 -cp test
+-cp testcases
 
 -lib haxeparser
 -lib tokentree
 -lib hxargs
 -lib utest
 -lib instrument
-
+-lib test-adapter
 
 -D coverage-console-summary-reporter
 #-D coverage-console-file-summary-reporter
@@ -18,8 +19,7 @@
 # --macro instrument.Instrumentation.profiling(['tokentree'], ['src'], [])
 # -D profiler-console-detail-reporter
 # -D debug_instrumentation
-
-# --macro nullSafety('tokentree')
+-D instrument-quiet
 
 --run TestMain
 

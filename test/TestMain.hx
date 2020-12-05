@@ -1,3 +1,4 @@
+import refactor.InterfacesTest;
 import utest.Runner;
 import utest.ui.Report;
 
@@ -5,7 +6,7 @@ using StringTools;
 
 class TestMain {
 	static function main() {
-		var tests:Array<ITest> = [];
+		var tests:Array<ITest> = [new InterfacesTest()];
 		var runner:Runner = new Runner();
 
 		#if instrument

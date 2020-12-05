@@ -1,6 +1,5 @@
 package refactor.actions;
 
-import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;

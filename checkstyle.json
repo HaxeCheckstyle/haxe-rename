@@ -69,13 +69,6 @@
 		},
 		{
 			"props": {
-				"allowMarkerInterfaces": true,
-				"allowProperties": false
-			},
-			"type": "Interface"
-		},
-		{
-			"props": {
 				"max": 160,
 				"ignorePattern": "(^@desc)|(LONG LINE TEST)"
 			},
@@ -137,14 +130,6 @@
 				]
 			},
 			"type": "ModifierOrder"
-		},
-		{
-			"props": {
-				"minLength": 2,
-				"ignore": "^\\s+$",
-				"allowDuplicates": 2
-			},
-			"type": "MultipleStringLiterals"
 		},
 		{
 			"type": "MultipleVariableDeclarations"

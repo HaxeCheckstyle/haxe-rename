@@ -1,7 +1,6 @@
 package refactor.actions;
 
 import haxe.io.Path;
-import refactor.actions.Refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;

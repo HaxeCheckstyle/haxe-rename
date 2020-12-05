@@ -26,7 +26,10 @@ class UsageCollector {
 			root = TokenTreeBuilder.buildTokenTree(tokens, content, TypeLevel);
 			var file:File = new File(context.fileName);
 			context.file = file;
-			file.init(readPackageName(root, context), readImports(root, context), readTypes(root, context), findImportInsertPos(root));
+			context.type = null;
+			var packageName:Null<Identifier> = readPackageName(root, context);
+			var imports:Array<Import> = readImports(root, context);
+			file.init(packageName, imports, readTypes(root, context), findImportInsertPos(root));
 			context.fileList.addFile(file);
 		} catch (e:ParserError) {
 			throw 'failed to parse ${context.fileName} - ParserError: $e (${e.pos})';
@@ -200,8 +203,9 @@ class UsageCollector {
 			return null;
 		}
 		var nameToken:TokenTree = token.getFirstChild();
+		var newType:Type = new Type(context.file);
 		var identifier:Identifier = makeIdentifier(context, nameToken, type, null);
-		var newType:Type = new Type(context.file, identifier);
+		newType.name = identifier;
 		context.type = newType;
 
 		switch (type) {
