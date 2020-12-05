@@ -8,4 +8,14 @@ class ChildChildClass extends ChildClass implements IAnotherInterface {
 	}
 
 	public function doNothing() {}
+
+	public var someProp(get, set):String;
+
+	function set_someProp(value:String):String {
+		return value;
+	}
+
+	function get_someProp():String {
+		return "";
+	}
 }

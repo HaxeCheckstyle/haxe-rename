@@ -32,6 +32,26 @@ class RefactorModuleLevelStatic {
 			}
 			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
 		}
+
+		// all uses in files importing with package.mainmodul
+		var importModul:String = '$packageName.$mainModulName';
+		allUses = context.nameMap.getIdentifiers(importModul);
+		for (use in allUses) {
+			switch (use.type) {
+				case ImportModul:
+					var uses:Array<Identifier> = use.file.findAllIdentifiers((i) -> i.name == identifier.name);
+					for (u in uses) {
+						switch (u.type) {
+							case CallOrAccess:
+								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos));
+							case ScopedLocal(_):
+							default:
+						}
+					}
+				default:
+			}
+		}
+
 		return changelist.execute();
 	}
 

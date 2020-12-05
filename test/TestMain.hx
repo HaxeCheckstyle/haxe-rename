@@ -1,3 +1,4 @@
+import refactor.ModuleLevelStaticsTest;
 import refactor.InterfacesTest;
 import utest.Runner;
 import utest.ui.Report;
@@ -6,7 +7,7 @@ using StringTools;
 
 class TestMain {
 	static function main() {
-		var tests:Array<ITest> = [new InterfacesTest()];
+		var tests:Array<ITest> = [new InterfacesTest(), new ModuleLevelStaticsTest()];
 		var runner:Runner = new Runner();
 
 		#if instrument
