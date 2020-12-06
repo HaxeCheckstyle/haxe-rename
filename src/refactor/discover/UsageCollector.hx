@@ -482,7 +482,10 @@ class UsageCollector {
 		}
 	}
 
-	function readExpression(context:UsageContext, identifier:Identifier, token:TokenTree) {
+	function readExpression(context:UsageContext, identifier:Identifier, token:Null<TokenTree>) {
+		if (token == null) {
+			return;
+		}
 		token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case Const(CIdent(_)):

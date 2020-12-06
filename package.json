@@ -17,6 +17,15 @@
     "devDependencies": {
         "lix": "^15.10.1"
     },
+    "bin": {
+        "haxe-refaxtor": "bin/refaxtor.js"
+    },
+    "files": [
+        "bin"
+    ],
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/"
+    },
     "bugs": "https://github.com/HaxeCheckstyle/haxe-refaxtor/issues",
     "license": "MIT"
 }
