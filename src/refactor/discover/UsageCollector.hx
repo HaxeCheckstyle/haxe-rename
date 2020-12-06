@@ -540,7 +540,7 @@ class UsageCollector {
 				readCaseStructure(context, identifier, caseToken, scopeEnd);
 			default:
 		}
-		var colon:Null<TokenTree> = caseToken.access().firstOf(DblDot).token;
+		var colon:Null<TokenTree> = token.access().firstOf(DblDot).token;
 		if (colon == null) {
 			return;
 		}

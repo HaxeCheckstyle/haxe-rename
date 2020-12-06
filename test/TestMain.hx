@@ -1,13 +1,12 @@
-import refactor.ModuleLevelStaticsTest;
 import refactor.InterfacesTest;
+import refactor.ModuleLevelStaticsTest;
+import refactor.ScopedLocalTest;
 import utest.Runner;
 import utest.ui.Report;
 
-using StringTools;
-
 class TestMain {
 	static function main() {
-		var tests:Array<ITest> = [new InterfacesTest(), new ModuleLevelStaticsTest()];
+		var tests:Array<ITest> = [new InterfacesTest(), new ModuleLevelStaticsTest(), new ScopedLocalTest()];
 		var runner:Runner = new Runner();
 
 		#if instrument

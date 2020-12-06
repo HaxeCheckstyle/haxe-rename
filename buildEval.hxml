@@ -4,5 +4,8 @@
 -lib hxargs
 
 --run refactor.Cli
--s demo
-
+-s testcases
+-l testcases/scopedlocal/Refactor.hx@504
+-n refactorContext
+-x
+#--i-have-backups

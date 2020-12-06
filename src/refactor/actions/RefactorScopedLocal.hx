@@ -7,12 +7,22 @@ import refactor.edits.Changelist;
 class RefactorScopedLocal {
 	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeEnd:Int):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
-		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
+		var identifierDot:String = identifier.name + ".";
 		var scopeStart:Int = identifier.pos.start;
-		for (use in allUses) {
-			if (use.pos.fileName != file.name) {
-				continue;
+		var allUses:Array<Identifier> = identifier.defineType.findAllIdentifiers(function(ident:Identifier) {
+			if (ident.pos.start < scopeStart) {
+				return false;
 			}
+			if (ident.name == identifier.name) {
+				return true;
+			}
+			if (ident.name.startsWith(identifierDot)) {
+				return true;
+			}
+			return false;
+		});
+
+		for (use in allUses) {
 			if (use.pos.start < scopeStart) {
 				continue;
 			}
@@ -28,7 +38,12 @@ class RefactorScopedLocal {
 					}
 				default:
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
+			if (use.name == identifier.name) {
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
+			} else {
+				var newName:String = context.what.toName + use.name.substr(identifier.name.length);
+				changelist.addChange(use.pos.fileName, ReplaceText(newName, use.pos));
+			}
 		}
 		return changelist.execute();
 	}
