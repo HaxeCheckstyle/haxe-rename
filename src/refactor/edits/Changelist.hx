@@ -52,10 +52,10 @@ class Changelist {
 					case Move(newFileName):
 						Sys.println('* rename to "$newFileName"');
 					case InsertText(text, pos):
-						Sys.println('* insert text to "$text" @${pos.start}-${pos.end}');
+						Sys.println('* insert text "$text" @${pos.start}-${pos.end}');
 						Sys.println('+++ $text');
 					case ReplaceText(text, pos):
-						Sys.println('* replace text to "$text" @${pos.start}-${pos.end}');
+						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}');
 						printDiffLines(pos, text);
 					case RemoveText(pos):
 						Sys.println('* remove text @${pos.start}-${pos.end}');
