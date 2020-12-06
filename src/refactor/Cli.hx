@@ -1,10 +1,6 @@
 package refactor;
 
 import haxe.Timer;
-import haxe.io.Path;
-import sys.FileSystem;
-import sys.io.File;
-import byte.ByteData;
 import refactor.actions.Refactor;
 import refactor.actions.RefactorResult;
 import refactor.actions.RefactorWhat;
@@ -106,7 +102,7 @@ class Cli {
 		};
 
 		var startTime = Timer.stamp();
-		traverseSources(paths, usageContext);
+		TraverseSources.traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 
 		var result:RefactorResult = Refactor.refactor({
@@ -151,27 +147,5 @@ class Cli {
 			toName: toName,
 			pos: pos
 		}
-	}
-
-	public static function traverseSources(paths:Array<String>, usageContext:UsageContext) {
-		for (path in paths) {
-			var path:String = StringTools.trim(path);
-
-			if (!FileSystem.exists(path)) {
-				Sys.println('Skipping \'$path\' (path does not exist)');
-				continue;
-			}
-			if (FileSystem.isDirectory(path)) {
-				traverseSources([for (file in FileSystem.readDirectory(path)) Path.join([path, file])], usageContext);
-			} else {
-				usageContext.fileName = path;
-				collectIdentifierData(usageContext);
-			}
-		}
-	}
-
-	static function collectIdentifierData(usageContext:UsageContext) {
-		var content:String = File.getContent(usageContext.fileName);
-		usageContext.usageCollector.parseFile(ByteData.ofString(content), usageContext);
 	}
 }

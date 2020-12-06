@@ -26,7 +26,7 @@ class TestBase implements ITest {
 			type: null
 		};
 
-		Cli.traverseSources(srcFolders, usageContext);
+		TraverseSources.traverseSources(srcFolders, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 	}
 
