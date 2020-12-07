@@ -289,6 +289,23 @@ class UsageCollector {
 			readInterpolatedFragment(context, identifier, fragment, token.pos.min + 1 + start + 1);
 			start = indexEnd;
 		}
+		start = 0;
+		var nameRegEx:EReg = ~/^[a-z][a-zA-Z0-9]*/;
+		while ((index = text.indexOf("$", start)) >= 0) {
+			if (index + 1 >= text.length) {
+				break;
+			}
+			start = index + 1;
+			if (nameRegEx.match(text.substr(start))) {
+				var matchedText:String = nameRegEx.matched(0);
+				var pos:IdentifierPos = {
+					fileName: token.pos.file,
+					start: token.pos.min + start + 1,
+					end: token.pos.min + start + matchedText.length + 1
+				};
+				new Identifier(CallOrAccess, matchedText, pos, context.nameMap, context.file, context.type, identifier);
+			}
+		}
 	}
 
 	function isDollarEscaped(text:String, index:Int):Bool {
