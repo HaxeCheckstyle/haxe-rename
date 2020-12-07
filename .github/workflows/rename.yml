@@ -1,4 +1,4 @@
-name: Haxe-Refaxtor
+name: Haxe-Rename
 
 on:
   push:
