@@ -1,5 +1,8 @@
 # Haxe refactoring
 
+[![Haxe-Refaxtor](https://github.com/HaxeCheckstyle/haxe-refaxtor/workflows/Haxe-Refaxtor/badge.svg)](https://github.com/HaxeCheckstyle/haxe-refaxtor/actions)
+[![codecov](https://codecov.io/gh/HaxeCheckstyle/haxe-refaxtor/branch/master/graph/badge.svg)](https://codecov.io/gh/HaxeCheckstyle/haxe-refaxtor)
+
 a work-in-progress refactoring tool for Haxe code.
 
 CAUTION: Make sure you have backups before performing any refactor operation!

@@ -10,9 +10,7 @@ class TraverseSources {
 	public static function traverseSources(paths:Array<String>, usageContext:UsageContext) {
 		for (path in paths) {
 			var path:String = StringTools.trim(path);
-
 			if (!FileSystem.exists(path)) {
-				Sys.println('Skipping \'$path\' (path does not exist)');
 				continue;
 			}
 			if (FileSystem.isDirectory(path)) {
