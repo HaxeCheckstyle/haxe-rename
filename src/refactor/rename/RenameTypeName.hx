@@ -1,12 +1,14 @@
-package refactor.actions;
+package refactor.rename;
 
+import refactor.RefactorResult;
+import refactor.RefactorContext;
 import haxe.io.Path;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
-class RefactorTypeName {
+class RenameTypeName {
 	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var path:Path = new Path(file.name);
 		var changelist:Changelist = new Changelist(context);

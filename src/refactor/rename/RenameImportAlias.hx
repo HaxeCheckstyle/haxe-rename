@@ -1,10 +1,12 @@
-package refactor.actions;
+package refactor.rename;
 
+import refactor.RefactorResult;
+import refactor.RefactorContext;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;
 
-class RefactorImportAlias {
+class RenameImportAlias {
 	public static function refactorImportAlias(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
 		var changelist:Changelist = new Changelist(context);

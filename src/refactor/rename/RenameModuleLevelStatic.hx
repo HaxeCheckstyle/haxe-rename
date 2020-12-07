@@ -1,11 +1,13 @@
-package refactor.actions;
+package refactor.rename;
 
+import refactor.RefactorResult;
+import refactor.RefactorContext;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
-class RefactorModuleLevelStatic {
+class RenameModuleLevelStatic {
 	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 

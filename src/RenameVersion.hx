@@ -1,7 +1,7 @@
 import haxe.Json;
 import sys.io.File;
 
-class RefactorVersion {
+class RenameVersion {
 	macro public static function getRefactorVersion():haxe.macro.Expr.ExprOf<String> {
 		#if !display
 		try {

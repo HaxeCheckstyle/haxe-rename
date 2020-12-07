@@ -1,11 +1,9 @@
 package refactor;
 
 import haxe.Timer;
-import refactor.actions.Refactor;
-import refactor.actions.RefactorResult;
-import refactor.actions.RefactorWhat;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
+import refactor.discover.TraverseSources;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.EditableDocument;
@@ -28,8 +26,8 @@ class Cli {
 			var process = new sys.io.Process("node", ["-v"]);
 			var nodeExists = process.exitCode() == 0;
 			process.close();
-			if (nodeExists && FileSystem.exists("bin/refactor.js")) {
-				var exitCode = Sys.command("node", ["bin/refactor.js"].concat(args));
+			if (nodeExists && FileSystem.exists("bin/rename.js")) {
+				var exitCode = Sys.command("node", ["bin/rename.js"].concat(args));
 				Sys.exit(exitCode);
 			}
 		} catch (e:Any) {}
@@ -50,7 +48,7 @@ class Cli {
 			@doc("file or directory with .hx files (multiple allowed)")
 			["-s", "--source"] => function(path:String) paths.push(path),
 
-			@doc("location (path + filename and offset from beginning of file) of identifier to refactor - <src/pack/Filename.hx@123>")
+			@doc("location (path + filename and offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>")
 			["-l"] => function(location:String) loc = location,
 
 			@doc("new name for all occurences of identifier")
@@ -59,10 +57,10 @@ class Cli {
 			// @doc("Print additional information")
 			// ["-v"] => function() verbose = true,
 
-			@doc("perform refactoring operations")
+			@doc("perform renaming operations")
 			["-x"] => function() execute = true,
 
-			@doc("you have a backup and you really, really want to refactor")
+			@doc("you have a backup and you really, really want to rename")
 			["--i-have-backups"] => function() forReal = true,
 
 			@doc("display list of options")
@@ -70,8 +68,8 @@ class Cli {
 		]);
 
 		function printHelp() {
-			var version:String = RefactorVersion.getRefactorVersion();
-			Sys.println('Haxe Refaxtor ${version}');
+			var version:String = RenameVersion.getRefactorVersion();
+			Sys.println('Haxe Rename ${version}');
 			Sys.println(argHandler.getDoc());
 		}
 
@@ -118,7 +116,7 @@ class Cli {
 			case NotFound:
 				Sys.println("could not find identifier at " + loc);
 			case Unsupported:
-				Sys.println("refactoring not supported at " + loc);
+				Sys.println("renaming not supported at " + loc);
 			case DryRun:
 				Sys.println("");
 			case Done:

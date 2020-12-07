@@ -1,13 +1,13 @@
-# Haxe refactoring
+# Haxe rename
 
-[![Haxe-Refaxtor](https://github.com/HaxeCheckstyle/haxe-refaxtor/workflows/Haxe-Refaxtor/badge.svg)](https://github.com/HaxeCheckstyle/haxe-refaxtor/actions)
-[![codecov](https://codecov.io/gh/HaxeCheckstyle/haxe-refaxtor/branch/master/graph/badge.svg)](https://codecov.io/gh/HaxeCheckstyle/haxe-refaxtor)
+[![Haxe-Rename](https://github.com/HaxeCheckstyle/haxe-rename/workflows/Haxe-Rename/badge.svg)](https://github.com/HaxeCheckstyle/haxe-rename/actions)
+[![codecov](https://codecov.io/gh/HaxeCheckstyle/haxe-rename/branch/master/graph/badge.svg)](https://codecov.io/gh/HaxeCheckstyle/haxe-rename)
 
-a work-in-progress refactoring tool for Haxe code.
+a work-in-progress renaming tool for Haxe code.
 
-CAUTION: Make sure you have backups before performing any refactor operation!
+CAUTION: Make sure you have backups before performing any rename operations!
 
-Note: refactoring uses static code analysis to figure out what places to change in a refactoring operation. if you make heavy use of type inference you might end up with compile errors.
+Note: renaming uses static code analysis to figure out what places to change in a rename operation. if you make heavy use of type inference you might end up with compile errors.
 
 ## features
 
@@ -23,19 +23,38 @@ Note: refactoring uses static code analysis to figure out what places to change 
 
 ## usage
 
-```bash
-Haxe Refaxtor 1.0.0
+```text
+Haxe Rename 1.0.0
 [-s | --source] <path> : file or directory with .hx files (multiple allowed)
-[-l] <location>        : location (path + filename and offset from beginning of file) of identifier to refactor - <src/pack/Filename.hx@123>
+[-l] <location>        : location (path + filename and offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>
 [-n] <newName>         : new name for all occurences of identifier
-[-x]                   : perform refactoring operations
-[--i-have-backups]     : you have a backup and you really, really want to refactor
+[-x]                   : perform renaming operations
+[--i-have-backups]     : you have a backup and you really, really want to rename
 [-h | --help]          : display list of options
 ```
 
 ### dry run
 
-`node bin/refaxtor.js -s src -l path/pack/FileName.hx@600 -n newName`
+`node bin/rename.js -s src -s test -l src/refactor/Refactor.hx@108 -n Rename`
+
+```haxe
+test/refactor/TestBase.hx
+* replace text with "refactor.Rename" @48-65
+--- import refactor.Refactor;
++++ import refactor.Rename;
+* replace text with "Rename" @993-1001
+---             var result:RefactorResult = Refactor.refactor({
++++             var result:RefactorResult = Rename.refactor({
+src/refactor/Refactor.hx
+* rename to "src/refactor/Rename.hx"
+* replace text with "Rename" @348-356
+--- class Refactor {
++++ class Rename {
+src/refactor/Cli.hx
+* replace text with "Rename" @2743-2751
+---             var result:RefactorResult = Refactor.refactor({
++++             var result:RefactorResult = Rename.refactor({
+```
 
 ### danger zone
 

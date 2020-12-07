@@ -1,4 +1,4 @@
-package refactor;
+package refactor.discover;
 
 import haxe.io.Path;
 import sys.FileSystem;

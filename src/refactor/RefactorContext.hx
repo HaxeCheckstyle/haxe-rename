@@ -1,6 +1,5 @@
-package refactor.actions;
+package refactor;
 
-import refactor.actions.RefactorWhat;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.edits.IEditableDocument;

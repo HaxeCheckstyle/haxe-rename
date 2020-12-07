@@ -1,11 +1,13 @@
-package refactor.actions;
+package refactor.rename;
 
+import refactor.RefactorResult;
+import refactor.RefactorContext;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
 
-class RefactorInterfaceField {
+class RenameInterfaceField {
 	public static function refactorInterfaceField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 

@@ -1,14 +1,15 @@
 {
-    "name": "@haxecheckstyle/haxe-refaxtor",
+    "name": "@haxecheckstyle/haxe-rename",
     "version": "1.0.0",
-    "description": "Refactoring tool for Haxe",
+    "description": "Renaming tool for Haxe",
     "repository": {
         "type": "git",
-        "url": "https://github.com/HaxeCheckstyle/haxe-refaxtor"
+        "url": "https://github.com/HaxeCheckstyle/haxe-rename"
     },
     "keywords": [
-        "refactoring",
-        "haxe"
+        "haxe",
+		"rename",
+        "refactor"
     ],
     "author": {
         "name": "Alexander Blum",
@@ -18,7 +19,7 @@
         "lix": "^15.10.1"
     },
     "bin": {
-        "haxe-refaxtor": "bin/refaxtor.js"
+        "haxe-rename": "bin/rename.js"
     },
     "files": [
         "bin"
@@ -26,6 +27,6 @@
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
     },
-    "bugs": "https://github.com/HaxeCheckstyle/haxe-refaxtor/issues",
+    "bugs": "https://github.com/HaxeCheckstyle/haxe-rename/issues",
     "license": "MIT"
 }

@@ -1,8 +1,8 @@
 package refactor.edits;
 
 import sys.io.File;
-import refactor.actions.RefactorContext;
-import refactor.actions.RefactorResult;
+import refactor.RefactorContext;
+import refactor.RefactorResult;
 import refactor.discover.IdentifierPos;
 
 class Changelist {

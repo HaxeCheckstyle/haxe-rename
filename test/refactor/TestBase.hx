@@ -1,12 +1,13 @@
 package refactor;
 
 import haxe.PosInfos;
+import refactor.Refactor;
+import refactor.RefactorResult;
+import refactor.RefactorWhat;
 import refactor.TestEditableDocument;
-import refactor.actions.Refactor;
-import refactor.actions.RefactorResult;
-import refactor.actions.RefactorWhat;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
+import refactor.discover.TraverseSources;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.FileEdit;

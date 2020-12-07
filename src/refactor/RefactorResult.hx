@@ -1,4 +1,4 @@
-package refactor.actions;
+package refactor;
 
 enum RefactorResult {
 	NoChange;
