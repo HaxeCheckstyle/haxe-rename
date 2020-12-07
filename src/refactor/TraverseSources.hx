@@ -16,8 +16,10 @@ class TraverseSources {
 			if (FileSystem.isDirectory(path)) {
 				traverseSources([for (file in FileSystem.readDirectory(path)) Path.join([path, file])], usageContext);
 			} else {
-				usageContext.fileName = path;
-				collectIdentifierData(usageContext);
+				if (path.endsWith(".hx")) {
+					usageContext.fileName = path;
+					collectIdentifierData(usageContext);
+				}
 			}
 		}
 	}
