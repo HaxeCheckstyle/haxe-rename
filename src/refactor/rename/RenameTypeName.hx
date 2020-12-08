@@ -39,12 +39,11 @@ class RenameTypeName {
 
 		if (file.packageIdentifier != null) {
 			// find all fully qualified modul names of type
-			var fullModulName:String = file.packageIdentifier.name + "." + identifier.name;
-			var newFullModulName:String = file.packageIdentifier.name + "." + context.what.toName;
-			allUses = context.nameMap.getIdentifiers(fullModulName);
+			var prefix:String = file.packageIdentifier.name + ".";
+			allUses = context.nameMap.getIdentifiers(prefix + identifier.name);
 			if (allUses != null) {
 				for (use in allUses) {
-					changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos));
+					RenameHelper.replaceTextWithPrefix(use, prefix, context.what.toName, changelist);
 				}
 			}
 
@@ -53,12 +52,12 @@ class RenameTypeName {
 				if (type.name.name == identifier.name) {
 					continue;
 				}
-				var fullSubModulName:String = fullModulName + "." + type.name;
-				var newFullSubModulName:String = newFullModulName + "." + type.name;
-				allUses = context.nameMap.getIdentifiers(fullSubModulName);
+				var fullSubModulName:String = identifier.name + "." + type.name;
+				var newFullSubModulName:String = context.what.toName + "." + type.name;
+				allUses = context.nameMap.getIdentifiers(prefix + fullSubModulName);
 				if (allUses != null) {
 					for (use in allUses) {
-						changelist.addChange(use.pos.fileName, ReplaceText(newFullSubModulName, use.pos));
+						RenameHelper.replaceTextWithPrefix(use, prefix, newFullSubModulName, changelist);
 					}
 				}
 			}

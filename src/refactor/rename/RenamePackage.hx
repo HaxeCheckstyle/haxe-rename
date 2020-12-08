@@ -38,7 +38,7 @@ class RenamePackage {
 			}
 
 			allUses = context.nameMap.getIdentifiers(type.name.name);
-			allUses = allUses.concat(context.nameMap.getStartsWith(type.name + "."));
+			allUses = allUses.concat(context.nameMap.getStartsWith(type.name.name + "."));
 			var uniqueFiles:Array<String> = [];
 			if (allUses != null) {
 				for (use in allUses) {
@@ -54,13 +54,17 @@ class RenamePackage {
 					if (useFile == null) {
 						continue;
 					}
-					var packageName:String = if (useFile.packageIdentifier == null) {
-						"";
-					} else {
-						useFile.packageIdentifier.name;
+					switch (useFile.importsPackage(fullModulName)) {
+						case None | SamePackage:
+						case Global | Imported | ImportedWithAlias(_):
+							// imported old location -> skip (we renamed import in previous loop)
+							continue;
 					}
-					if (packageName != identifier.name) {
-						continue;
+					switch (useFile.importsPackage(newFullModulName)) {
+						case None:
+						case Global | SamePackage | Imported | ImportedWithAlias(_):
+							// already imports new location -> skip
+							continue;
 					}
 					var importPos:IdentifierPos = {fileName: use.pos.fileName, start: useFile.importInsertPos, end: useFile.importInsertPos}
 					changelist.addChange(use.pos.fileName, InsertText('import $newFullModulName;\n', importPos));
@@ -69,7 +73,7 @@ class RenamePackage {
 			}
 		}
 
-		// TODO prevent duplicate imports / remove redundant imports
+		// TODO remove redundant imports
 
 		moveFileToPackage(context, file, changelist, packageName);
 		return changelist.execute();

@@ -9,7 +9,7 @@ class InterfacesTest extends TestBase {
 
 	public function testRenameInterface() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "interfaces.MyInterface", 38, 59),
+			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "MyInterface", 49, 59),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "MyInterface", 94, 104),
 			makeMoveTestEdit("testcases/interfaces/IInterface.hx", "testcases/interfaces/MyInterface.hx"),
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "MyInterface", 31, 41),
@@ -31,8 +31,8 @@ class InterfacesTest extends TestBase {
 	public function testRenameInterfaceFieldDoSomething() {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 123, 134),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "child.doIt", 224, 241),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "child.doIt", 356, 373),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 230, 241),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 362, 373),
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doIt", 75, 86),
 			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 107, 118),
 			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 164, 175),
@@ -42,13 +42,13 @@ class InterfacesTest extends TestBase {
 
 	public function testRenameInterfaceFieldDoSomethingElse() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "super.doMore", 141, 162),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "child.doMore", 247, 268),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "child.doMore", 379, 400),
-			makeReplaceTestEdit("testcases/interfaces/pack/AbstractChild.hx", "this.doMore", 97, 117),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 147, 162),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 253, 268),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 385, 400),
+			makeReplaceTestEdit("testcases/interfaces/pack/AbstractChild.hx", "doMore", 102, 117),
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doMore", 105, 120),
 			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "doMore", 111, 126),
-			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "super.doMore", 133, 154),
+			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "doMore", 139, 154),
 			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "doMore", 166, 181),
 			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doMore", 142, 157),
 		];
@@ -77,11 +77,11 @@ class InterfacesTest extends TestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "state", 157, 165),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "state", 92, 100),
-			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "set_state", 237, 249),
-			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "get_state", 303, 315),
+			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "state", 241, 249),
+			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "state", 307, 315),
 			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "state", 250, 258),
-			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "set_state", 288, 300),
-			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "get_state", 354, 366),
+			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "state", 292, 300),
+			makeReplaceTestEdit("testcases/interfaces/ChildChildClass.hx", "state", 358, 366),
 		];
 		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "state", pos: 160}, edits);
 	}

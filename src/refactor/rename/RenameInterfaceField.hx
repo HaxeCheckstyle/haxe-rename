@@ -4,6 +4,7 @@ import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
 
@@ -11,10 +12,10 @@ class RenameInterfaceField {
 	public static function refactorInterfaceField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 
-		function replaceInType(type:Type, from:String, to:String) {
-			var allUses:Array<Identifier> = type.getIdentifiers(from);
+		function replaceInType(type:Type, prefix:String, from:String, to:String) {
+			var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
 			for (use in allUses) {
-				changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos));
+				RenameHelper.replaceTextWithPrefix(use, prefix, to, changelist);
 			}
 		}
 
@@ -25,19 +26,19 @@ class RenameInterfaceField {
 		types.push(identifier.defineType);
 		for (type in types) {
 			// use of field inside interfaces / classes (self + extending / implementing)
-			replaceInType(type, identifier.name, context.what.toName);
+			replaceInType(type, "", identifier.name, context.what.toName);
 
 			// super calls inside types
-			replaceInType(type, 'super.${identifier.name}', 'super.${context.what.toName}');
+			replaceInType(type, "super.", identifier.name, context.what.toName);
 
 			// this calls inside types
-			replaceInType(type, 'this.${identifier.name}', 'this.${context.what.toName}');
+			replaceInType(type, "this.", identifier.name, context.what.toName);
 
 			// property setters / getters
 			switch (identifier.type) {
 				case InterfaceProperty:
-					replaceInType(type, 'set_${identifier.name}', 'set_${context.what.toName}');
-					replaceInType(type, 'get_${identifier.name}', 'get_${context.what.toName}');
+					replaceInType(type, "set_", identifier.name, context.what.toName);
+					replaceInType(type, "get_", identifier.name, context.what.toName);
 				default:
 			}
 
@@ -70,7 +71,8 @@ class RenameInterfaceField {
 						// case StructureField:
 						// case CallOrAccess:
 						case ScopedLocal(scopeEnd):
-							var allUses2:Array<Identifier> = use.defineType.getIdentifiers('${use.parent.name}.${identifier.name}');
+							var prefix:String = '${use.parent.name}.';
+							var allUses2:Array<Identifier> = use.defineType.getIdentifiers('$prefix${identifier.name}');
 							var scopeStart:Int = use.pos.start;
 							for (use2 in allUses2) {
 								if (use2.pos.start < scopeStart) {
@@ -79,7 +81,7 @@ class RenameInterfaceField {
 								if (use2.pos.start > scopeEnd) {
 									continue;
 								}
-								changelist.addChange(use2.pos.fileName, ReplaceText('${use.parent.name}.${context.what.toName}', use2.pos));
+								RenameHelper.replaceTextWithPrefix(use2, prefix, context.what.toName, changelist);
 							}
 						default:
 					}

@@ -285,7 +285,6 @@ class UsageCollector {
 			if (fragment.indexOf("{") >= 0) {
 				continue;
 			}
-
 			readInterpolatedFragment(context, identifier, fragment, token.pos.min + 1 + start + 1);
 			start = indexEnd;
 		}
