@@ -58,7 +58,7 @@ src/refactor/Cli.hx
 
 ### danger zone
 
-`node bin/refaxtor.js -s src -l path/pack/FileName.hx@600 -n newName -x --i-have-backups`
+`node bin/rename.js -s src -l path/pack/FileName.hx@600 -n newName -x --i-have-backups`
 
 ## compile
 
