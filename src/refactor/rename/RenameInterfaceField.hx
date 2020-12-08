@@ -1,7 +1,7 @@
 package refactor.rename;
 
-import refactor.RefactorResult;
 import refactor.RefactorContext;
+import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.Type;
