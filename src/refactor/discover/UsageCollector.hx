@@ -564,7 +564,7 @@ class UsageCollector {
 		if (colon == null) {
 			return;
 		}
-		readExpression(context, identifier, colon.getFirstChild());
+		readBlock(context, identifier, colon);
 	}
 
 	function readCaseConst(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
