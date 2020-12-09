@@ -4,6 +4,7 @@ import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RenameScopedLocal {
@@ -41,10 +42,16 @@ class RenameScopedLocal {
 				default:
 			}
 			if (use.name == identifier.name) {
+				// exact match
 				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
 			} else {
-				var newName:String = context.what.toName + use.name.substr(identifier.name.length);
-				changelist.addChange(use.pos.fileName, ReplaceText(newName, use.pos));
+				// starts with identifier + "." -> replace only identifier part
+				var pos:IdentifierPos = {
+					fileName: use.pos.fileName,
+					start: use.pos.start,
+					end: use.pos.start + identifier.pos.end - identifier.pos.start
+				};
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos));
 			}
 		}
 		return changelist.execute();

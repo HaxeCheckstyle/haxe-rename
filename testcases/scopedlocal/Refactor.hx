@@ -1,15 +1,15 @@
 package scopedLocal;
 
-import refactor.actions.RefactorContext;
-import refactor.actions.RefactorImportAlias;
-import refactor.actions.RefactorInterfaceField;
-import refactor.actions.RefactorModuleLevelStatic;
-import refactor.actions.RefactorPackageName;
-import refactor.actions.RefactorResult;
-import refactor.actions.RefactorScopedLocal;
-import refactor.actions.RefactorTypeName;
+import refactor.RefactorContext;
+import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.rename.RenameImportAlias;
+import refactor.rename.RenameInterfaceField;
+import refactor.rename.RenameModuleLevelStatic;
+import refactor.rename.RenamePackage;
+import refactor.rename.RenameScopedLocal;
+import refactor.rename.RenameTypeName;
 
 class Refactor {
 	public static function refactor(context:RefactorContext):RefactorResult {
@@ -27,17 +27,17 @@ class Refactor {
 		}
 		return switch (identifier.type) {
 			case PackageName:
-				RefactorPackageName.refactorPackageName(context, file, identifier);
+				RenamePackage.refactorPackageName(context, file, identifier);
 			case ImportModul:
 				Unsupported;
 			case ImportAlias:
-				RefactorImportAlias.refactorImportAlias(context, file, identifier);
+				RenameImportAlias.refactorImportAlias(context, file, identifier);
 			case UsingModul:
 				Unsupported;
 			case Abstract | Class | Enum | Interface | Typedef:
-				RefactorTypeName.refactorTypeName(context, file, identifier);
+				RenameTypeName.refactorTypeName(context, file, identifier);
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
-				RefactorModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
+				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements:
 				Unsupported;
 			case AbstractOver | AbstractFrom | AbstractTo:
@@ -55,7 +55,7 @@ class Refactor {
 			case StructureField:
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
-				RefactorInterfaceField.refactorInterfaceField(context, file, identifier);
+				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
 			case TypeHint:
 				Unsupported;
 			case EnumField:
@@ -63,7 +63,7 @@ class Refactor {
 			case CallOrAccess:
 				Unsupported;
 			case ScopedLocal(scopeEnd):
-				RefactorScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
+				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 			case StringConst:
 				Unsupported;
 		}

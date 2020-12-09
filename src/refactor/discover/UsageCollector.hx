@@ -240,7 +240,7 @@ class UsageCollector {
 			case ModuleLevelStaticVar:
 				readVarInit(context, identifier, nameToken);
 			case ModuleLevelStaticMethod:
-				readMethod(context, identifier, nameToken.getFirstChild());
+				readMethod(context, identifier, nameToken);
 			default:
 		}
 		readStrings(context, identifier, nameToken);
