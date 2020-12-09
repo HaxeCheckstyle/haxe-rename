@@ -693,6 +693,8 @@ class UsageCollector {
 			switch (child.tok) {
 				case Const(CIdent(_)):
 					makeIdentifier(context, child, TypedParameter, identifier);
+				case POpen:
+					readParameter(context, identifier, child, token.getPos().max);
 				case Binop(OpGt):
 					break;
 				default:

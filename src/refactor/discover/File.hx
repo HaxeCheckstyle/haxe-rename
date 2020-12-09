@@ -93,6 +93,7 @@ class File {
 		for (type in typeList) {
 			results = results.concat(type.findAllIdentifiers(matcher));
 		}
+		results.sort(Identifier.sortIdentifier);
 		return results;
 	}
 }

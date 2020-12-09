@@ -21,6 +21,7 @@ class NameMap {
 			names.set(identifier.name, [identifier]);
 		} else {
 			list.push(identifier);
+			list.sort(Identifier.sortIdentifier);
 		}
 	}
 
@@ -31,6 +32,7 @@ class NameMap {
 				results = results.concat(list);
 			}
 		}
+		results.sort(Identifier.sortIdentifier);
 		return results;
 	}
 }

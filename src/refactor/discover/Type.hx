@@ -46,6 +46,7 @@ class Type {
 				results.push(use);
 			}
 		}
+		results.sort(Identifier.sortIdentifier);
 		return results;
 	}
 

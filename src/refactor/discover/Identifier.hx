@@ -64,6 +64,17 @@ class Identifier {
 		for (use in uses) {
 			results = results.concat(use.findAllIdentifiers(matcher));
 		}
+		results.sort(sortIdentifier);
 		return results;
+	}
+
+	public static function sortIdentifier(a:Identifier, b:Identifier):Int {
+		if (a.pos.start < b.pos.start) {
+			return -1;
+		}
+		if (a.pos.start > b.pos.start) {
+			return 1;
+		}
+		return 0;
 	}
 }
