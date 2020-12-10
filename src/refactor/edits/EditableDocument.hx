@@ -1,11 +1,12 @@
 package refactor.edits;
 
+import haxe.io.Bytes;
 import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 
 class EditableDocument implements IEditableDocument {
-	var originalContent:String;
+	var originalContent:Bytes;
 	var originalFileName:String;
 	var fileName:String;
 	var refactoredContent:StringBuf;
@@ -14,7 +15,7 @@ class EditableDocument implements IEditableDocument {
 	public function new(fileName:String) {
 		this.fileName = fileName;
 		this.originalFileName = fileName;
-		originalContent = File.getContent(fileName);
+		originalContent = File.getBytes(fileName);
 		refactoredContent = new StringBuf();
 		lastPos = 0;
 	}
@@ -24,22 +25,22 @@ class EditableDocument implements IEditableDocument {
 			case Move(newFileName):
 				fileName = newFileName;
 			case ReplaceText(text, pos):
-				refactoredContent.add(originalContent.substring(lastPos, pos.start));
+				refactoredContent.add(originalContent.getString(lastPos, pos.start - lastPos));
 				refactoredContent.add(text);
 				lastPos = pos.end;
 			case InsertText(text, pos):
-				refactoredContent.add(originalContent.substring(lastPos, pos.start));
+				refactoredContent.add(originalContent.getString(lastPos, pos.start - lastPos));
 				refactoredContent.add(text);
 				lastPos = pos.start;
 			case RemoveText(pos):
-				refactoredContent.add(originalContent.substring(lastPos, pos.start));
+				refactoredContent.add(originalContent.getString(lastPos, pos.start - lastPos));
 				lastPos = pos.end;
 		}
 	}
 
 	public function endEdits() {
 		if (lastPos < originalContent.length) {
-			refactoredContent.add(originalContent.substring(lastPos, originalContent.length));
+			refactoredContent.add(originalContent.getString(lastPos, originalContent.length - lastPos));
 		}
 		var folder:String = Path.directory(fileName);
 		if (!FileSystem.isDirectory(folder)) {

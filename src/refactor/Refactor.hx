@@ -15,7 +15,6 @@ class Refactor {
 		if (file == null) {
 			return NotFound;
 		}
-
 		var identifier:Identifier = file.getIdentifier(context.what.pos);
 		if (identifier == null) {
 			return NotFound;
@@ -42,13 +41,10 @@ class Refactor {
 				Unsupported;
 			case Property:
 				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
-				// Unsupported;
 			case FieldVar:
 				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
-				// Unsupported;
 			case Method:
 				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
-				// Unsupported;
 			case TypedParameter:
 				Unsupported;
 			case TypedefField:

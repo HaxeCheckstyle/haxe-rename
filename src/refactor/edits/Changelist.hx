@@ -1,5 +1,6 @@
 package refactor.edits;
 
+import haxe.io.Bytes;
 import sys.io.File;
 import refactor.RefactorContext;
 import refactor.RefactorResult;
@@ -89,30 +90,30 @@ class Changelist {
 	}
 
 	function printDiffLines(pos:IdentifierPos, toName:Null<String>) {
-		var content:String = File.getContent(pos.fileName);
+		var content:Bytes = File.getBytes(pos.fileName);
 
 		var lineStart:Int = pos.start;
 		var lineEnd:Int = pos.end;
 		while (lineStart > 0) {
-			var char:String = content.charAt(lineStart);
-			if (char == "\r" || char == "\n") {
+			var char:Int = content.get(lineStart);
+			if (char == 0x0A || char == 0x0D) {
 				lineStart++;
 				break;
 			}
 			lineStart--;
 		}
 		while (lineEnd < content.length) {
-			var char:String = content.charAt(lineEnd);
-			if (char == "\r" || char == "\n") {
+			var char:Int = content.get(lineEnd);
+			if (char == 0x0A || char == 0x0D) {
 				break;
 			}
 			lineEnd++;
 		}
-		var origLine:String = content.substring(lineStart, lineEnd);
+		var origLine:String = content.getString(lineStart, lineEnd - lineStart);
 		Sys.println('--- $origLine');
 		if (toName != null) {
-			var newContent:String = content.substring(0, pos.start) + toName + content.substring(pos.end, content.length);
-			var newLine:String = newContent.substring(lineStart, lineEnd + (toName.length - (pos.end - pos.start)));
+			var newContent:String = content.getString(0, pos.start) + toName + content.getString(pos.end, content.length - pos.end);
+			var newLine:String = Bytes.ofString(newContent).getString(lineStart, lineEnd + (toName.length - (pos.end - pos.start) - lineStart));
 			Sys.println('+++ $newLine');
 		}
 	}
