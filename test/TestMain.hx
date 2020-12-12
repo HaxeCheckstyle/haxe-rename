@@ -1,3 +1,4 @@
+import refactor.ClassTest;
 import refactor.InterfaceTest;
 import refactor.ModuleLevelStaticTest;
 import refactor.ScopedLocalTest;
@@ -6,7 +7,12 @@ import utest.ui.Report;
 
 class TestMain {
 	static function main() {
-		var tests:Array<ITest> = [new InterfaceTest(), new ModuleLevelStaticTest(), new ScopedLocalTest()];
+		var tests:Array<ITest> = [
+			new ClassTest(),
+			new InterfaceTest(),
+			new ModuleLevelStaticTest(),
+			new ScopedLocalTest()
+		];
 		var runner:Runner = new Runner();
 
 		#if instrument

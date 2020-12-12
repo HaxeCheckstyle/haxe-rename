@@ -4,19 +4,13 @@ import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
 
 class RenameField {
 	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
-
-		function replaceInType(type:Type, prefix:String, from:String, to:String) {
-			var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
-			for (use in allUses) {
-				RenameHelper.replaceTextWithPrefix(use, prefix, to, changelist);
-			}
-		}
 
 		var packName:String = file.getPackage();
 		var types:Array<Type> = RenameHelper.findDescendantTypes(context, packName, identifier.defineType);
@@ -25,19 +19,20 @@ class RenameField {
 		types.push(identifier.defineType);
 		for (type in types) {
 			// use of field inside interfaces / classes (self + extending / implementing)
-			replaceInType(type, "", identifier.name, context.what.toName);
+			replaceInType(changelist, type, "", identifier.name, context.what.toName);
 
 			// super calls inside types
-			replaceInType(type, "super.", identifier.name, context.what.toName);
+			replaceInType(changelist, type, "super.", identifier.name, context.what.toName);
 
 			// this calls inside types
-			replaceInType(type, "this.", identifier.name, context.what.toName);
+			replaceInType(changelist, type, "this.", identifier.name, context.what.toName);
+			replaceInTypeWithFieldAccess(changelist, type, "this.", identifier.name, context.what.toName);
 
 			// property setters / getters
 			switch (identifier.type) {
 				case InterfaceProperty:
-					replaceInType(type, "set_", identifier.name, context.what.toName);
-					replaceInType(type, "get_", identifier.name, context.what.toName);
+					replaceInType(changelist, type, "set_", identifier.name, context.what.toName);
+					replaceInType(changelist, type, "get_", identifier.name, context.what.toName);
 				default:
 			}
 
@@ -49,6 +44,35 @@ class RenameField {
 			// TODO imports with alias
 		}
 		return changelist.execute();
+	}
+
+	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
+		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
+		var scopeEnd:Int = 0;
+		for (use in allUses) {
+			if (use.pos.start <= scopeEnd) {
+				continue;
+			}
+			switch (use.type) {
+				case ScopedLocal(end):
+					scopeEnd = end;
+					continue;
+				default:
+			}
+			RenameHelper.replaceTextWithPrefix(use, prefix, to, changelist);
+		}
+	}
+
+	static function replaceInTypeWithFieldAccess(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
+		var allUses:Array<Identifier> = type.getStartsWith('$prefix$from.');
+		for (use in allUses) {
+			var pos:IdentifierPos = {
+				fileName: use.pos.fileName,
+				start: use.pos.start + prefix.length,
+				end: use.pos.start + prefix.length + from.length
+			};
+			changelist.addChange(use.pos.fileName, ReplaceText(to, pos));
+		}
 	}
 
 	static function replaceStaticUse(context:RefactorContext, changelist:Changelist, type:Type, fromName:String) {
