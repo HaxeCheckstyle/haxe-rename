@@ -103,7 +103,7 @@ class Cli {
 		TraverseSources.traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
 
-		var result:RefactorResult = Refactor.refactor({
+		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			what: what,

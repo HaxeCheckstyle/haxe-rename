@@ -34,7 +34,7 @@ class TestBase implements ITest {
 	function refactorAndCheck(what:RefactorWhat, edits:Array<TestEdit>, ?pos:PosInfos) {
 		var editList:TestEditList = new TestEditList();
 
-		var result:RefactorResult = Refactor.refactor({
+		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			what: what,

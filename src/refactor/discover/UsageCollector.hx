@@ -502,14 +502,29 @@ class UsageCollector {
 		if (token == null) {
 			return;
 		}
+
 		token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case Const(CIdent(_)):
-					if (token.parent.tok.match(Dot)) {
-						return GoDeeper;
+					var parent:TokenTree = token.parent;
+					if (parent.tok.match(Dot)) {
+						var prev:Null<TokenTree> = parent.previousSibling;
+						if (prev == null) {
+							return GoDeeper;
+						}
+						switch (prev.tok) {
+							case BkOpen | POpen:
+								// method chaining
+								var newIdent:Identifier = makeIdentifier(context, token, CallOrAccess, identifier);
+								readBlock(context, newIdent, token);
+								return SkipSubtree;
+							default:
+								return GoDeeper;
+						}
 					}
-					makeIdentifier(context, token, CallOrAccess, identifier);
-					GoDeeper;
+					var newIdent:Identifier = makeIdentifier(context, token, CallOrAccess, identifier);
+					readBlock(context, newIdent, token);
+					SkipSubtree;
 				case Kwd(KwdVar):
 					var fullPos:Position = token.parent.getPos();
 					var scopeEnd:Int = fullPos.max;
