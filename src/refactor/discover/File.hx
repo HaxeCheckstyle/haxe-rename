@@ -28,15 +28,26 @@ class File {
 		return "";
 	}
 
-	public function importsPackage(packName:String):ImportStatus {
+	public function importsModule(packName:String, moduleName:String, typeName:String):ImportStatus {
 		if (packName.length <= 0) {
 			return Global;
 		}
 		if (packName == getPackage()) {
 			return SamePackage;
 		}
+		var fullModule:String = '$packName.$moduleName';
+		var fullSubModule:Null<String> = null;
+		if (moduleName == typeName) {
+			fullSubModule = '$fullModule.$typeName';
+		}
 		for (importEntry in importList) {
-			if (importEntry.moduleName.name == packName) {
+			if (importEntry.moduleName.name == fullModule) {
+				if (importEntry.alias != null) {
+					return ImportedWithAlias(importEntry.alias.name);
+				}
+				return Imported;
+			}
+			if (importEntry.moduleName.name == fullSubModule) {
 				if (importEntry.alias != null) {
 					return ImportedWithAlias(importEntry.alias.name);
 				}
@@ -47,7 +58,7 @@ class File {
 		if (importHxFile == null) {
 			return None;
 		}
-		return importHxFile.importsPackage(packName);
+		return importHxFile.importsModule(packName, moduleName, typeName);
 	}
 
 	public function getMainModulName():String {

@@ -13,6 +13,14 @@ class Type {
 		uses = [];
 	}
 
+	public function getFullModulName():String {
+		var packageName:String = file.getPackage();
+		if (packageName.length <= 0) {
+			return name.name;
+		}
+		return '$packageName.${name.name}';
+	}
+
 	public function addIdentifier(identifier:Identifier) {
 		nameMap.addIdentifier(identifier);
 		uses.push(identifier);

@@ -69,6 +69,12 @@ class Identifier {
 	}
 
 	public static function sortIdentifier(a:Identifier, b:Identifier):Int {
+		if (a.pos.fileName < b.pos.fileName) {
+			return -1;
+		}
+		if (a.pos.fileName > b.pos.fileName) {
+			return 1;
+		}
 		if (a.pos.start < b.pos.start) {
 			return -1;
 		}

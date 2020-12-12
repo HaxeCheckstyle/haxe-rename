@@ -54,13 +54,13 @@ class RenamePackage {
 					if (useFile == null) {
 						continue;
 					}
-					switch (useFile.importsPackage(fullModulName)) {
+					switch (useFile.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
 						case None | SamePackage:
 						case Global | Imported | ImportedWithAlias(_):
 							// imported old location -> skip (we renamed import in previous loop)
 							continue;
 					}
-					switch (useFile.importsPackage(newFullModulName)) {
+					switch (useFile.importsModule(context.what.toName, type.file.getMainModulName(), type.name.name)) {
 						case None:
 						case Global | SamePackage | Imported | ImportedWithAlias(_):
 							// already imports new location -> skip
