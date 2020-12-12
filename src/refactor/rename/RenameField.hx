@@ -20,6 +20,7 @@ class RenameField {
 		for (type in types) {
 			// use of field inside interfaces / classes (self + extending / implementing)
 			replaceInType(changelist, type, "", identifier.name, context.what.toName);
+			replaceInTypeWithFieldAccess(changelist, type, "", identifier.name, context.what.toName);
 
 			// super calls inside types
 			replaceInType(changelist, type, "super.", identifier.name, context.what.toName);
