@@ -39,11 +39,7 @@ class Refactor {
 				Unsupported;
 			case AbstractOver | AbstractFrom | AbstractTo:
 				Unsupported;
-			case Property:
-				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
-			case FieldVar:
-				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
-			case Method:
+			case Property | FieldVar | Method:
 				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
 			case TypedParameter:
 				Unsupported;
