@@ -2,8 +2,8 @@ package refactor;
 
 import refactor.discover.File;
 import refactor.discover.Identifier;
-import refactor.rename.RenameImportAlias;
 import refactor.rename.RenameField;
+import refactor.rename.RenameImportAlias;
 import refactor.rename.RenameModuleLevelStatic;
 import refactor.rename.RenamePackage;
 import refactor.rename.RenameScopedLocal;
@@ -25,19 +25,15 @@ class Refactor {
 		return switch (identifier.type) {
 			case PackageName:
 				RenamePackage.refactorPackageName(context, file, identifier);
-			case ImportModul:
+			case ImportModul | UsingModul:
 				Unsupported;
 			case ImportAlias:
 				RenameImportAlias.refactorImportAlias(context, file, identifier);
-			case UsingModul:
-				Unsupported;
 			case Abstract | Class | Enum | Interface | Typedef:
 				RenameTypeName.refactorTypeName(context, file, identifier);
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
-			case Extends | Implements:
-				Unsupported;
-			case AbstractOver | AbstractFrom | AbstractTo:
+			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo:
 				Unsupported;
 			case Property | FieldVar | Method:
 				RenameField.refactorField(context, file, identifier);
