@@ -2,7 +2,7 @@ package refactor;
 
 import refactor.TestEditableDocument.TestEdit;
 
-class InterfacesTest extends TestBase {
+class InterfaceTest extends TestBase {
 	function setupClass() {
 		setupData(["testcases/interfaces"]);
 	}

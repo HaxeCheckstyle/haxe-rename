@@ -7,8 +7,8 @@ import refactor.discover.Identifier;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
 
-class RenameInterfaceField {
-	public static function refactorInterfaceField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+class RenameField {
+	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var changelist:Changelist = new Changelist(context);
 
 		function replaceInType(type:Type, prefix:String, from:String, to:String) {

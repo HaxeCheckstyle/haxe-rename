@@ -20,6 +20,7 @@ Note: renaming uses static code analysis to figure out what places to change in 
 * remame a case capture
 * rename module level statics
 * rename interface fields
+* rename class fields
 
 ## usage
 

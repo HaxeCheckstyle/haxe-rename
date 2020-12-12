@@ -2,7 +2,7 @@ package refactor;
 
 import refactor.TestEditableDocument.TestEdit;
 
-class ModuleLevelStaticsTest extends TestBase {
+class ModuleLevelStaticTest extends TestBase {
 	function setupClass() {
 		setupData(["testcases/modulelevelstatics"]);
 	}

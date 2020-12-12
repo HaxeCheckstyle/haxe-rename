@@ -2,9 +2,8 @@ package refactor;
 
 import refactor.discover.File;
 import refactor.discover.Identifier;
-import refactor.edits.IEditableDocument;
 import refactor.rename.RenameImportAlias;
-import refactor.rename.RenameInterfaceField;
+import refactor.rename.RenameField;
 import refactor.rename.RenameModuleLevelStatic;
 import refactor.rename.RenamePackage;
 import refactor.rename.RenameScopedLocal;
@@ -41,7 +40,7 @@ class Refactor {
 			case AbstractOver | AbstractFrom | AbstractTo:
 				Unsupported;
 			case Property | FieldVar | Method:
-				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
+				RenameField.refactorField(context, file, identifier);
 			case TypedParameter:
 				Unsupported;
 			case TypedefField:
@@ -49,7 +48,7 @@ class Refactor {
 			case StructureField:
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
-				RenameInterfaceField.refactorInterfaceField(context, file, identifier);
+				RenameField.refactorField(context, file, identifier);
 			case TypeHint:
 				Unsupported;
 			case EnumField:
@@ -65,7 +64,7 @@ class Refactor {
 
 	static function findActualWhat(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var parts:Array<String> = identifier.name.split(".");
-		if (parts.length <= 1) {
+		if (parts.length <= 0) {
 			return Unsupported;
 		}
 		var firstPart:String = parts[0];
@@ -77,8 +76,6 @@ class Refactor {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case ModuleLevelStaticVar:
-				case ModuleLevelStaticMethod:
 				case Property | FieldVar | Method:
 					if (identifier.defineType.name != use.defineType.name) {
 						continue;
@@ -86,8 +83,6 @@ class Refactor {
 					if (candidate == null) {
 						candidate = use;
 					}
-				// case TypedefField:
-				// case StructureField:
 				case ScopedLocal(scopeEnd):
 					if ((use.pos.start < identifier.pos.start) && (identifier.pos.start < scopeEnd)) {
 						candidate = use;

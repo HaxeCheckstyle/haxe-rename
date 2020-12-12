@@ -50,4 +50,22 @@ class ScopedLocalTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/StringInterpolation.hx", toName: "base", pos: 191}, edits);
 	}
+
+	public function testRenameBaseTypeParameterFromUse() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 460, 467),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 526, 533),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 551, 558),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 671, 678),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 767, 774),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 909, 916),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1038, 1045),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1194, 1201),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1332, 1339),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1806, 1813),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 2017, 2024),
+
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 2020}, edits);
+	}
 }

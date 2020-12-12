@@ -613,11 +613,31 @@ class UsageCollector {
 			return;
 		}
 		for (child in token.children) {
-			var field:Identifier = makeIdentifier(context, child, StructureField, identifier);
-			if (field.uses != null) {
-				for (use in field.uses) {
-					use.type = ScopedLocal(scopeEnd);
-				}
+			switch (child.tok) {
+				case Const(_):
+					var field:Null<Identifier> = makeIdentifier(context, child, StructureField, identifier);
+					if (field == null) {
+						continue;
+					}
+					if (!child.hasChildren()) {
+						continue;
+					}
+					var valueChild:TokenTree = child.getFirstChild();
+					switch (valueChild.tok) {
+						case Kwd(_) | Const(_) | Dollar(_) | Unop(_) | Binop(_):
+							readExpression(context, field, valueChild);
+						case BkOpen | BrOpen:
+							readCaseStructure(context, field, valueChild, scopeEnd);
+							continue;
+						default:
+					}
+					if (field.uses != null) {
+						for (use in field.uses) {
+							use.type = ScopedLocal(scopeEnd);
+						}
+					}
+				default:
+					break;
 			}
 		}
 	}
