@@ -33,7 +33,7 @@ class Refactor {
 				RenameTypeName.refactorTypeName(context, file, identifier);
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
-			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo:
+			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
 				Unsupported;
 			case Property | FieldVar | Method:
 				RenameField.refactorField(context, file, identifier);
@@ -45,16 +45,12 @@ class Refactor {
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
 				RenameField.refactorField(context, file, identifier);
-			case TypeHint:
-				Unsupported;
 			case EnumField:
 				Unsupported;
 			case CallOrAccess:
 				findActualWhat(context, file, identifier);
 			case ScopedLocal(scopeEnd):
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
-			case StringConst:
-				Unsupported;
 		}
 	}
 
