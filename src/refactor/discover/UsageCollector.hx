@@ -550,10 +550,49 @@ class UsageCollector {
 				case BrOpen:
 					readBlock(context, identifier, token);
 					SkipSubtree;
+				case Kwd(KwdFor):
+					readFor(context, identifier, token);
+					SkipSubtree;
 				default:
 					GoDeeper;
 			}
 		});
+	}
+
+	function readFor(context:UsageContext, identifier:Identifier, token:TokenTree) {
+		if (!token.hasChildren()) {
+			return;
+		}
+		var skip:Bool = true;
+		for (child in token.children) {
+			switch (child.tok) {
+				case POpen:
+					var fullPos:Position = token.getPos();
+					var scopeEnd:Int = fullPos.max;
+					readForIteration(context, identifier, child.getFirstChild(), scopeEnd);
+					skip = false;
+				default:
+					if (skip) {
+						continue;
+					}
+					readExpression(context, identifier, child);
+			}
+		}
+	}
+
+	function readForIteration(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
+		makeIdentifier(context, token, ScopedLocal(scopeEnd), identifier);
+		if (!token.hasChildren()) {
+			return;
+		}
+		for (child in token.children) {
+			switch (child.tok) {
+				case Binop(OpArrow):
+					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd), identifier);
+				default:
+					readExpression(context, identifier, child);
+			}
+		}
 	}
 
 	function readCase(context:UsageContext, identifier:Identifier, token:TokenTree) {
