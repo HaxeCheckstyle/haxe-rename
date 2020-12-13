@@ -21,6 +21,7 @@ Note: renaming uses static code analysis to figure out what places to change in 
 * rename module level statics
 * rename interface fields
 * rename class fields
+* rename enum fields
 
 ## usage
 
