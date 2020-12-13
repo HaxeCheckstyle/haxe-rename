@@ -15,13 +15,13 @@ class RenameTypeName {
 		if (path.file == identifier.name) {
 			// type and filename are identical -> move file
 			var newFileName:String = Path.join([path.dir, context.what.toName]) + "." + path.ext;
-			changelist.addChange(file.name, Move(newFileName));
+			changelist.addChange(file.name, Move(newFileName), null);
 		}
 
 		var allUses:Null<Array<Identifier>> = context.nameMap.getIdentifiers(identifier.name);
 		if (allUses != null) {
 			for (use in allUses) {
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 			}
 		}
 
@@ -33,7 +33,7 @@ class RenameTypeName {
 					start: use.pos.start,
 					end: use.pos.start + identifier.name.length
 				}
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos));
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos), use);
 			}
 		}
 

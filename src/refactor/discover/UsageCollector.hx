@@ -302,7 +302,7 @@ class UsageCollector {
 					start: token.pos.min + start + 1,
 					end: token.pos.min + start + matchedText.length + 1
 				};
-				new Identifier(CallOrAccess, matchedText, pos, context.nameMap, context.file, context.type, identifier);
+				new Identifier(Access, matchedText, pos, context.nameMap, context.file, context.type, identifier);
 			}
 		}
 	}
@@ -515,14 +515,14 @@ class UsageCollector {
 						switch (prev.tok) {
 							case BkOpen | POpen:
 								// method chaining
-								var newIdent:Identifier = makeIdentifier(context, token, CallOrAccess, identifier);
+								var newIdent:Identifier = makeIdentifier(context, token, Access, identifier);
 								readBlock(context, newIdent, token);
 								return SkipSubtree;
 							default:
 								return GoDeeper;
 						}
 					}
-					var newIdent:Identifier = makeIdentifier(context, token, CallOrAccess, identifier);
+					var newIdent:Identifier = makeIdentifier(context, token, Access, identifier);
 					readBlock(context, newIdent, token);
 					SkipSubtree;
 				case Kwd(KwdVar):
@@ -542,7 +542,7 @@ class UsageCollector {
 					}
 					SkipSubtree;
 				case Kwd(KwdThis):
-					makeIdentifier(context, token, CallOrAccess, identifier);
+					makeIdentifier(context, token, Access, identifier);
 					GoDeeper;
 				case Kwd(KwdCase):
 					readCase(context, identifier, token);
@@ -601,30 +601,30 @@ class UsageCollector {
 		}
 		var fullPos:Position = token.getPos();
 		var scopeEnd:Int = fullPos.max;
-		var caseToken:TokenTree = token.getFirstChild();
-		switch (caseToken.tok) {
-			case Const(CIdent(_)):
-				readCaseConst(context, identifier, caseToken, scopeEnd);
-			case Kwd(KwdVar):
-				makeIdentifier(context, caseToken.getFirstChild(), ScopedLocal(scopeEnd), identifier);
-			case BkOpen:
-				readCaseArray(context, identifier, caseToken, scopeEnd);
-			case BrOpen:
-				readCaseStructure(context, identifier, caseToken, scopeEnd);
-			default:
+
+		for (child in token.children) {
+			switch (child.tok) {
+				case Const(CIdent(_)):
+					readCaseConst(context, identifier, child, scopeEnd);
+				case Kwd(KwdVar):
+					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd), identifier);
+				case BkOpen:
+					readCaseArray(context, identifier, child, scopeEnd);
+				case BrOpen:
+					readCaseStructure(context, identifier, child, scopeEnd);
+				case DblDot:
+					readBlock(context, identifier, child);
+					break;
+				default:
+			}
 		}
-		var colon:Null<TokenTree> = token.access().firstOf(DblDot).token;
-		if (colon == null) {
-			return;
-		}
-		readBlock(context, identifier, colon);
 	}
 
 	function readCaseConst(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
 		if (!token.hasChildren()) {
 			return;
 		}
-		makeIdentifier(context, token, CallOrAccess, identifier);
+		var caseIdent:Identifier = makeIdentifier(context, token, Access, identifier);
 		var pOpen:Array<TokenTree> = token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case POpen:
@@ -635,6 +635,9 @@ class UsageCollector {
 		});
 		for (child in pOpen) {
 			readParameter(context, identifier, child, scopeEnd);
+		}
+		if (!caseIdent.name.contains(".") && pOpen.length > 0) {
+			caseIdent.type = Access;
 		}
 	}
 
@@ -725,6 +728,11 @@ class UsageCollector {
 				case Binop(OpLt):
 					if (TokenTreeCheckUtils.isTypeParameter(nameToken)) {
 						typeParamLt = nameToken;
+					}
+					break;
+				case POpen:
+					if (type.match(Access)) {
+						type = Call;
 					}
 					break;
 				case DblDot:

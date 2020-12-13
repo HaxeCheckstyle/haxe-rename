@@ -8,6 +8,7 @@ class Identifier {
 	public var file:File;
 	public var parent:Null<Identifier>;
 	public var defineType:Null<Type>;
+	public var edited:Bool;
 
 	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>, parent:Null<Identifier>) {
 		this.type = type;
@@ -16,6 +17,7 @@ class Identifier {
 		this.file = file;
 		this.parent = parent;
 		this.defineType = defineType;
+		edited = false;
 
 		if (defineType != null) {
 			defineType.addIdentifier(this);

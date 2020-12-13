@@ -1,10 +1,12 @@
 package refactor.discover;
 
 class NameMap {
-	final names:Map<String, Array<Identifier>>;
+	final names:IdentifierMap;
+	final parts:IdentifierMap;
 
 	public function new() {
-		names = new Map<String, Array<Identifier>>();
+		names = new IdentifierMap();
+		parts = new IdentifierMap();
 	}
 
 	public function getIdentifiers(name:String):Array<Identifier> {
@@ -16,12 +18,19 @@ class NameMap {
 	}
 
 	public function addIdentifier(identifier:Identifier) {
-		var list:Null<Array<Identifier>> = names.get(identifier.name);
-		if (list == null) {
-			names.set(identifier.name, [identifier]);
-		} else {
-			list.push(identifier);
-			list.sort(Identifier.sortIdentifier);
+		function addToMap(map:IdentifierMap, key:String) {
+			var list:Null<Array<Identifier>> = map.get(key);
+			if (list == null) {
+				map.set(key, [identifier]);
+			} else {
+				list.push(identifier);
+				list.sort(Identifier.sortIdentifier);
+			}
+		}
+		addToMap(names, identifier.name);
+		var nameParts:Array<String> = identifier.name.split(".");
+		for (part in nameParts) {
+			addToMap(parts, part);
 		}
 	}
 
@@ -35,4 +44,17 @@ class NameMap {
 		results.sort(Identifier.sortIdentifier);
 		return results;
 	}
+
+	public function matchIdentifierPart(name:String, unused:Bool):Array<Identifier> {
+		var results:Null<Array<Identifier>> = parts.get(name);
+		if (results == null) {
+			return [];
+		}
+		if (unused) {
+			return results.filter(i -> !i.edited);
+		}
+		return results;
+	}
 }
+
+typedef IdentifierMap = Map<String, Array<Identifier>>;

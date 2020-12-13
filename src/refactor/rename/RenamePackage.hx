@@ -17,9 +17,9 @@ class RenamePackage {
 		var packageName:String = file.getPackage();
 		if (packageName.length > 0) {
 			packageNamePrefix = file.packageIdentifier.name + ".";
-			changelist.addChange(file.name, ReplaceText(context.what.toName, file.packageIdentifier.pos));
+			changelist.addChange(file.name, ReplaceText(context.what.toName, file.packageIdentifier.pos), identifier);
 		} else {
-			changelist.addChange(file.name, InsertText('package ${context.what.toName};\n', {fileName: file.name, start: 0, end: 0}));
+			changelist.addChange(file.name, InsertText('package ${context.what.toName};\n', {fileName: file.name, start: 0, end: 0}), identifier);
 		}
 
 		for (type in file.typeList) {
@@ -33,7 +33,7 @@ class RenamePackage {
 			var allUses:Array<Identifier> = context.nameMap.getIdentifiers(fullModulName);
 			if (allUses != null) {
 				for (use in allUses) {
-					changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos));
+					changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos), use);
 				}
 			}
 
@@ -67,7 +67,7 @@ class RenamePackage {
 							continue;
 					}
 					var importPos:IdentifierPos = {fileName: use.pos.fileName, start: useFile.importInsertPos, end: useFile.importInsertPos}
-					changelist.addChange(use.pos.fileName, InsertText('import $newFullModulName;\n', importPos));
+					changelist.addChange(use.pos.fileName, InsertText('import $newFullModulName;\n', importPos), use);
 					uniqueFiles.push(use.pos.fileName);
 				}
 			}
@@ -91,6 +91,6 @@ class RenamePackage {
 		var rootPath:String = Path.join(dotPath.substr(0, index).split("."));
 		pathParts.unshift(Path.removeTrailingSlashes(rootPath));
 		pathParts.push('${mainTypeName}.hx');
-		changelist.addChange(file.name, Move(Path.join(pathParts)));
+		changelist.addChange(file.name, Move(Path.join(pathParts)), null);
 	}
 }

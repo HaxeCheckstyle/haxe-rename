@@ -43,7 +43,7 @@ class RenameScopedLocal {
 			}
 			if (use.name == identifier.name) {
 				// exact match
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 			} else {
 				// starts with identifier + "." -> replace only identifier part
 				var pos:IdentifierPos = {
@@ -51,7 +51,7 @@ class RenameScopedLocal {
 					start: use.pos.start,
 					end: use.pos.start + identifier.pos.end - identifier.pos.start
 				};
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos));
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
 			}
 		}
 		return changelist.execute();

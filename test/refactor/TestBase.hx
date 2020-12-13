@@ -31,6 +31,15 @@ class TestBase implements ITest {
 		usageContext.usageCollector.updateImportHx(usageContext);
 	}
 
+	@:access(refactor.discover.NameMap)
+	function setup() {
+		for (key => list in usageContext.nameMap.names) {
+			for (identifier in list) {
+				identifier.edited = false;
+			}
+		}
+	}
+
 	function refactorAndCheck(what:RefactorWhat, edits:Array<TestEdit>, ?pos:PosInfos) {
 		var editList:TestEditList = new TestEditList();
 

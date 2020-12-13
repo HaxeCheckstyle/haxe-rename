@@ -28,7 +28,8 @@ enum IdentifierType {
 	InterfaceMethod;
 	TypeHint;
 	EnumField;
-	CallOrAccess;
+	Call;
+	Access;
 	ScopedLocal(scopeEnd:Int);
 	StringConst;
 }

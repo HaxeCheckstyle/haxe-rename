@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import sys.io.File;
 import refactor.RefactorContext;
 import refactor.RefactorResult;
+import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 
 class Changelist {
@@ -15,7 +16,13 @@ class Changelist {
 		this.context = context;
 	}
 
-	public function addChange(fileName:String, change:FileEdit) {
+	public function addChange(fileName:String, change:FileEdit, identifier:Null<Identifier>) {
+		if (identifier != null) {
+			if (identifier.edited) {
+				return;
+			}
+			identifier.edited = true;
+		}
 		var fileChanges:Null<Array<FileEdit>> = changes.get(fileName);
 		if (fileChanges == null) {
 			changes.set(fileName, [change]);

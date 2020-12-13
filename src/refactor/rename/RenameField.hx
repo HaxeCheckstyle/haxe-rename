@@ -72,7 +72,7 @@ class RenameField {
 				start: use.pos.start + prefix.length,
 				end: use.pos.start + prefix.length + from.length
 			};
-			changelist.addChange(use.pos.fileName, ReplaceText(to, pos));
+			changelist.addChange(use.pos.fileName, ReplaceText(to, pos), use);
 		}
 	}
 

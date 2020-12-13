@@ -2,6 +2,7 @@ package refactor;
 
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.rename.RenameEnumField;
 import refactor.rename.RenameField;
 import refactor.rename.RenameImportAlias;
 import refactor.rename.RenameModuleLevelStatic;
@@ -46,8 +47,8 @@ class Refactor {
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
 				RenameField.refactorField(context, file, identifier);
 			case EnumField:
-				Unsupported;
-			case CallOrAccess:
+				RenameEnumField.refactorEnumField(context, file, identifier);
+			case Call | Access:
 				findActualWhat(context, file, identifier);
 			case ScopedLocal(scopeEnd):
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);

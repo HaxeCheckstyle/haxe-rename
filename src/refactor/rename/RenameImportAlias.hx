@@ -11,7 +11,7 @@ class RenameImportAlias {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
 		var changelist:Changelist = new Changelist(context);
 		for (use in allUses) {
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos));
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 		}
 		return changelist.execute();
 	}

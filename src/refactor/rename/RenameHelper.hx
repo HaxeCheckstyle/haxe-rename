@@ -8,14 +8,14 @@ import refactor.edits.Changelist;
 class RenameHelper {
 	public static function replaceTextWithPrefix(use:Identifier, prefix:String, to:String, changelist:Changelist) {
 		if (prefix.length <= 0) {
-			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos));
+			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos), use);
 		} else {
 			var pos:IdentifierPos = {
 				fileName: use.pos.fileName,
 				start: use.pos.start + prefix.length,
 				end: use.pos.end
 			};
-			changelist.addChange(use.pos.fileName, ReplaceText(to, pos));
+			changelist.addChange(use.pos.fileName, ReplaceText(to, pos), use);
 		}
 	}
 
