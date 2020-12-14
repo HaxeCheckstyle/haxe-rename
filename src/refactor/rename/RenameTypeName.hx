@@ -10,9 +10,11 @@ import refactor.edits.Changelist;
 
 class RenameTypeName {
 	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
-		var path:Path = new Path(file.name);
 		var changelist:Changelist = new Changelist(context);
-		if (path.file == identifier.name) {
+		var packName:String = file.getPackage();
+		var mainModuleName:String = file.getMainModulName();
+		var path:Path = new Path(file.name);
+		if (mainModuleName == identifier.name) {
 			// type and filename are identical -> move file
 			var newFileName:String = Path.join([path.dir, context.what.toName]) + "." + path.ext;
 			changelist.addChange(file.name, Move(newFileName), null);
@@ -21,6 +23,15 @@ class RenameTypeName {
 		var allUses:Null<Array<Identifier>> = context.nameMap.getIdentifiers(identifier.name);
 		if (allUses != null) {
 			for (use in allUses) {
+				switch (use.file.importsModule(packName, mainModuleName, identifier.name)) {
+					case None:
+						continue;
+					case ImportedWithAlias(alias):
+						if (alias != identifier.name) {
+							continue;
+						}
+					case Global | SamePackage | Imported:
+				}
 				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 			}
 		}
@@ -44,21 +55,6 @@ class RenameTypeName {
 			if (allUses != null) {
 				for (use in allUses) {
 					RenameHelper.replaceTextWithPrefix(use, prefix, context.what.toName, changelist);
-				}
-			}
-
-			// find all fully qualified modul names of type
-			for (type in file.typeList) {
-				if (type.name.name == identifier.name) {
-					continue;
-				}
-				var fullSubModulName:String = identifier.name + "." + type.name;
-				var newFullSubModulName:String = context.what.toName + "." + type.name;
-				allUses = context.nameMap.getIdentifiers(prefix + fullSubModulName);
-				if (allUses != null) {
-					for (use in allUses) {
-						RenameHelper.replaceTextWithPrefix(use, prefix, newFullSubModulName, changelist);
-					}
 				}
 			}
 		}

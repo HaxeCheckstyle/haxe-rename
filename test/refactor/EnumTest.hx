@@ -7,6 +7,16 @@ class EnumTest extends TestBase {
 		setupData(["testcases/enums"]);
 	}
 
+	public function testRenameEnumType() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 74, 88),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 464, 478),
+			makeMoveTestEdit("testcases/enums/IdentifierType.hx", "testcases/enums/IdentType.hx"),
+			makeReplaceTestEdit("testcases/enums/IdentifierType.hx", "IdentType", 21, 35),
+		];
+		refactorAndCheck({fileName: "testcases/enums/IdentifierType.hx", toName: "IdentType", pos: 30}, edits);
+	}
+
 	public function testRenameScopedLocal() {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 219, 230),
