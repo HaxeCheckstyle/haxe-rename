@@ -594,12 +594,12 @@ class UsageCollector {
 			return;
 		}
 		var index:Int = 0;
-		if (identifier.uses != null) {
+		if (identifier != null && identifier.uses != null) {
 			index = identifier.uses.length;
 		}
 		readExpression(context, identifier, token.getFirstChild());
 		var switchIdent:Null<Identifier> = identifier;
-		if (identifier.uses != null && (identifier.uses.length > index)) {
+		if (identifier != null && identifier.uses != null && (identifier.uses.length > index)) {
 			switchIdent = identifier.uses[index];
 		}
 		var brOpen:Null<TokenTree> = token.access().firstOf(BrOpen).token;
