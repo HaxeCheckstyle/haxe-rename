@@ -123,4 +123,103 @@ class RenameHelper {
 			}
 		}
 	}
+
+	public static function matchesType(context:RefactorContext, identifier:Identifier, searchType:Type):Bool {
+		var identifierType:Null<Type> = findTypeOfIdentifier(context, identifier);
+		if (identifierType == null) {
+			return false;
+		}
+		return (searchType.getFullModulName() == identifierType.getFullModulName());
+	}
+
+	public static function findTypeOfIdentifier(context:RefactorContext, identifier:Identifier):Null<Type> {
+		var parts:Array<String> = identifier.name.split(".");
+
+		var part:String = parts.shift();
+		var type:Null<Type> = findFieldOrScopedLocal(context, identifier.defineType, part, identifier.pos.start);
+		if (type == null) {
+			return null;
+		}
+		for (part in parts) {
+			type = findField(context, type, part);
+			if (type == null) {
+				return null;
+			}
+		}
+		return type;
+	}
+
+	public static function findFieldOrScopedLocal(context:RefactorContext, containerType:Type, name:String, pos:Int):Null<Type> {
+		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
+		var candidate:Null<Identifier> = null;
+		var fieldCandidate:Null<Identifier> = null;
+		for (use in allUses) {
+			switch (use.type) {
+				case Property | FieldVar | Method:
+					fieldCandidate = use;
+				case TypedefField:
+					fieldCandidate = use;
+				case EnumField:
+					fieldCandidate = use;
+				case ScopedLocal(scopeEnd):
+					if ((pos >= use.pos.start) && (pos <= scopeEnd)) {
+						candidate = use;
+					}
+				default:
+			}
+		}
+		if (candidate == null) {
+			candidate = fieldCandidate;
+		}
+		if (candidate == null) {
+			return null;
+		}
+		for (use in candidate.uses) {
+			switch (use.type) {
+				case TypeHint:
+					return typeFromTypeHint(context, use);
+				default:
+			}
+		}
+		return null;
+	}
+
+	public static function findField(context:RefactorContext, containerType:Type, name:String):Null<Type> {
+		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
+		var candidate:Null<Identifier> = null;
+		for (use in allUses) {
+			switch (use.type) {
+				case Property | FieldVar | Method | TypedefField | EnumField:
+					candidate = use;
+				default:
+			}
+		}
+		if (candidate == null) {
+			return null;
+		}
+		for (use in candidate.uses) {
+			switch (use.type) {
+				case TypeHint:
+					return typeFromTypeHint(context, use);
+				default:
+			}
+		}
+		return null;
+	}
+
+	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):Null<Type> {
+		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(hint.name);
+		for (use in allUses) {
+			switch (use.type) {
+				case Abstract | Class | Enum | Interface | Typedef:
+					switch (hint.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), use.name)) {
+						case None:
+						case Global | SamePackage | Imported | ImportedWithAlias(_):
+							return use.file.getType(use.name);
+					}
+				default:
+			}
+		}
+		return null;
+	}
 }

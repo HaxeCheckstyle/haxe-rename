@@ -22,12 +22,13 @@ enum IdentifierType {
 	Method;
 	TypedParameter;
 	TypedefField;
-	StructureField;
+	StructureField(fieldNames:Array<String>);
 	InterfaceProperty;
 	InterfaceVar;
 	InterfaceMethod;
 	TypeHint;
 	EnumField;
+	CaseLabel(switchIdentifier:Identifier);
 	Call;
 	Access;
 	ScopedLocal(scopeEnd:Int);

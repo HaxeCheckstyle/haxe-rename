@@ -42,7 +42,7 @@ class Refactor {
 				Unsupported;
 			case TypedefField:
 				Unsupported;
-			case StructureField:
+			case StructureField(_):
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
 				RenameField.refactorField(context, file, identifier);
@@ -50,6 +50,8 @@ class Refactor {
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call | Access:
 				findActualWhat(context, file, identifier);
+			case CaseLabel(_):
+				Unsupported;
 			case ScopedLocal(scopeEnd):
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 		}

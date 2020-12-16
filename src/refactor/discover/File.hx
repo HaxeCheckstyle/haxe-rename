@@ -67,6 +67,15 @@ class File {
 		return path.file;
 	}
 
+	public function getType(typeName:String):Null<Type> {
+		for (type in typeList) {
+			if (type.name.name == typeName) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 	public function getIdentifier(pos:Int):Null<Identifier> {
 		if (packageIdentifier != null && packageIdentifier.containsPos(pos)) {
 			return packageIdentifier;

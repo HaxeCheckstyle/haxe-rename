@@ -4,7 +4,6 @@ import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
-import refactor.discover.NameMap.IdentifierMap;
 import refactor.edits.Changelist;
 
 class RenameEnumField {
@@ -50,12 +49,15 @@ class RenameEnumField {
 			}
 			switch (use.type) {
 				case Access:
+				case CaseLabel(switchIdentifier):
+					if (!RenameHelper.matchesType(context, switchIdentifier, identifier.defineType)) {
+						continue;
+					}
 				default:
 					continue;
 			}
 			RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
 		}
-
 		return changelist.execute();
 	}
 }

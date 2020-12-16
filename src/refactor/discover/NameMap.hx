@@ -14,6 +14,7 @@ class NameMap {
 		if (results == null) {
 			return [];
 		}
+		results.sort(Identifier.sortIdentifier);
 		return results;
 	}
 
@@ -24,7 +25,6 @@ class NameMap {
 				map.set(key, [identifier]);
 			} else {
 				list.push(identifier);
-				list.sort(Identifier.sortIdentifier);
 			}
 		}
 		addToMap(names, identifier.name);
@@ -51,7 +51,8 @@ class NameMap {
 			return [];
 		}
 		if (unused) {
-			return results.filter(i -> !i.edited);
+			results = results.filter(i -> !i.edited);
+			results.sort(Identifier.sortIdentifier);
 		}
 		return results;
 	}

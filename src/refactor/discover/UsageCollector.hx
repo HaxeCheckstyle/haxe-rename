@@ -470,6 +470,25 @@ class UsageCollector {
 		}
 	}
 
+	function readObjectLiteral(context:UsageContext, identifier:Identifier, token:TokenTree) {
+		if (!token.hasChildren()) {
+			return;
+		}
+		var names:Array<String> = [];
+		for (child in token.children) {
+			switch (child.tok) {
+				case Const(CIdent(s)):
+					names.push(s);
+					var field:Identifier = makeIdentifier(context, child, StructureField(names), identifier);
+					readExpression(context, field, child.getFirstChild());
+				case BrClose:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 	function readBlock(context:UsageContext, identifier:Identifier, token:TokenTree) {
 		if (!token.hasChildren()) {
 			return;
@@ -544,11 +563,22 @@ class UsageCollector {
 				case Kwd(KwdThis):
 					makeIdentifier(context, token, Access, identifier);
 					GoDeeper;
-				case Kwd(KwdCase):
-					readCase(context, identifier, token);
-					SkipSubtree;
 				case BrOpen:
-					readBlock(context, identifier, token);
+					switch (TokenTreeCheckUtils.getBrOpenType(token)) {
+						case Block:
+							readBlock(context, identifier, token);
+						case TypedefDecl:
+							readBlock(context, identifier, token);
+						case ObjectDecl:
+							readObjectLiteral(context, identifier, token);
+						case AnonType:
+							readBlock(context, identifier, token);
+						case Unknown:
+							readBlock(context, identifier, token);
+					}
+					SkipSubtree;
+				case Kwd(KwdSwitch):
+					readSwitch(context, identifier, token);
 					SkipSubtree;
 				case Kwd(KwdFor):
 					readFor(context, identifier, token);
@@ -557,6 +587,37 @@ class UsageCollector {
 					GoDeeper;
 			}
 		});
+	}
+
+	function readSwitch(context:UsageContext, identifier:Identifier, token:TokenTree) {
+		if (!token.hasChildren()) {
+			return;
+		}
+		var index:Int = 0;
+		if (identifier.uses != null) {
+			index = identifier.uses.length;
+		}
+		readExpression(context, identifier, token.getFirstChild());
+		var switchIdent:Null<Identifier> = identifier;
+		if (identifier.uses != null && (identifier.uses.length > index)) {
+			switchIdent = identifier.uses[index];
+		}
+		var brOpen:Null<TokenTree> = token.access().firstOf(BrOpen).token;
+		if ((brOpen == null) || (!brOpen.hasChildren())) {
+			return;
+		}
+		for (child in brOpen.children) {
+			switch (child.tok) {
+				case Kwd(KwdCase):
+					readCase(context, switchIdent, child);
+				case Kwd(KwdDefault):
+					if (child.hasChildren()) {
+						readBlock(context, switchIdent, child.getFirstChild());
+					}
+				default:
+					break;
+			}
+		}
 	}
 
 	function readFor(context:UsageContext, identifier:Identifier, token:TokenTree) {
@@ -624,7 +685,7 @@ class UsageCollector {
 		if (!token.hasChildren()) {
 			return;
 		}
-		var caseIdent:Identifier = makeIdentifier(context, token, Access, identifier);
+		var caseIdent:Identifier = makeIdentifier(context, token, CaseLabel(identifier), identifier);
 		var pOpen:Array<TokenTree> = token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case POpen:
@@ -636,9 +697,9 @@ class UsageCollector {
 		for (child in pOpen) {
 			readParameter(context, identifier, child, scopeEnd);
 		}
-		if (!caseIdent.name.contains(".") && pOpen.length > 0) {
-			caseIdent.type = Access;
-		}
+		// if (!caseIdent.name.contains(".") && pOpen.length > 0) {
+		caseIdent.type = CaseLabel(identifier);
+		// }
 	}
 
 	function readCaseArray(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
@@ -657,7 +718,7 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Const(_):
-					var field:Null<Identifier> = makeIdentifier(context, child, StructureField, identifier);
+					var field:Null<Identifier> = makeIdentifier(context, child, StructureField([]), identifier);
 					if (field == null) {
 						continue;
 					}
@@ -804,12 +865,15 @@ class UsageCollector {
 		if (!token.hasChildren()) {
 			return;
 		}
+		var fieldNames:Array<String> = [];
 		for (child in token.children) {
 			switch (child.tok) {
-				case Const(CIdent(_)):
-					makeIdentifier(context, child, StructureField, identifier);
+				case Const(CIdent(s)):
+					fieldNames.push(s);
+					makeIdentifier(context, child, StructureField(fieldNames), identifier);
 				default:
 			}
 		}
+		trace(fieldNames);
 	}
 }
