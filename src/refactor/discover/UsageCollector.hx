@@ -142,7 +142,6 @@ class UsageCollector {
 				case Dot:
 				case Binop(OpMult):
 					starImport = true;
-					pos.end = token.pos.max;
 				case Semicolon:
 					break;
 				default:

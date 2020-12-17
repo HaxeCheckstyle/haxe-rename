@@ -254,6 +254,9 @@
 	"exclude": {
 		"path": "RELATIVE_TO_PROJECT",
 		"all": [],
+		"AvoidStarImport": [
+			"testcases"
+		],
 		"MultipleStringLiterals": [
 			"config"
 		]

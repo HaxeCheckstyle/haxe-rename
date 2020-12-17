@@ -9,3 +9,5 @@ class ChildClass extends BaseClass {
 		super.doSomething(data);
 	}
 }
+
+typedef ListOfChilds = Array<ChildClass>;
