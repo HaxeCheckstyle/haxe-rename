@@ -19,7 +19,7 @@ enum IdentifierType {
 	AbstractTo;
 	Property;
 	FieldVar;
-	Method;
+	Method(isStatic:Bool);
 	TypedParameter;
 	TypedefField;
 	StructureField(fieldNames:Array<String>);
@@ -31,6 +31,13 @@ enum IdentifierType {
 	CaseLabel(switchIdentifier:Identifier);
 	Call;
 	Access;
-	ScopedLocal(scopeEnd:Int);
+	ScopedLocal(scopeEnd:Int, scopeType:ScopedLocalType);
 	StringConst;
+}
+
+enum ScopedLocalType {
+	Parameter;
+	Var;
+	CaseCapture;
+	ForLoop;
 }

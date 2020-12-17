@@ -50,7 +50,11 @@ class RenameEnumField {
 			switch (use.type) {
 				case Access:
 				case CaseLabel(switchIdentifier):
-					if (!RenameHelper.matchesType(context, switchIdentifier, identifier.defineType)) {
+					if (!RenameHelper.matchesType(context, {
+						name: switchIdentifier.name,
+						pos: switchIdentifier.pos.start,
+						defineType: switchIdentifier.defineType
+					}, KnownType(identifier.defineType))) {
 						continue;
 					}
 				default:

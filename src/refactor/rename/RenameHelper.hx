@@ -104,7 +104,7 @@ class RenameHelper {
 						// case TypedefField:
 						// case StructureField:
 						// case CallOrAccess:
-						case ScopedLocal(scopeEnd):
+						case ScopedLocal(scopeEnd, _):
 							var prefix:String = '${use.parent.name}.';
 							var allUses2:Array<Identifier> = use.defineType.getIdentifiers('$prefix${identifier.name}');
 							var scopeStart:Int = use.pos.start;
@@ -124,44 +124,60 @@ class RenameHelper {
 		}
 	}
 
-	public static function matchesType(context:RefactorContext, identifier:Identifier, searchType:Type):Bool {
-		var identifierType:Null<Type> = findTypeOfIdentifier(context, identifier);
+	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
+		var identifierType:Null<TypeHintType> = findTypeOfIdentifier(context, searchTypeOf);
 		if (identifierType == null) {
 			return false;
 		}
-		return (searchType.getFullModulName() == identifierType.getFullModulName());
+		return switch ([identifierType, searchType]) {
+			case [UnknownType(name1), UnknownType(name2)]:
+				name1 == name2;
+			case [KnownType(type1), KnownType(type2)]:
+				(type1.getFullModulName() == type2.getFullModulName());
+			default:
+				false;
+		}
 	}
 
-	public static function findTypeOfIdentifier(context:RefactorContext, identifier:Identifier):Null<Type> {
-		var parts:Array<String> = identifier.name.split(".");
+	public static function findTypeOfIdentifier(context:RefactorContext, searchTypeOf:SearchTypeOf):Null<TypeHintType> {
+		var parts:Array<String> = searchTypeOf.name.split(".");
 
 		var part:String = parts.shift();
-		var type:Null<Type> = findFieldOrScopedLocal(context, identifier.defineType, part, identifier.pos.start);
-		if (type == null) {
-			return null;
-		}
-		for (part in parts) {
-			type = findField(context, type, part);
-			if (type == null) {
+		var type:Null<TypeHintType> = findFieldOrScopedLocal(context, searchTypeOf.defineType, part, searchTypeOf.pos);
+		switch (type) {
+			case null:
 				return null;
-			}
+			case KnownType(t):
+				for (part in parts) {
+					type = findField(context, t, part);
+					switch (type) {
+						case null:
+							return type;
+						case KnownType(type):
+							t = type;
+						case UnknownType(name):
+							return type;
+					}
+				}
+				return type;
+			case UnknownType(name):
+				return type;
 		}
-		return type;
 	}
 
-	public static function findFieldOrScopedLocal(context:RefactorContext, containerType:Type, name:String, pos:Int):Null<Type> {
+	public static function findFieldOrScopedLocal(context:RefactorContext, containerType:Type, name:String, pos:Int):Null<TypeHintType> {
 		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
 		var candidate:Null<Identifier> = null;
 		var fieldCandidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method:
+				case Property | FieldVar | Method(_):
 					fieldCandidate = use;
 				case TypedefField:
 					fieldCandidate = use;
 				case EnumField:
 					fieldCandidate = use;
-				case ScopedLocal(scopeEnd):
+				case ScopedLocal(scopeEnd, _):
 					if ((pos >= use.pos.start) && (pos <= scopeEnd)) {
 						candidate = use;
 					}
@@ -184,12 +200,12 @@ class RenameHelper {
 		return null;
 	}
 
-	public static function findField(context:RefactorContext, containerType:Type, name:String):Null<Type> {
+	public static function findField(context:RefactorContext, containerType:Type, name:String):Null<TypeHintType> {
 		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method | TypedefField | EnumField:
+				case Property | FieldVar | Method(_) | TypedefField | EnumField:
 					candidate = use;
 				default:
 			}
@@ -207,7 +223,7 @@ class RenameHelper {
 		return null;
 	}
 
-	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):Null<Type> {
+	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):TypeHintType {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(hint.name);
 		for (use in allUses) {
 			switch (use.type) {
@@ -215,11 +231,22 @@ class RenameHelper {
 					switch (hint.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), use.name)) {
 						case None:
 						case Global | SamePackage | Imported | ImportedWithAlias(_):
-							return use.file.getType(use.name);
+							return KnownType(use.file.getType(use.name));
 					}
 				default:
 			}
 		}
-		return null;
+		return UnknownType(hint.name);
 	}
+}
+
+typedef SearchTypeOf = {
+	var name:String;
+	var pos:Int;
+	var defineType:Type;
+}
+
+enum TypeHintType {
+	KnownType(type:Type);
+	UnknownType(name:String);
 }

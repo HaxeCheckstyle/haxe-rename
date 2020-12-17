@@ -33,7 +33,7 @@ class RenameScopedLocal {
 				continue;
 			}
 			switch (use.type) {
-				case ScopedLocal(scopeEnd):
+				case ScopedLocal(scopeEnd, _):
 					if (use.pos.start != identifier.pos.start) {
 						// new parameter with identical name, so we skip its scope
 						scopeStart = scopeEnd;

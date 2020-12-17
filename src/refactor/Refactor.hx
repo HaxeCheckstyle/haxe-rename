@@ -36,8 +36,10 @@ class Refactor {
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
 				Unsupported;
-			case Property | FieldVar | Method:
-				RenameField.refactorField(context, file, identifier);
+			case Property | FieldVar:
+				RenameField.refactorField(context, file, identifier, false);
+			case Method(isStatic):
+				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
 				Unsupported;
 			case TypedefField:
@@ -45,14 +47,14 @@ class Refactor {
 			case StructureField(_):
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
-				RenameField.refactorField(context, file, identifier);
+				RenameField.refactorField(context, file, identifier, false);
 			case EnumField:
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call | Access:
 				findActualWhat(context, file, identifier);
 			case CaseLabel(_):
 				Unsupported;
-			case ScopedLocal(scopeEnd):
+			case ScopedLocal(scopeEnd, _):
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 		}
 	}
@@ -71,14 +73,14 @@ class Refactor {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method:
+				case Property | FieldVar | Method(_):
 					if (identifier.defineType.name != use.defineType.name) {
 						continue;
 					}
 					if (candidate == null) {
 						candidate = use;
 					}
-				case ScopedLocal(scopeEnd):
+				case ScopedLocal(scopeEnd, _):
 					if ((use.pos.start < identifier.pos.start) && (identifier.pos.start < scopeEnd)) {
 						candidate = use;
 					}
