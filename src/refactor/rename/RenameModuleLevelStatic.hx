@@ -53,7 +53,7 @@ class RenameModuleLevelStatic {
 				default:
 			}
 		}
-
+		RenameHelper.replaceStaticExtension(context, changelist, identifier);
 		return changelist.execute();
 	}
 

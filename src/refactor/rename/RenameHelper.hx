@@ -238,6 +238,50 @@ class RenameHelper {
 		}
 		return UnknownType(hint.name);
 	}
+
+	public static function replaceStaticExtension(context:RefactorContext, changelist:Changelist, identifier:Identifier) {
+		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
+
+		var firstParam:Null<Identifier> = null;
+		for (use in identifier.uses) {
+			switch (use.type) {
+				case ScopedLocal(_, Parameter):
+					firstParam = use;
+					break;
+				default:
+			}
+		}
+		if (firstParam == null) {
+			return;
+		}
+
+		var firstParamType:Null<TypeHintType> = null;
+		for (use in firstParam.uses) {
+			switch (use.type) {
+				case TypeHint:
+					firstParamType = RenameHelper.typeFromTypeHint(context, use);
+				default:
+			}
+		}
+		if (firstParamType == null) {
+			return;
+		}
+
+		for (use in allUses) {
+			var object:String = use.name.substr(0, use.name.length - identifier.name.length - 1);
+
+			// TODO check for using as well!
+			if (!RenameHelper.matchesType(context, {
+				name: object,
+				pos: use.pos.start,
+				defineType: use.defineType
+			}, firstParamType)) {
+				continue;
+			}
+
+			RenameHelper.replaceTextWithPrefix(use, '$object.', context.what.toName, changelist);
+		}
+	}
 }
 
 typedef SearchTypeOf = {

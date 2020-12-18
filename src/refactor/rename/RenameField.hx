@@ -43,7 +43,7 @@ class RenameField {
 
 			if (isStatic) {
 				replaceStaticUse(context, changelist, type, identifier.name);
-				replaceStaticExtension(context, changelist, type, identifier);
+				RenameHelper.replaceStaticExtension(context, changelist, identifier);
 			}
 
 			// TODO imports with alias
@@ -98,49 +98,6 @@ class RenameField {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
 		for (use in allUses) {
 			RenameHelper.replaceTextWithPrefix(use, '$fullModuleName.', context.what.toName, changelist);
-		}
-	}
-
-	static function replaceStaticExtension(context:RefactorContext, changelist:Changelist, type:Type, identifier:Identifier) {
-		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
-
-		var firstParam:Null<Identifier> = null;
-		for (use in identifier.uses) {
-			switch (use.type) {
-				case ScopedLocal(_, Parameter):
-					firstParam = use;
-					break;
-				default:
-			}
-		}
-		if (firstParam == null) {
-			return;
-		}
-
-		var firstParamType:Null<TypeHintType> = null;
-		for (use in firstParam.uses) {
-			switch (use.type) {
-				case TypeHint:
-					firstParamType = RenameHelper.typeFromTypeHint(context, use);
-				default:
-			}
-		}
-		if (firstParamType == null) {
-			return;
-		}
-
-		for (use in allUses) {
-			var object:String = use.name.substr(0, use.name.length - identifier.name.length - 1);
-
-			if (!RenameHelper.matchesType(context, {
-				name: object,
-				pos: use.pos.start,
-				defineType: use.defineType
-			}, firstParamType)) {
-				continue;
-			}
-
-			RenameHelper.replaceTextWithPrefix(use, '$object.', context.what.toName, changelist);
 		}
 	}
 }
