@@ -10,4 +10,7 @@ typedef RefactorContext = {
 	var what:RefactorWhat;
 	var forRealExecute:Bool;
 	var docFactory:(fileName:String) -> IEditableDocument;
+	var verboseLog:VerboseLogger;
 }
+
+typedef VerboseLogger = (text:String) -> Void;

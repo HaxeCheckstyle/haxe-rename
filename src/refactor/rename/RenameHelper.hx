@@ -125,8 +125,18 @@ class RenameHelper {
 	}
 
 	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
+		function printTypeHint(hintType:TypeHintType):String {
+			return switch (hintType) {
+				case KnownType(type):
+					'KnownType($type)';
+				case UnknownType(name):
+					'UnknownType($name)';
+			}
+		}
+
 		var identifierType:Null<TypeHintType> = findTypeOfIdentifier(context, searchTypeOf);
 		if (identifierType == null) {
+			context.verboseLog('could not find type of candidate "${searchTypeOf.name}" for static extension of ${printTypeHint(searchType)}');
 			return false;
 		}
 		return switch ([identifierType, searchType]) {
@@ -135,6 +145,7 @@ class RenameHelper {
 			case [KnownType(type1), KnownType(type2)]:
 				(type1.getFullModulName() == type2.getFullModulName());
 			default:
+				context.verboseLog('types do not match for static extension ${searchTypeOf.name}:${printTypeHint(identifierType)} != ${printTypeHint(searchType)}');
 				false;
 		}
 	}
@@ -252,6 +263,7 @@ class RenameHelper {
 			}
 		}
 		if (firstParam == null) {
+			context.verboseLog("could not find first parameter for static extension");
 			return;
 		}
 
@@ -264,11 +276,32 @@ class RenameHelper {
 			}
 		}
 		if (firstParamType == null) {
+			context.verboseLog("could not find type of first parameter for static extension");
 			return;
 		}
 
 		for (use in allUses) {
-			var object:String = use.name.substr(0, use.name.length - identifier.name.length - 1);
+			var object:String = "";
+			if (use.name == identifier.name) {
+				if (use.parent != null) {
+					switch (firstParamType) {
+						case null:
+						case KnownType(type):
+							if (use.parent.name == type.name.name) {
+								changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+								continue;
+							}
+						case UnknownType(name):
+							if (use.parent.name == name) {
+								changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+								continue;
+							}
+					}
+				}
+				object = use.name;
+			} else {
+				object = use.name.substr(0, use.name.length - identifier.name.length - 1);
+			}
 
 			// TODO check for using as well!
 			if (!RenameHelper.matchesType(context, {

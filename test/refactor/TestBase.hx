@@ -48,7 +48,8 @@ class TestBase implements ITest {
 			fileList: usageContext.fileList,
 			what: what,
 			forRealExecute: true,
-			docFactory: (fileName) -> editList.newDoc(fileName)
+			docFactory: (fileName) -> editList.newDoc(fileName),
+			verboseLog: function(text:String) {}
 		});
 		Assert.equals(Done, result, pos);
 		Assert.equals(editList.docCounter, editList.docFinishedCounter, pos);

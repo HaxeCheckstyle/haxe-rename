@@ -1,6 +1,7 @@
 package refactor;
 
 import haxe.Timer;
+import refactor.RefactorContext.VerboseLogger;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
@@ -44,6 +45,7 @@ class Cli {
 		var toName:String = "";
 		var help:Bool = false;
 		var execute:Bool = false;
+		var verboseLog:VerboseLogger = function(text:String) {};
 		var argHandler = hxargs.Args.generate([
 			@doc("file or directory with .hx files (multiple allowed)")
 			["-s", "--source"] => function(path:String) paths.push(path),
@@ -54,8 +56,8 @@ class Cli {
 			@doc("new name for all occurences of identifier")
 			["-n"] => function(newName:String) toName = newName,
 
-			// @doc("Print additional information")
-			// ["-v"] => function() verbose = true,
+			@doc("Print additional information")
+			["-v"] => function() verboseLog = logMessage,
 
 			@doc("perform renaming operations")
 			["-x"] => function() execute = true,
@@ -108,7 +110,8 @@ class Cli {
 			fileList: usageContext.fileList,
 			what: what,
 			forRealExecute: execute && forReal,
-			docFactory: EditableDocument.new
+			docFactory: EditableDocument.new,
+			verboseLog: verboseLog
 		});
 		switch (result) {
 			case NoChange:
@@ -126,6 +129,10 @@ class Cli {
 		// printStats(Timer.stamp() - startTime);
 		Sys.println(Timer.stamp() - startTime);
 		Sys.exit(exitCode);
+	}
+
+	function logMessage(text:String) {
+		Sys.println(text);
 	}
 
 	function makeWhat(location:String, toName:String):Null<RefactorWhat> {
