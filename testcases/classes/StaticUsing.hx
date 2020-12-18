@@ -14,5 +14,7 @@ class StaticUsing {
 		var text:String;
 
 		text.printText();
+
+		Sys.println(new ChildClass().print());
 	}
 }

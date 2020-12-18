@@ -36,6 +36,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 142, 152),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 159, 169),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 280, 290),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 72, 82),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 123, 133),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 142, 152),
@@ -79,6 +80,7 @@ class ClassTest extends TestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "printChild", 151, 156),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 210, 215),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 293, 298),
 		];
 		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "printChild", pos: 153}, edits);
 	}
