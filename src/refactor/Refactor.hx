@@ -25,20 +25,26 @@ class Refactor {
 		}
 		return switch (identifier.type) {
 			case PackageName:
+				context.verboseLog('rename package name "${identifier.name}"');
 				RenamePackage.refactorPackageName(context, file, identifier);
 			case ImportModul | UsingModul:
 				Unsupported;
 			case ImportAlias:
+				context.verboseLog('rename import alias "${identifier.name}"');
 				RenameImportAlias.refactorImportAlias(context, file, identifier);
 			case Abstract | Class | Enum | Interface | Typedef:
+				context.verboseLog('rename type name "${identifier.name}"');
 				RenameTypeName.refactorTypeName(context, file, identifier);
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
+				context.verboseLog('rename module level static "${identifier.name}"');
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
 				Unsupported;
 			case Property | FieldVar:
+				context.verboseLog('rename field "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);
 			case Method(isStatic):
+				context.verboseLog('rename class method "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
 				Unsupported;
@@ -47,14 +53,18 @@ class Refactor {
 			case StructureField(_):
 				Unsupported;
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
+				context.verboseLog('rename interface field "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);
 			case EnumField:
+				context.verboseLog('rename enum field "${identifier.name}"');
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call | Access:
+				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
 				findActualWhat(context, file, identifier);
 			case CaseLabel(_):
 				Unsupported;
-			case ScopedLocal(scopeEnd, _):
+			case ScopedLocal(scopeEnd, type):
+				context.verboseLog('rename scoped local "${identifier.name}" ($type)');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 		}
 	}
