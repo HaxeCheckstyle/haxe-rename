@@ -43,7 +43,11 @@ class RenameField {
 
 			if (isStatic) {
 				replaceStaticUse(context, changelist, type, identifier.name);
-				RenameHelper.replaceStaticExtension(context, changelist, identifier);
+				switch (identifier.type) {
+					case Method(true):
+						RenameHelper.replaceStaticExtension(context, changelist, identifier);
+					default:
+				}
 			}
 
 			// TODO imports with alias

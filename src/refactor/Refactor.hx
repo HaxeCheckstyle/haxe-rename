@@ -40,9 +40,12 @@ class Refactor {
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
 				Unsupported;
-			case Property | FieldVar:
-				context.verboseLog('rename field "${identifier.name}"');
+			case Property:
+				context.verboseLog('rename property "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);
+			case FieldVar(isStatic):
+				context.verboseLog('rename field "${identifier.name}"');
+				RenameField.refactorField(context, file, identifier, isStatic);
 			case Method(isStatic):
 				context.verboseLog('rename class method "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
@@ -83,7 +86,7 @@ class Refactor {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method(_):
+				case Property | FieldVar(_) | Method(_):
 					if (identifier.defineType.name != use.defineType.name) {
 						continue;
 					}

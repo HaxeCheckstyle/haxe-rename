@@ -18,7 +18,7 @@ enum IdentifierType {
 	AbstractFrom;
 	AbstractTo;
 	Property;
-	FieldVar;
+	FieldVar(isStatic:Bool);
 	Method(isStatic:Bool);
 	TypedParameter;
 	TypedefField;

@@ -209,12 +209,7 @@ class UsageCollector {
 
 		switch (type) {
 			case Abstract:
-				//  abstract base type
-				var pOpen:Null<TokenTree> = nameToken.access().firstOf(POpen).token;
-				if (pOpen != null) {
-					readTypeHint(context, identifier, pOpen, AbstractOver);
-				}
-				addFields(context, identifier, nameToken.access().firstOf(BrOpen).token);
+				addAbstractFields(context, identifier, nameToken);
 			case Class:
 				addFields(context, identifier, nameToken);
 			case Enum:
@@ -226,7 +221,7 @@ class UsageCollector {
 						switch (use.type) {
 							case Property:
 								use.type = InterfaceProperty;
-							case FieldVar:
+							case FieldVar(_):
 								use.type = InterfaceVar;
 							case Method(_):
 								use.type = InterfaceMethod;
@@ -405,25 +400,61 @@ class UsageCollector {
 					makeIdentifier(context, child.getFirstChild(), Extends, identifier);
 				case Kwd(KwdImplements):
 					makeIdentifier(context, child.getFirstChild(), Implements, identifier);
-				case Const(CIdent("from")):
-					makeIdentifier(context, child.getFirstChild(), AbstractFrom, identifier);
-				case Const(CIdent("to")):
-					makeIdentifier(context, child.getFirstChild(), AbstractTo, identifier);
 				case BrOpen:
 					addFields(context, identifier, child);
 				case Kwd(KwdFunction):
 					var nameToken:TokenTree = child.getFirstChild();
 					var method:Identifier = makeIdentifier(context, nameToken, Method(nameToken.access().firstOf(Kwd(KwdStatic)).exists()), identifier);
 					readMethod(context, method, nameToken);
-				case Kwd(KwdVar):
-					var name:TokenTree = child.getFirstChild();
-					var variable:Identifier = makeIdentifier(context, name, FieldVar, identifier);
-					if (name.access().firstChild().matches(POpen).exists()) {
+				case Kwd(KwdVar) | Kwd(KwdFinal):
+					var nameToken:TokenTree = child.getFirstChild();
+					var variable:Identifier = makeIdentifier(context, nameToken, FieldVar(nameToken.access().firstOf(Kwd(KwdStatic)).exists()), identifier);
+					if (nameToken.access().firstChild().matches(POpen).exists()) {
 						variable.type = Property;
 					}
 					readVarInit(context, variable, child.getFirstChild());
-				case Kwd(KwdFinal):
-					var variable:Identifier = makeIdentifier(context, child.getFirstChild(), FieldVar, identifier);
+				default:
+			}
+		};
+	}
+
+	function addAbstractFields(context:UsageContext, identifier:Identifier, token:Null<TokenTree>) {
+		if (token == null || !token.hasChildren()) {
+			return;
+		}
+		var staticVars:Bool = false;
+		var block:Null<TokenTree> = null;
+		for (child in token.children) {
+			switch (child.tok) {
+				case Kwd(KwdEnum):
+					staticVars = true;
+				case Const(CIdent("from")):
+					makeIdentifier(context, child.getFirstChild(), AbstractFrom, identifier);
+				case Const(CIdent("to")):
+					makeIdentifier(context, child.getFirstChild(), AbstractTo, identifier);
+				case POpen:
+					readTypeHint(context, identifier, child, AbstractOver);
+				case BrOpen:
+					block = child;
+					break;
+				default:
+			}
+		}
+		if (block == null) {
+			return;
+		}
+		for (child in block.children) {
+			switch (child.tok) {
+				case Kwd(KwdFunction):
+					var nameToken:TokenTree = child.getFirstChild();
+					var method:Identifier = makeIdentifier(context, nameToken, Method(nameToken.access().firstOf(Kwd(KwdStatic)).exists()), identifier);
+					readMethod(context, method, nameToken);
+				case Kwd(KwdVar) | Kwd(KwdFinal):
+					var nameToken:TokenTree = child.getFirstChild();
+					var variable:Identifier = makeIdentifier(context, nameToken, FieldVar(staticVars), identifier);
+					if (nameToken.access().firstChild().matches(POpen).exists()) {
+						variable.type = Property;
+					}
 					readVarInit(context, variable, child.getFirstChild());
 				default:
 			}

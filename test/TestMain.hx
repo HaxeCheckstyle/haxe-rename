@@ -1,5 +1,6 @@
 import refactor.ClassTest;
 import refactor.EnumTest;
+import refactor.ImportAliasTest;
 import refactor.InterfaceTest;
 import refactor.ModuleLevelStaticTest;
 import refactor.ScopedLocalTest;
@@ -11,6 +12,7 @@ class TestMain {
 		var tests:Array<ITest> = [
 			new ClassTest(),
 			new EnumTest(),
+			new ImportAliasTest(),
 			new InterfaceTest(),
 			new ModuleLevelStaticTest(),
 			new ScopedLocalTest()

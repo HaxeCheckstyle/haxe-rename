@@ -182,7 +182,7 @@ class RenameHelper {
 		var fieldCandidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method(_):
+				case Property | FieldVar(_) | Method(_):
 					fieldCandidate = use;
 				case TypedefField:
 					fieldCandidate = use;
@@ -216,7 +216,7 @@ class RenameHelper {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar | Method(_) | TypedefField | EnumField:
+				case Property | FieldVar(_) | Method(_) | TypedefField | EnumField:
 					candidate = use;
 				default:
 			}
@@ -253,6 +253,9 @@ class RenameHelper {
 	public static function replaceStaticExtension(context:RefactorContext, changelist:Changelist, identifier:Identifier) {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 
+		if (identifier.uses == null) {
+			return;
+		}
 		var firstParam:Null<Identifier> = null;
 		for (use in identifier.uses) {
 			switch (use.type) {
