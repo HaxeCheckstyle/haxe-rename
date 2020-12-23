@@ -68,4 +68,13 @@ class ScopedLocalTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 2020}, edits);
 	}
+
+	public function testRenameFileNameParameterWithStructureFields() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 99, 107),
+			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 182, 190),
+			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 229, 237),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Structure.hx", toName: "file", pos: 102}, edits);
+	}
 }

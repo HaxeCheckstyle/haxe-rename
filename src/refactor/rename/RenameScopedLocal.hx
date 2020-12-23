@@ -39,6 +39,8 @@ class RenameScopedLocal {
 						scopeStart = scopeEnd;
 						continue;
 					}
+				case StructureField(_):
+					continue;
 				default:
 			}
 			if (use.name == identifier.name) {
