@@ -50,7 +50,7 @@ class Cli {
 			@doc("file or directory with .hx files (multiple allowed)")
 			["-s", "--source"] => function(path:String) paths.push(path),
 
-			@doc("location (path + filename and offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>")
+			@doc("location (path + filename and byte offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>")
 			["-l"] => function(location:String) loc = location,
 
 			@doc("new name for all occurences of identifier")

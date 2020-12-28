@@ -106,7 +106,10 @@ class RenameHelper {
 						// case CallOrAccess:
 						case ScopedLocal(scopeEnd, _):
 							var prefix:String = '${use.parent.name}.';
-							var allUses2:Array<Identifier> = use.defineType.getIdentifiers('$prefix${identifier.name}');
+							var allUses2:Array<Identifier> = // use.defineType.getIdentifiers('$prefix${identifier.name}');
+								use.defineType.findAllIdentifiers((i) -> i.name == '$prefix${identifier.name}'
+									|| i.name.startsWith('$prefix${identifier.name}.'));
+
 							var scopeStart:Int = use.pos.start;
 							for (use2 in allUses2) {
 								if (use2.pos.start < scopeStart) {
@@ -115,7 +118,16 @@ class RenameHelper {
 								if (use2.pos.start > scopeEnd) {
 									continue;
 								}
-								RenameHelper.replaceTextWithPrefix(use2, prefix, context.what.toName, changelist);
+
+								var pos:IdentifierPos = {
+									fileName: use2.pos.fileName,
+									start: use2.pos.start + prefix.length,
+									end: use2.pos.end
+								};
+								if (use2.name.startsWith('$prefix${identifier.name}.')) {
+									pos.end = use2.pos.start + '$prefix${identifier.name}'.length;
+								}
+								changelist.addChange(use2.pos.fileName, ReplaceText(context.what.toName, pos), use2);
 							}
 						default:
 					}
@@ -184,7 +196,7 @@ class RenameHelper {
 			switch (use.type) {
 				case Property | FieldVar(_) | Method(_):
 					fieldCandidate = use;
-				case TypedefField:
+				case TypedefField(_):
 					fieldCandidate = use;
 				case EnumField:
 					fieldCandidate = use;
@@ -216,7 +228,7 @@ class RenameHelper {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar(_) | Method(_) | TypedefField | EnumField:
+				case Property | FieldVar(_) | Method(_) | TypedefField(_) | EnumField:
 					candidate = use;
 				default:
 			}

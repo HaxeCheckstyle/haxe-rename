@@ -7,7 +7,6 @@ import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
-import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameField {
 	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):RefactorResult {

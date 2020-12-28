@@ -2,6 +2,7 @@ package refactor;
 
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.rename.RenameAnonStructField;
 import refactor.rename.RenameEnumField;
 import refactor.rename.RenameField;
 import refactor.rename.RenameImportAlias;
@@ -51,10 +52,12 @@ class Refactor {
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
 				Unsupported;
-			case TypedefField:
+			case TypedefBase:
 				Unsupported;
-			case StructureField(_):
-				Unsupported;
+			case TypedefField(fields):
+				RenameAnonStructField.refactorAnonStructField(context, file, identifier, fields);
+			case StructureField(fields):
+				RenameAnonStructField.refactorStructureField(context, file, identifier, fields);
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
 				context.verboseLog('rename interface field "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);

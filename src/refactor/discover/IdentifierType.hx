@@ -1,5 +1,7 @@
 package refactor.discover;
 
+import refactor.discover.Identifier;
+
 enum IdentifierType {
 	PackageName;
 	ImportModul;
@@ -21,7 +23,8 @@ enum IdentifierType {
 	FieldVar(isStatic:Bool);
 	Method(isStatic:Bool);
 	TypedParameter;
-	TypedefField;
+	TypedefBase;
+	TypedefField(fields:Array<TypedefFieldType>);
 	StructureField(fieldNames:Array<String>);
 	InterfaceProperty;
 	InterfaceVar;
@@ -40,4 +43,9 @@ enum ScopedLocalType {
 	Var;
 	CaseCapture;
 	ForLoop;
+}
+
+enum TypedefFieldType {
+	Required(identifier:Identifier);
+	Optional(identifier:Identifier);
 }

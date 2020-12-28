@@ -1,3 +1,4 @@
+import refactor.TypedefTest;
 import refactor.ClassTest;
 import refactor.EnumTest;
 import refactor.ImportAliasTest;
@@ -15,7 +16,8 @@ class TestMain {
 			new ImportAliasTest(),
 			new InterfaceTest(),
 			new ModuleLevelStaticTest(),
-			new ScopedLocalTest()
+			new ScopedLocalTest(),
+			new TypedefTest()
 		];
 		var runner:Runner = new Runner();
 

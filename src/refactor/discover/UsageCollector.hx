@@ -8,6 +8,7 @@ import hxparse.ParserError;
 import tokentree.TokenTree;
 import tokentree.TokenTreeBuilder;
 import refactor.discover.File.Import;
+import refactor.discover.IdentifierType.TypedefFieldType;
 
 class UsageCollector {
 	public function new() {}
@@ -203,9 +204,9 @@ class UsageCollector {
 		}
 		var nameToken:TokenTree = token.getFirstChild();
 		var newType:Type = new Type(context.file);
+		context.type = newType;
 		var identifier:Identifier = makeIdentifier(context, nameToken, type, null);
 		newType.name = identifier;
-		context.type = newType;
 
 		switch (type) {
 			case Abstract:
@@ -230,7 +231,7 @@ class UsageCollector {
 					}
 				}
 			case Typedef:
-				addTypedefFields(context, identifier, nameToken);
+				readTypedef(context, identifier, nameToken);
 			case ModuleLevelStaticVar:
 				readVarInit(context, identifier, nameToken);
 			case ModuleLevelStaticMethod:
@@ -373,18 +374,20 @@ class UsageCollector {
 		}
 	}
 
-	function addTypedefFields(context:UsageContext, identifier:Identifier, token:TokenTree) {
+	function readTypedef(context:UsageContext, identifier:Identifier, token:TokenTree) {
 		if (!token.hasChildren()) {
 			return;
 		}
-		for (child in token.children) {
+		var assignToken:Null<TokenTree> = token.getFirstChild();
+		if (assignToken == null || !assignToken.tok.match(Binop(OpAssign)) || !assignToken.hasChildren()) {
+			return;
+		}
+		for (child in assignToken.children) {
 			switch (child.tok) {
-				case Binop(OpAssign) | BrOpen:
-					addTypedefFields(context, identifier, child);
+				case BrOpen:
+					readAnonStructure(context, identifier, child);
 				case Const(CIdent(_)):
-					makeIdentifier(context, child, TypedefField, identifier);
-				case Kwd(KwdVar):
-					makeIdentifier(context, child.getFirstChild(), TypedefField, identifier);
+					makeIdentifier(context, child, TypedefBase, identifier);
 				default:
 			}
 		}
@@ -896,12 +899,35 @@ class UsageCollector {
 		if (!token.hasChildren()) {
 			return;
 		}
-		var fieldNames:Array<String> = [];
+		var fields:Array<TypedefFieldType> = [];
 		for (child in token.children) {
 			switch (child.tok) {
-				case Const(CIdent(s)):
-					fieldNames.push(s);
-					makeIdentifier(context, child, StructureField(fieldNames), identifier);
+				case Const(CIdent(_)):
+					var identifier:Identifier = makeIdentifier(context, child, TypedefField(fields), identifier);
+					if (child.access()
+						.firstOf(At)
+						.firstOf(DblDot)
+						.firstOf(Const(CIdent("optional")))
+						.exists()) {
+						fields.push(Optional(identifier));
+					} else {
+						fields.push(Required(identifier));
+					}
+				case Kwd(KwdVar) | Kwd(KwdFinal):
+					var nameToken:TokenTree = child.getFirstChild();
+					var identifier:Identifier = makeIdentifier(context, nameToken, TypedefField(fields), identifier);
+					if (nameToken.access()
+						.firstOf(At)
+						.firstOf(DblDot)
+						.firstOf(Const(CIdent("optional")))
+						.exists()) {
+						fields.push(Optional(identifier));
+					} else {
+						fields.push(Required(identifier));
+					}
+				case Question:
+					var identifier:Identifier = makeIdentifier(context, child.getFirstChild(), TypedefField(fields), identifier);
+					fields.push(Optional(identifier));
 				default:
 			}
 		}

@@ -22,13 +22,14 @@ Note: renaming uses static code analysis to figure out what places to change in 
 * rename interface fields
 * rename class fields
 * rename enum fields
+* rename anon struct fields (limited to object literals)
 
 ## usage
 
 ```text
 Haxe Rename 1.0.0
 [-s | --source] <path> : file or directory with .hx files (multiple allowed)
-[-l] <location>        : location (path + filename and offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>
+[-l] <location>        : location (path + filename and byte offset from beginning of file) of identifier to rename - <src/pack/Filename.hx@123>
 [-n] <newName>         : new name for all occurences of identifier
 [-x]                   : perform renaming operations
 [--i-have-backups]     : you have a backup and you really, really want to rename
