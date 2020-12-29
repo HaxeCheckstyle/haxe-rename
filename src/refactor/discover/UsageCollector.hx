@@ -207,6 +207,7 @@ class UsageCollector {
 		context.type = newType;
 		var identifier:Identifier = makeIdentifier(context, nameToken, type, null);
 		newType.name = identifier;
+		context.typeList.addType(newType);
 
 		switch (type) {
 			case Abstract:
@@ -813,7 +814,17 @@ class UsageCollector {
 				default:
 					break;
 			}
-			nameToken = nameToken.getFirstChild();
+			if (!nameToken.hasChildren()) {
+				break;
+			}
+			for (child in nameToken.children) {
+				switch (child.tok) {
+					case Kwd(KwdThis) | Const(_) | Dot | Binop(OpLt) | DblDot | POpen:
+						nameToken = child;
+						break;
+					default:
+				}
+			}
 			if (nameToken == null) {
 				break;
 			}
@@ -931,6 +942,5 @@ class UsageCollector {
 				default:
 			}
 		}
-		// trace(fieldNames);
 	}
 }

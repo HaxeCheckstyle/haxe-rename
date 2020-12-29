@@ -6,5 +6,6 @@ typedef UsageContext = {
 	var usageCollector:UsageCollector;
 	var nameMap:NameMap;
 	var fileList:FileList;
+	var typeList:TypeList;
 	var type:Null<Type>;
 }

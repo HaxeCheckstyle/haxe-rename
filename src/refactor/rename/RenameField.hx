@@ -7,6 +7,8 @@ import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.rename.RenameHelper.SearchTypeOf;
+import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameField {
 	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):RefactorResult {
@@ -37,9 +39,6 @@ class RenameField {
 				default:
 			}
 
-			// find typehints that use type and rename those
-			RenameHelper.replaceTypeHintsUses(context, changelist, type, identifier);
-
 			if (isStatic) {
 				replaceStaticUse(context, changelist, type, identifier.name);
 				switch (identifier.type) {
@@ -51,7 +50,46 @@ class RenameField {
 
 			// TODO imports with alias
 		}
+		replaceAccessOrCalls(context, changelist, identifier, types);
 		return changelist.execute();
+	}
+
+	static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>) {
+		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
+		for (use in allUses) {
+			var name:String = use.name;
+			var index:Int = name.indexOf('.${identifier.name}');
+			if (index < 0) {
+				continue;
+			}
+			name = name.substr(0, index);
+
+			var search:SearchTypeOf = {
+				name: name,
+				pos: use.pos.start,
+				defineType: use.defineType
+			};
+			var typeResult:Null<TypeHintType> = RenameHelper.findTypeOfIdentifier(context, search);
+			switch (typeResult) {
+				case null:
+					continue;
+				case KnownType(type):
+					for (t in types) {
+						if (t != type) {
+							continue;
+						}
+						var pos:IdentifierPos = {
+							fileName: use.pos.fileName,
+							start: use.pos.start + name.length + 1,
+							end: use.pos.end
+						};
+						pos.end = pos.start + identifier.name.length;
+						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
+					}
+				case UnknownType(_):
+					continue;
+			}
+		}
 	}
 
 	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {

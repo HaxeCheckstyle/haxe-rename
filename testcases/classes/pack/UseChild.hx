@@ -9,4 +9,8 @@ class UseChild {
 	function main(child:ChildClass) {
 		list.push(child);
 	}
+
+	function accessParent(child:ChildClass) {
+		child.parent.doSomething([]);
+	}
 }

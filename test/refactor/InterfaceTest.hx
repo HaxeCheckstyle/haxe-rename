@@ -30,9 +30,9 @@ class InterfaceTest extends TestBase {
 
 	public function testRenameInterfaceFieldDoSomething() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 123, 134),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 230, 241),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 362, 373),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 153, 164),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 260, 271),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 392, 403),
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doIt", 75, 86),
 			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 107, 118),
 			makeReplaceTestEdit("testcases/interfaces/BaseClass.hx", "doIt", 164, 175),
@@ -42,9 +42,9 @@ class InterfaceTest extends TestBase {
 
 	public function testRenameInterfaceFieldDoSomethingElse() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 147, 162),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 253, 268),
-			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 385, 400),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 177, 192),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 283, 298),
+			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 415, 430),
 			makeReplaceTestEdit("testcases/interfaces/pack/AbstractChild.hx", "doMore", 102, 117),
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "doMore", 105, 120),
 			makeReplaceTestEdit("testcases/interfaces/ChildClass.hx", "doMore", 111, 126),

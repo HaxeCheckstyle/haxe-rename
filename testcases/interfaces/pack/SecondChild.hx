@@ -1,6 +1,7 @@
 package interfaces.pack;
 
 import interfaces.BaseClass as Base;
+import interfaces.ChildClass;
 
 class SecondChild extends Base {
 	override public function doSomething() {

@@ -3,6 +3,7 @@ package refactor.rename;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
+import refactor.discover.TypeList;
 import refactor.edits.Changelist;
 
 class RenameHelper {
@@ -84,57 +85,55 @@ class RenameHelper {
 		return types;
 	}
 
-	public static function replaceTypeHintsUses(context:RefactorContext, changelist:Changelist, type:Type, identifier:Identifier) {
-		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(type.name.name);
-		allUses = allUses.concat(context.nameMap.getIdentifiers(type.getFullModulName()));
-		for (use in allUses) {
-			switch (use.type) {
-				case TypeHint:
-					if (use.parent == null) {
-						continue;
-					}
-					switch (use.parent.type) {
-						// case ModuleLevelStaticVar:
-						// case ModuleLevelStaticMethod:
-						// case AbstractFrom:
-						// case AbstractTo:
-						// case Property:
-						// case FieldVar:
-						// case Method:
-						// case TypedefField:
-						// case StructureField:
-						// case CallOrAccess:
-						case ScopedLocal(scopeEnd, _):
-							var prefix:String = '${use.parent.name}.';
-							var allUses2:Array<Identifier> = // use.defineType.getIdentifiers('$prefix${identifier.name}');
-								use.defineType.findAllIdentifiers((i) -> i.name == '$prefix${identifier.name}'
-									|| i.name.startsWith('$prefix${identifier.name}.'));
-
-							var scopeStart:Int = use.pos.start;
-							for (use2 in allUses2) {
-								if (use2.pos.start < scopeStart) {
-									continue;
-								}
-								if (use2.pos.start > scopeEnd) {
-									continue;
-								}
-
-								var pos:IdentifierPos = {
-									fileName: use2.pos.fileName,
-									start: use2.pos.start + prefix.length,
-									end: use2.pos.end
-								};
-								if (use2.name.startsWith('$prefix${identifier.name}.')) {
-									pos.end = use2.pos.start + '$prefix${identifier.name}'.length;
-								}
-								changelist.addChange(use2.pos.fileName, ReplaceText(context.what.toName, pos), use2);
-							}
-						default:
-					}
-				default:
-			}
-		}
-	}
+	// public static function replaceTypeHintsUses(context:RefactorContext, changelist:Changelist, type:Type, identifier:Identifier) {
+	// 	var allUses:Array<Identifier> = context.nameMap.getIdentifiers(type.name.name);
+	// 	allUses = allUses.concat(context.nameMap.getIdentifiers(type.getFullModulName()));
+	// 	for (use in allUses) {
+	// 		switch (use.type) {
+	// 			case TypeHint:
+	// 				if (use.parent == null) {
+	// 					continue;
+	// 				}
+	// 				switch (use.parent.type) {
+	// 					// case ModuleLevelStaticVar:
+	// 					// case ModuleLevelStaticMethod:
+	// 					// case AbstractFrom:
+	// 					// case AbstractTo:
+	// 					// case Property:
+	// 					// case FieldVar:
+	// 					// case Method:
+	// 					// case TypedefField:
+	// 					// case StructureField:
+	// 					// case CallOrAccess:
+	// 					case ScopedLocal(scopeEnd, _):
+	// 						var prefix:String = '${use.parent.name}.';
+	// 						// var allUses2:Array<Identifier> = use.defineType.getIdentifiers('$prefix${identifier.name}');
+	// 						var allUses2:Array<Identifier> = use.defineType.findAllIdentifiers((i) -> i.name == '$prefix${identifier.name}'
+	// 							|| i.name.startsWith('$prefix${identifier.name}.'));
+	// 						var scopeStart:Int = use.pos.start;
+	// 						for (use2 in allUses2) {
+	// 							if (use2.pos.start < scopeStart) {
+	// 								continue;
+	// 							}
+	// 							if (use2.pos.start > scopeEnd) {
+	// 								continue;
+	// 							}
+	// 							var pos:IdentifierPos = {
+	// 								fileName: use2.pos.fileName,
+	// 								start: use2.pos.start + prefix.length,
+	// 								end: use2.pos.end
+	// 							};
+	// 							if (use2.name.startsWith('$prefix${identifier.name}.')) {
+	// 								pos.end = use2.pos.start + '$prefix${identifier.name}'.length;
+	// 							}
+	// 							changelist.addChange(use2.pos.fileName, ReplaceText(context.what.toName, pos), use2);
+	// 						}
+	// 					default:
+	// 				}
+	// 			default:
+	// 		}
+	// 	}
+	// }
 
 	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
 		function printTypeHint(hintType:TypeHintType):String {
@@ -178,7 +177,7 @@ class RenameHelper {
 							return type;
 						case KnownType(type):
 							t = type;
-						case UnknownType(name):
+						case UnknownType(_):
 							return type;
 					}
 				}
@@ -210,7 +209,7 @@ class RenameHelper {
 		if (candidate == null) {
 			candidate = fieldCandidate;
 		}
-		if (candidate == null) {
+		if ((candidate == null) || (candidate.uses == null)) {
 			return null;
 		}
 		for (use in candidate.uses) {
@@ -230,10 +229,22 @@ class RenameHelper {
 			switch (use.type) {
 				case Property | FieldVar(_) | Method(_) | TypedefField(_) | EnumField:
 					candidate = use;
+					break;
 				default:
 			}
 		}
-		if (candidate == null) {
+		if ((candidate == null) || (candidate.uses == null)) {
+			switch (containerType.name.type) {
+				// case Abstract:
+				case Class:
+					var baseType:Null<Type> = findBaseClass(context.typeList, containerType);
+					if (baseType == null) {
+						return null;
+					}
+					return findField(context, baseType, name);
+				case Typedef:
+				default:
+			}
 			return null;
 		}
 		for (use in candidate.uses) {
@@ -246,17 +257,41 @@ class RenameHelper {
 		return null;
 	}
 
+	public static function findBaseClass(typeList:TypeList, type:Type):Null<Type> {
+		var baseClasses:Array<Identifier> = type.findAllIdentifiers((i) -> i.type.match(Extends));
+		for (base in baseClasses) {
+			var candidateTypes:Array<Type> = typeList.findTypeName(base.name);
+			for (candidate in candidateTypes) {
+				switch (type.file.importsModule(candidate.file.getPackage(), candidate.file.getMainModulName(), candidate.name.name)) {
+					case None:
+					case ImportedWithAlias(_):
+					case Global | SamePackage | Imported:
+						return candidate;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):TypeHintType {
-		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(hint.name);
-		for (use in allUses) {
-			switch (use.type) {
-				case Abstract | Class | Enum | Interface | Typedef:
-					switch (hint.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), use.name)) {
-						case None:
-						case Global | SamePackage | Imported | ImportedWithAlias(_):
-							return KnownType(use.file.getType(use.name));
-					}
-				default:
+		var parts:Array<String> = hint.name.split(".");
+		var typeName:String = parts.pop();
+
+		var allTypes:Array<Type> = context.typeList.findTypeName(typeName);
+		if (parts.length > 0) {
+			for (type in allTypes) {
+				if (type.getFullModulName() == hint.name) {
+					return KnownType(type);
+				}
+			}
+			return UnknownType(hint.name);
+		}
+		for (type in allTypes) {
+			switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
+				case None:
+				case ImportedWithAlias(_):
+				case Global | SamePackage | Imported:
+					return KnownType(type);
 			}
 		}
 		return UnknownType(hint.name);

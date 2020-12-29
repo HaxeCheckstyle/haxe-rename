@@ -5,6 +5,7 @@ import refactor.RefactorContext.VerboseLogger;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
+import refactor.discover.TypeList;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.EditableDocument;
@@ -98,6 +99,7 @@ class Cli {
 			usageCollector: new UsageCollector(),
 			nameMap: new NameMap(),
 			fileList: new FileList(),
+			typeList: new TypeList(),
 			type: null
 		};
 
@@ -108,6 +110,7 @@ class Cli {
 		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
+			typeList: usageContext.typeList,
 			what: what,
 			forRealExecute: execute && forReal,
 			docFactory: EditableDocument.new,

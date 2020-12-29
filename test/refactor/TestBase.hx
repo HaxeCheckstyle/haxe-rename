@@ -1,5 +1,6 @@
 package refactor;
 
+import refactor.discover.TypeList;
 import haxe.PosInfos;
 import refactor.Refactor;
 import refactor.RefactorResult;
@@ -24,6 +25,7 @@ class TestBase implements ITest {
 			usageCollector: new UsageCollector(),
 			nameMap: new NameMap(),
 			fileList: new FileList(),
+			typeList:  new TypeList(),
 			type: null
 		};
 
@@ -46,6 +48,7 @@ class TestBase implements ITest {
 		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
+			typeList:usageContext.typeList,
 			what: what,
 			forRealExecute: true,
 			docFactory: (fileName) -> editList.newDoc(fileName),

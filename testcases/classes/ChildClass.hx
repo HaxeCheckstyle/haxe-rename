@@ -1,6 +1,8 @@
 package classes;
 
 class ChildClass extends BaseClass {
+	public var parent:BaseClass;
+
 	public function new() {
 		super();
 	}

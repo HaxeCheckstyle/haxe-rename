@@ -10,4 +10,8 @@ class BaseClass {
 	public function doSomething(data:Array<String>) {
 		this.data = this.data.concat(data);
 	}
+
+	public function doSomething3(d:Array<String>) {
+		data.concat(d);
+	}
 }

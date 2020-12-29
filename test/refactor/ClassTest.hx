@@ -9,8 +9,9 @@ class ClassTest extends TestBase {
 
 	public function testRenameBaseClassMethod() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 114, 125),
-			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 156, 167),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 239, 250),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 145, 156),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 187, 198),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "addData", 121, 132),
 		];
 		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "addData", pos: 128}, edits);
@@ -22,6 +23,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 89, 93),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 162, 166),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 174, 178),
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 248, 252),
 		];
 		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 44}, edits);
 	}
@@ -31,6 +33,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 67, 77),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 143, 153),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 210, 220),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 111, 121),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
@@ -42,7 +45,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 142, 152),
 			makeMoveTestEdit("testcases/classes/ChildClass.hx", "testcases/classes/ItemClass.hx"),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ItemClass", 24, 34),
-			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ItemClass", 210, 220),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ItemClass", 241, 251),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ItemClass", pos: 28}, edits);
 	}
@@ -63,9 +66,9 @@ class ClassTest extends TestBase {
 	public function testRenameTypedef() {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ChildList", 107, 119),
-			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ChildList", 189, 201),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ChildList", 220, 232),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 194}, edits);
+		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 224}, edits);
 	}
 
 	public function testRenameStaticExtentionSum() {
@@ -91,5 +94,13 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 248, 257),
 		];
 		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "logText", pos: 229}, edits);
+	}
+
+	public function testRenameChildClassParent() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 232, 238),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "parentBase", 67, 73),
+		];
+		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits);
 	}
 }

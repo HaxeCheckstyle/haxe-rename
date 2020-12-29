@@ -257,6 +257,9 @@
 		"AvoidStarImport": [
 			"testcases"
 		],
+		"HiddenField": [
+			"testcases"
+		],
 		"MultipleStringLiterals": [
 			"config"
 		]
