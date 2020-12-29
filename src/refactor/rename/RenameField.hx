@@ -17,7 +17,6 @@ class RenameField {
 		var packName:String = file.getPackage();
 		var types:Array<Type> = RenameHelper.findDescendantTypes(context, packName, identifier.defineType);
 
-		// trace(types.map(t -> t.name.name));
 		types.push(identifier.defineType);
 		for (type in types) {
 			// use of field inside interfaces / classes (self + extending / implementing)
@@ -73,7 +72,7 @@ class RenameField {
 			switch (typeResult) {
 				case null:
 					continue;
-				case KnownType(type):
+				case KnownType(type, _):
 					for (t in types) {
 						if (t != type) {
 							continue;
@@ -86,7 +85,7 @@ class RenameField {
 						pos.end = pos.start + identifier.name.length;
 						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
 					}
-				case UnknownType(_):
+				case UnknownType(_, _):
 					continue;
 			}
 		}

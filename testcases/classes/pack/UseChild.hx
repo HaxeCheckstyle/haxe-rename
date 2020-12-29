@@ -13,4 +13,16 @@ class UseChild {
 	function accessParent(child:ChildClass) {
 		child.parent.doSomething([]);
 	}
+
+	function iterate() {
+		var list:Array<ChildClass> = [];
+		for (item in list) {
+			item.parent.doSomething([""]);
+		}
+	}
+
+	function nullIdent() {
+		var child:Null<ChildClass> = list.pop();
+		child.parent.doSomething([""]);
+	}
 }

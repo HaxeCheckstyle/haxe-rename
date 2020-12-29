@@ -1,5 +1,6 @@
 package refactor.rename;
 
+import haxe.display.Display.Define;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
@@ -138,10 +139,10 @@ class RenameHelper {
 	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
 		function printTypeHint(hintType:TypeHintType):String {
 			return switch (hintType) {
-				case KnownType(type):
-					'KnownType($type)';
-				case UnknownType(name):
-					'UnknownType($name)';
+				case KnownType(type, params):
+					'KnownType($type, ${params.map((i) -> i.name)})';
+				case UnknownType(name, params):
+					'UnknownType($name, ${params.map((i) -> i.name)})';
 			}
 		}
 
@@ -150,14 +151,36 @@ class RenameHelper {
 			context.verboseLog('could not find type of candidate "${searchTypeOf.name}" for static extension of ${printTypeHint(searchType)}');
 			return false;
 		}
-		return switch ([identifierType, searchType]) {
-			case [UnknownType(name1), UnknownType(name2)]:
-				name1 == name2;
-			case [KnownType(type1), KnownType(type2)]:
-				(type1.getFullModulName() == type2.getFullModulName());
+		switch ([identifierType, searchType]) {
+			case [UnknownType(name1, params1), UnknownType(name2, params2)]:
+				if (name1 != name2) {
+					return false;
+				}
+				if (params1.length != params2.length) {
+					return false;
+				}
+				for (index in 0...params1.length) {
+					if (params1[index].name != params2[index].name) {
+						return false;
+					}
+				}
+				return true;
+			case [KnownType(type1, params1), KnownType(type2, params2)]:
+				if (type1.getFullModulName() != type2.getFullModulName()) {
+					return false;
+				}
+				if (params1.length != params2.length) {
+					return false;
+				}
+				for (index in 0...params1.length) {
+					if (params1[index].name != params2[index].name) {
+						return false;
+					}
+				}
+				return true;
 			default:
 				context.verboseLog('types do not match for static extension ${searchTypeOf.name}:${printTypeHint(identifierType)} != ${printTypeHint(searchType)}');
-				false;
+				return false;
 		}
 	}
 
@@ -169,20 +192,20 @@ class RenameHelper {
 		switch (type) {
 			case null:
 				return null;
-			case KnownType(t):
+			case KnownType(t, params):
 				for (part in parts) {
 					type = findField(context, t, part);
 					switch (type) {
 						case null:
 							return type;
-						case KnownType(type):
+						case KnownType(type, params):
 							t = type;
-						case UnknownType(_):
+						case UnknownType(_, _):
 							return type;
 					}
 				}
 				return type;
-			case UnknownType(name):
+			case UnknownType(name, _):
 				return type;
 		}
 	}
@@ -211,6 +234,27 @@ class RenameHelper {
 		}
 		if ((candidate == null) || (candidate.uses == null)) {
 			return null;
+		}
+		switch (candidate.type) {
+			case ScopedLocal(_, ForLoop(loopIdent)):
+				var index:Int = loopIdent.indexOf(candidate);
+				for (child in loopIdent) {
+					switch (child.type) {
+						case ScopedLocal(_, ForLoop(_)):
+							continue;
+						default:
+							var iteratorVar:Null<TypeHintType> = findFieldOrScopedLocal(context, containerType, child.name, child.pos.start);
+							switch (iteratorVar) {
+								case null:
+								case KnownType(_, typeParams) | UnknownType(_, typeParams):
+									if (typeParams.length <= index) {
+										continue;
+									}
+									return typeFromTypeHint(context, typeParams[index]);
+							}
+					}
+				}
+			default:
 		}
 		for (use in candidate.uses) {
 			switch (use.type) {
@@ -273,28 +317,47 @@ class RenameHelper {
 		return null;
 	}
 
-	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):TypeHintType {
+	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):Null<TypeHintType> {
+		if (hint.name == "Null") {
+			if ((hint.uses == null) || (hint.uses.length <= 0)) {
+				return null;
+			}
+			return typeFromTypeHint(context, hint.uses[0]);
+		}
+
 		var parts:Array<String> = hint.name.split(".");
 		var typeName:String = parts.pop();
+
+		var typeParams:Array<Identifier> = [];
+		if (hint.uses != null) {
+			for (use in hint.uses) {
+				switch (use.type) {
+					case TypedParameter:
+						typeParams.push(use);
+					default:
+				}
+			}
+		}
 
 		var allTypes:Array<Type> = context.typeList.findTypeName(typeName);
 		if (parts.length > 0) {
 			for (type in allTypes) {
 				if (type.getFullModulName() == hint.name) {
-					return KnownType(type);
+					return KnownType(type, typeParams);
 				}
 			}
-			return UnknownType(hint.name);
+			return UnknownType(hint.name, typeParams);
 		}
 		for (type in allTypes) {
 			switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
 				case None:
 				case ImportedWithAlias(_):
 				case Global | SamePackage | Imported:
-					return KnownType(type);
+					return KnownType(type, typeParams);
 			}
 		}
-		return UnknownType(hint.name);
+		// TODO if there's no type found maybe it's because of an import alias
+		return UnknownType(hint.name, typeParams);
 	}
 
 	public static function replaceStaticExtension(context:RefactorContext, changelist:Changelist, identifier:Identifier) {
@@ -316,7 +379,6 @@ class RenameHelper {
 			context.verboseLog("could not find first parameter for static extension");
 			return;
 		}
-
 		var firstParamType:Null<TypeHintType> = null;
 		for (use in firstParam.uses) {
 			switch (use.type) {
@@ -336,12 +398,12 @@ class RenameHelper {
 				if (use.parent != null) {
 					switch (firstParamType) {
 						case null:
-						case KnownType(type):
+						case KnownType(type, _):
 							if (use.parent.name == type.name.name) {
 								changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 								continue;
 							}
-						case UnknownType(name):
+						case UnknownType(name, _):
 							if (use.parent.name == name) {
 								changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 								continue;
@@ -374,6 +436,8 @@ typedef SearchTypeOf = {
 }
 
 enum TypeHintType {
-	KnownType(type:Type);
-	UnknownType(name:String);
+	KnownType(type:Type, typeParams:TypeParameterList);
+	UnknownType(name:String, typeParams:TypeParameterList);
 }
+
+typedef TypeParameterList = Array<Identifier>;

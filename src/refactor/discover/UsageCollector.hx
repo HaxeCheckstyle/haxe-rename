@@ -677,16 +677,25 @@ class UsageCollector {
 	}
 
 	function readForIteration(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
-		makeIdentifier(context, token, ScopedLocal(scopeEnd, ForLoop), identifier);
+		var loopIdentifiers:Array<Identifier> = [];
+
+		var ident:Identifier = makeIdentifier(context, token, ScopedLocal(scopeEnd, ForLoop(loopIdentifiers)), identifier);
+		loopIdentifiers.push(ident);
 		if (!token.hasChildren()) {
 			return;
 		}
 		for (child in token.children) {
 			switch (child.tok) {
 				case Binop(OpArrow):
-					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, ForLoop), identifier);
+					ident = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, ForLoop(loopIdentifiers)), identifier);
+					loopIdentifiers.push(ident);
 				default:
-					readExpression(context, identifier, child);
+					readExpression(context, ident, child);
+					if (ident.uses != null) {
+						for (use in ident.uses) {
+							loopIdentifiers.push(use);
+						}
+					}
 			}
 		}
 	}
@@ -808,7 +817,7 @@ class UsageCollector {
 		var typeHintColon:Null<TokenTree> = null;
 		while (nameToken != null) {
 			switch (nameToken.tok) {
-				case Kwd(KwdThis) | Const(CIdent(_)):
+				case Kwd(KwdThis) | Kwd(KwdNull) | Const(CIdent(_)):
 					pack.push(nameToken.toString());
 					pos.end = nameToken.pos.max;
 				default:
@@ -819,7 +828,7 @@ class UsageCollector {
 			}
 			for (child in nameToken.children) {
 				switch (child.tok) {
-					case Kwd(KwdThis) | Const(_) | Dot | Binop(OpLt) | DblDot | POpen:
+					case Kwd(KwdThis) | Kwd(KwdNull) | Const(_) | Dot | Binop(OpLt) | DblDot | POpen:
 						nameToken = child;
 						break;
 					default:

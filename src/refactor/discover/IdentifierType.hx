@@ -42,7 +42,7 @@ enum ScopedLocalType {
 	Parameter;
 	Var;
 	CaseCapture;
-	ForLoop;
+	ForLoop(loopIdentifiers:Array<Identifier>);
 }
 
 enum TypedefFieldType {

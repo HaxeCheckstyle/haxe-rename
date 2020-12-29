@@ -54,7 +54,7 @@ class RenameEnumField {
 						name: switchIdentifier.name,
 						pos: switchIdentifier.pos.start,
 						defineType: switchIdentifier.defineType
-					}, KnownType(identifier.defineType))) {
+					}, KnownType(identifier.defineType, []))) {
 						continue;
 					}
 				default:
