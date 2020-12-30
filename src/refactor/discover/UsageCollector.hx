@@ -590,7 +590,7 @@ class UsageCollector {
 					var scopeEnd:Int = fullPos.max;
 					var method:Null<Identifier> = makeIdentifier(context, token.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
 					if (method == null) {
-						readMethod(context, identifier, token.getFirstChild());
+						readMethod(context, identifier, token);
 					} else {
 						readMethod(context, method, token.getFirstChild());
 					}

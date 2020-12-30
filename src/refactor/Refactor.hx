@@ -80,8 +80,15 @@ class Refactor {
 		if (parts.length <= 0) {
 			return Unsupported;
 		}
-		var firstPart:String = parts[0];
-		if (context.what.pos > identifier.pos.start + firstPart.length) {
+		var firstPart:String = parts.shift();
+		var onlyFields:Bool = false;
+		var offset:Int = 0;
+		if (firstPart == "this") {
+			firstPart = parts.shift();
+			onlyFields = true;
+			offset = 5;
+		}
+		if (context.what.pos > identifier.pos.start + firstPart.length + offset) {
 			// rename position is not in first part of dotted identifiier
 			return Unsupported;
 		}
@@ -96,7 +103,7 @@ class Refactor {
 					if (candidate == null) {
 						candidate = use;
 					}
-				case ScopedLocal(scopeEnd, _):
+				case ScopedLocal(scopeEnd, _) if (!onlyFields):
 					if ((use.pos.start < identifier.pos.start) && (identifier.pos.start < scopeEnd)) {
 						candidate = use;
 					}

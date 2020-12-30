@@ -1,11 +1,9 @@
 package refactor.discover;
 
 class TypeList {
-	public var types:Array<Type>;
+	public final types:Array<Type> = [];
 
-	public function new() {
-		types = [];
-	}
+	public function new() {}
 
 	public function addType(type:Type) {
 		types.push(type);
