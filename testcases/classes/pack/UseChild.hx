@@ -25,4 +25,11 @@ class UseChild {
 		var child:Null<ChildClass> = list.pop();
 		child.parent.doSomething([""]);
 	}
+
+	function struct(child:ChildClass):Any {
+		return {
+			id: 1,
+			parent: child.parent
+		};
+	}
 }

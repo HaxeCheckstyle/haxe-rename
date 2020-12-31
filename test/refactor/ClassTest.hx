@@ -38,6 +38,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 210, 220),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 299, 309),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 423, 433),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 510, 520),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 111, 121),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
@@ -105,6 +106,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 232, 238),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 348, 354),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 457, 463),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 566, 572),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "parentBase", 67, 73),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits);
@@ -112,9 +114,21 @@ class ClassTest extends TestBase {
 
 	public function testRenameIdentifierPos() {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/classes/Identifier.hx", "position", 253, 256),
+			makeReplaceTestEdit("testcases/classes/MyIdentifier.hx", "position", 253, 256),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "position", 387, 390),
 		];
-		refactorAndCheck({fileName: "testcases/classes/Identifier.hx", toName: "position", pos: 254}, edits);
+		refactorAndCheck({fileName: "testcases/classes/MyIdentifier.hx", toName: "position", pos: 254}, edits);
+	}
+
+	public function testRenameJsonClassWidth() {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 72, 77),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 194, 199),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 374, 379),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 449, 454),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 463, 468),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 620, 625),
+		];
+		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "jsonWidth", pos: 74}, edits);
 	}
 }

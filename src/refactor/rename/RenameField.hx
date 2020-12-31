@@ -57,7 +57,7 @@ class RenameField {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 		for (use in allUses) {
 			var name:String = use.name;
-			var index:Int = name.indexOf('.${identifier.name}');
+			var index:Int = name.lastIndexOf('.${identifier.name}');
 			if (index < 0) {
 				continue;
 			}
@@ -101,6 +101,8 @@ class RenameField {
 			switch (use.type) {
 				case ScopedLocal(end, _):
 					scopeEnd = end;
+					continue;
+				case StructureField(_):
 					continue;
 				default:
 			}
