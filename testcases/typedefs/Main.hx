@@ -2,6 +2,7 @@ package typedefs;
 
 import haxe.io.Path;
 import typedefs.Types.ExtendedIdentifierPos;
+import typedefs.Types.IdentifierPos;
 
 class Main {
 	static function main() {
@@ -33,5 +34,17 @@ class Main {
 			char: char,
 			msg: msg
 		};
+
+		printIdentifierPos(pos);
+		printIdentifierPos(posEx);
+		printIdentifierPos({fileName: "file", start: 10, end: 20});
+		printIdentifierPos({fileName: fileName, start: 10, end: 20});
+	}
+
+	static function printIdentifierPos(pos:IdentifierPos) {
+		trace (pos.fileName.length);
+	}
+	static function printExtendedIdentifierPos(pos:ExtendedIdentifierPos) {
+		trace(pos.fileName.length);
 	}
 }

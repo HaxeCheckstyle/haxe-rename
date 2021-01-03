@@ -427,6 +427,39 @@ class RenameHelper {
 			RenameHelper.replaceTextWithPrefix(use, '$object.', context.what.toName, changelist);
 		}
 	}
+
+	public static function replaceSingleAccessOrCall(context:RefactorContext, changelist:Changelist, use:Identifier, fromName:String, types:Array<Type>) {
+		var name:String = use.name;
+		var index:Int = name.lastIndexOf('.$fromName');
+		if (index < 0) {
+			return;
+		}
+		name = name.substr(0, index);
+
+		var search:SearchTypeOf = {
+			name: name,
+			pos: use.pos.start,
+			defineType: use.defineType
+		};
+		var typeResult:Null<TypeHintType> = RenameHelper.findTypeOfIdentifier(context, search);
+		switch (typeResult) {
+			case null:
+			case KnownType(type, _):
+				for (t in types) {
+					if (t != type) {
+						continue;
+					}
+					var pos:IdentifierPos = {
+						fileName: use.pos.fileName,
+						start: use.pos.start + name.length + 1,
+						end: use.pos.end
+					};
+					pos.end = pos.start + fromName.length;
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
+				}
+			case UnknownType(_, _):
+		}
+	}
 }
 
 typedef SearchTypeOf = {

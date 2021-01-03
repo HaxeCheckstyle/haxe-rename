@@ -49,6 +49,9 @@ class RenameAnonStructField {
 					if (!matchesFields(fields, fieldNames)) {
 						continue;
 					}
+				case Call | Access:
+					RenameHelper.replaceSingleAccessOrCall(context, changelist, use, fromName, [type]);
+					continue;
 				default:
 					continue;
 			}

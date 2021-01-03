@@ -53,43 +53,13 @@ class RenameField {
 		return changelist.execute();
 	}
 
-	static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>) {
+	public static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>) {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 		for (use in allUses) {
-			var name:String = use.name;
-			var index:Int = name.lastIndexOf('.${identifier.name}');
-			if (index < 0) {
-				continue;
-			}
-			name = name.substr(0, index);
-
-			var search:SearchTypeOf = {
-				name: name,
-				pos: use.pos.start,
-				defineType: use.defineType
-			};
-			var typeResult:Null<TypeHintType> = RenameHelper.findTypeOfIdentifier(context, search);
-			switch (typeResult) {
-				case null:
-					continue;
-				case KnownType(type, _):
-					for (t in types) {
-						if (t != type) {
-							continue;
-						}
-						var pos:IdentifierPos = {
-							fileName: use.pos.fileName,
-							start: use.pos.start + name.length + 1,
-							end: use.pos.end
-						};
-						pos.end = pos.start + identifier.name.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
-					}
-				case UnknownType(_, _):
-					continue;
-			}
+			RenameHelper.replaceSingleAccessOrCall(context, changelist, use, identifier.name, types);
 		}
 	}
+
 
 	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
 		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
