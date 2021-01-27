@@ -1,6 +1,5 @@
 package refactor.rename;
 
-import haxe.display.Display.Define;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
@@ -86,56 +85,6 @@ class RenameHelper {
 		return types;
 	}
 
-	// public static function replaceTypeHintsUses(context:RefactorContext, changelist:Changelist, type:Type, identifier:Identifier) {
-	// 	var allUses:Array<Identifier> = context.nameMap.getIdentifiers(type.name.name);
-	// 	allUses = allUses.concat(context.nameMap.getIdentifiers(type.getFullModulName()));
-	// 	for (use in allUses) {
-	// 		switch (use.type) {
-	// 			case TypeHint:
-	// 				if (use.parent == null) {
-	// 					continue;
-	// 				}
-	// 				switch (use.parent.type) {
-	// 					// case ModuleLevelStaticVar:
-	// 					// case ModuleLevelStaticMethod:
-	// 					// case AbstractFrom:
-	// 					// case AbstractTo:
-	// 					// case Property:
-	// 					// case FieldVar:
-	// 					// case Method:
-	// 					// case TypedefField:
-	// 					// case StructureField:
-	// 					// case CallOrAccess:
-	// 					case ScopedLocal(scopeEnd, _):
-	// 						var prefix:String = '${use.parent.name}.';
-	// 						// var allUses2:Array<Identifier> = use.defineType.getIdentifiers('$prefix${identifier.name}');
-	// 						var allUses2:Array<Identifier> = use.defineType.findAllIdentifiers((i) -> i.name == '$prefix${identifier.name}'
-	// 							|| i.name.startsWith('$prefix${identifier.name}.'));
-	// 						var scopeStart:Int = use.pos.start;
-	// 						for (use2 in allUses2) {
-	// 							if (use2.pos.start < scopeStart) {
-	// 								continue;
-	// 							}
-	// 							if (use2.pos.start > scopeEnd) {
-	// 								continue;
-	// 							}
-	// 							var pos:IdentifierPos = {
-	// 								fileName: use2.pos.fileName,
-	// 								start: use2.pos.start + prefix.length,
-	// 								end: use2.pos.end
-	// 							};
-	// 							if (use2.name.startsWith('$prefix${identifier.name}.')) {
-	// 								pos.end = use2.pos.start + '$prefix${identifier.name}'.length;
-	// 							}
-	// 							changelist.addChange(use2.pos.fileName, ReplaceText(context.what.toName, pos), use2);
-	// 						}
-	// 					default:
-	// 				}
-	// 			default:
-	// 		}
-	// 	}
-	// }
-
 	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
 		function printTypeHint(hintType:TypeHintType):String {
 			return switch (hintType) {
@@ -220,7 +169,7 @@ class RenameHelper {
 					fieldCandidate = use;
 				case TypedefField(_):
 					fieldCandidate = use;
-				case EnumField:
+				case EnumField(_):
 					fieldCandidate = use;
 				case ScopedLocal(scopeEnd, _):
 					if ((pos >= use.pos.start) && (pos <= scopeEnd)) {
@@ -232,9 +181,10 @@ class RenameHelper {
 		if (candidate == null) {
 			candidate = fieldCandidate;
 		}
-		if ((candidate == null) || (candidate.uses == null)) {
+		if (candidate == null) {
 			return null;
 		}
+		var typeHint:Null<Identifier> = candidate.getTypeHint();
 		switch (candidate.type) {
 			case ScopedLocal(_, ForLoop(loopIdent)):
 				var index:Int = loopIdent.indexOf(candidate);
@@ -254,14 +204,48 @@ class RenameHelper {
 							}
 					}
 				}
+			case ScopedLocal(_, Parameter(params)):
+				if (typeHint != null) {
+					return typeFromTypeHint(context, typeHint);
+				}
+				var index:Int = params.indexOf(candidate);
+				switch (candidate.parent.type) {
+					case CaseLabel(switchIdentifier):
+						var enumType:Null<TypeHintType> = findFieldOrScopedLocal(context, containerType, switchIdentifier.name, switchIdentifier.pos.start);
+						switch (enumType) {
+							case null:
+								return null;
+							case KnownType(type, typeParams):
+								switch (type.name.type) {
+									case Enum:
+										var enumFields:Array<Identifier> = type.findAllIdentifiers((i) -> i.name == candidate.parent.name);
+										for (field in enumFields) {
+											switch (field.type) {
+												case EnumField(params):
+													if (params.length <= index) {
+														return null;
+													}
+													typeHint = params[index].getTypeHint();
+													if (typeHint == null) {
+														return null;
+													}
+													return typeFromTypeHint(context, typeHint);
+												default:
+											}
+										}
+
+									default:
+								}
+							case UnknownType(_, _):
+								return null;
+						}
+					default:
+				}
+
 			default:
 		}
-		for (use in candidate.uses) {
-			switch (use.type) {
-				case TypeHint:
-					return typeFromTypeHint(context, use);
-				default:
-			}
+		if (typeHint != null) {
+			return typeFromTypeHint(context, typeHint);
 		}
 		return null;
 	}
@@ -271,7 +255,7 @@ class RenameHelper {
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
 			switch (use.type) {
-				case Property | FieldVar(_) | Method(_) | TypedefField(_) | EnumField:
+				case Property | FieldVar(_) | Method(_) | TypedefField(_) | EnumField(_):
 					candidate = use;
 					break;
 				default:
@@ -369,7 +353,7 @@ class RenameHelper {
 		var firstParam:Null<Identifier> = null;
 		for (use in identifier.uses) {
 			switch (use.type) {
-				case ScopedLocal(_, Parameter):
+				case ScopedLocal(_, Parameter(_)):
 					firstParam = use;
 					break;
 				default:

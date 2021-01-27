@@ -2,8 +2,8 @@ package refactor.discover;
 
 class Type {
 	var nameMap:NameMap;
-	var uses:Array<Identifier>;
 
+	public var uses:Array<Identifier>;
 	public var file:File;
 	public var name:Null<Identifier>;
 

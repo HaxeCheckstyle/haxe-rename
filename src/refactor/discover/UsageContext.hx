@@ -1,5 +1,7 @@
 package refactor.discover;
 
+import refactor.cache.IFileCache;
+
 typedef UsageContext = {
 	var file:Null<File>;
 	var fileName:String;
@@ -8,4 +10,5 @@ typedef UsageContext = {
 	var fileList:FileList;
 	var typeList:TypeList;
 	var type:Null<Type>;
+	var cache:Null<IFileCache>;
 }

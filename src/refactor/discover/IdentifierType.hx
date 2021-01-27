@@ -30,7 +30,7 @@ enum IdentifierType {
 	InterfaceVar;
 	InterfaceMethod;
 	TypeHint;
-	EnumField;
+	EnumField(params:Array<Identifier>);
 	CaseLabel(switchIdentifier:Identifier);
 	Call;
 	Access;
@@ -39,7 +39,7 @@ enum IdentifierType {
 }
 
 enum ScopedLocalType {
-	Parameter;
+	Parameter(params:Array<Identifier>);
 	Var;
 	CaseCapture;
 	ForLoop(loopIdentifiers:Array<Identifier>);

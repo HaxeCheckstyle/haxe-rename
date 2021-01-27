@@ -45,6 +45,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 142, 152),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 159, 169),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 280, 290),
+			makeReplaceTestEdit("testcases/classes/EnumType.hx", "ItemClass", 75, 85),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 72, 82),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 123, 133),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "ItemClass", 142, 152),
@@ -61,6 +62,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 59, 77),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "classes.pack.ChildClass", 30, 48),
 			makeInsertTestEdit("testcases/classes/StaticUsing.hx", "import classes.pack.ChildClass;\n", 18),
+			makeInsertTestEdit("testcases/classes/EnumType.hx", "import classes.pack.ChildClass;\n", 18),
 			makeInsertTestEdit("testcases/classes/ChildHelper.hx", "import classes.pack.ChildClass;\n", 18),
 			makeMoveTestEdit("testcases/classes/ChildClass.hx", "testcases/classes/pack/ChildClass.hx"),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "classes.pack", 8, 15),
@@ -107,6 +109,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 348, 354),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 457, 463),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 566, 572),
+			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "parentBase", 310, 316),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "parentBase", 67, 73),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits);

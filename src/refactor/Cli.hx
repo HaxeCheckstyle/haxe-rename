@@ -10,6 +10,7 @@ import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.EditableDocument;
 
+// import refactor.cache.FileCache;
 class Cli {
 	var verbose:Bool = false;
 	var forReal:Bool = false;
@@ -23,7 +24,7 @@ class Cli {
 		var args = Sys.args();
 
 		#if neko
-		// use the faster JS version if possible
+		// JS version is faster (if available)
 		try {
 			var process = new sys.io.Process("node", ["-v"]);
 			var nodeExists = process.exitCode() == 0;
@@ -100,12 +101,14 @@ class Cli {
 			nameMap: new NameMap(),
 			fileList: new FileList(),
 			typeList: new TypeList(),
-			type: null
+			type: null,
+			cache: null // new FileCache()
 		};
 
 		var startTime = Timer.stamp();
 		TraverseSources.traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
+		// usageContext.cache.save();
 
 		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,

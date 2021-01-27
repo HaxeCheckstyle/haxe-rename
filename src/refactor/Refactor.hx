@@ -61,7 +61,7 @@ class Refactor {
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
 				context.verboseLog('rename interface field "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);
-			case EnumField:
+			case EnumField(_):
 				context.verboseLog('rename enum field "${identifier.name}"');
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call | Access:

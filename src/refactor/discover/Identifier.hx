@@ -10,29 +10,30 @@ class Identifier {
 	public var defineType:Null<Type>;
 	public var edited:Bool;
 
-	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>, parent:Null<Identifier>) {
+	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>) {
 		this.type = type;
 		this.name = name;
 		this.pos = pos;
 		this.file = file;
-		this.parent = parent;
 		this.defineType = defineType;
+		parent = null;
 		edited = false;
 
 		if (defineType != null) {
 			defineType.addIdentifier(this);
 		}
-		if (parent != null) {
-			parent.addUse(this);
-		}
 		nameMap.addIdentifier(this);
 	}
 
-	public function addUse(identifier:Identifier) {
+	public function addUse(identifier:Null<Identifier>) {
+		if (identifier == null) {
+			return;
+		}
 		if (uses == null) {
 			uses = [];
 		}
 		uses.push(identifier);
+		identifier.parent = this;
 	}
 
 	public function containsPos(offset:Int):Bool {
@@ -84,5 +85,19 @@ class Identifier {
 			return 1;
 		}
 		return 0;
+	}
+
+	public function getTypeHint():Null<Identifier> {
+		if (uses == null) {
+			return null;
+		}
+		for (use in uses) {
+			switch (use.type) {
+				case TypeHint:
+					return use;
+				default:
+			}
+		}
+		return null;
 	}
 }

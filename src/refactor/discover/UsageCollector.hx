@@ -14,6 +14,13 @@ class UsageCollector {
 	public function new() {}
 
 	public function parseFile(content:ByteData, context:UsageContext) {
+		if (context.cache != null) {
+			var file:Null<File> = context.cache.getFile(context.fileName, context.nameMap);
+			if (file != null) {
+				context.fileList.addFile(file);
+				return;
+			}
+		}
 		var root:Null<TokenTree> = null;
 		try {
 			var lexer = new HaxeLexer(content, context.fileName);
@@ -32,6 +39,9 @@ class UsageCollector {
 			var imports:Array<Import> = readImports(root, context);
 			file.init(packageName, imports, readTypes(root, context), findImportInsertPos(root));
 			context.fileList.addFile(file);
+			if (context.cache != null) {
+				context.cache.storeFile(file);
+			}
 		} catch (e:ParserError) {
 			throw 'failed to parse ${context.fileName} - ParserError: $e (${e.pos})';
 		} catch (e:LexerError) {
@@ -151,9 +161,9 @@ class UsageCollector {
 			token = token.getFirstChild();
 		}
 
-		var importIdentifier:Identifier = new Identifier(type, pack.join("."), pos, context.nameMap, context.file, null, null);
+		var importIdentifier:Identifier = new Identifier(type, pack.join("."), pos, context.nameMap, context.file, null);
 		if (alias != null) {
-			alias.parent = importIdentifier;
+			importIdentifier.addUse(alias.parent);
 		}
 		return {
 			moduleName: importIdentifier,
@@ -255,7 +265,7 @@ class UsageCollector {
 							start: token.pos.min + 1,
 							end: token.pos.max - 1
 						};
-						identifier.addUse(new Identifier(StringConst, s, pos, context.nameMap, context.file, context.type, identifier));
+						identifier.addUse(new Identifier(StringConst, s, pos, context.nameMap, context.file, context.type));
 					}
 					SkipSubtree;
 				case Const(CString(s, SingleQuotes)):
@@ -298,7 +308,7 @@ class UsageCollector {
 					start: token.pos.min + start + 1,
 					end: token.pos.min + start + matchedText.length + 1
 				};
-				new Identifier(Access, matchedText, pos, context.nameMap, context.file, context.type, identifier);
+				identifier.addUse(new Identifier(Access, matchedText, pos, context.nameMap, context.file, context.type));
 			}
 		}
 	}
@@ -346,7 +356,7 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Const(CIdent(_)):
-					var enumField:Identifier = makeIdentifier(context, child, EnumField, identifier);
+					var enumField:Identifier = makeIdentifier(context, child, EnumField([]), identifier);
 					if (enumField == null) {
 						continue;
 					}
@@ -357,7 +367,8 @@ class UsageCollector {
 					if (!pOpen.matches(POpen)) {
 						continue;
 					}
-					readParameter(context, enumField, pOpen, pOpen.pos.max);
+					var params:Array<Identifier> = readParameter(context, enumField, pOpen, pOpen.pos.max);
+					enumField.type = EnumField(params);
 				case Sharp("if") | Sharp("elseif"):
 					readExpression(context, identifier, child.getFirstChild());
 					for (index in 1...child.children.length - 1) {
@@ -739,11 +750,8 @@ class UsageCollector {
 			}
 		});
 		for (child in pOpen) {
-			readParameter(context, identifier, child, scopeEnd);
+			readParameter(context, caseIdent, child, scopeEnd);
 		}
-		// if (!caseIdent.name.contains(".") && pOpen.length > 0) {
-		caseIdent.type = CaseLabel(identifier);
-		// }
 	}
 
 	function readCaseArray(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
@@ -789,14 +797,17 @@ class UsageCollector {
 		}
 	}
 
-	function readParameter(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
+	function readParameter(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int):Array<Identifier> {
+		var params:Array<Identifier> = [];
 		for (child in token.children) {
 			switch (child.tok) {
-				case Const(CIdent(_)):
-					makeIdentifier(context, child, ScopedLocal(scopeEnd, Parameter), identifier);
+				case Const(CIdent(s)):
+					var paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(scopeEnd, Parameter(params)), identifier);
+					params.push(paramIdent);
 				default:
 			}
 		}
+		return params;
 	}
 
 	function makePosition(fileName:String, token:TokenTree):IdentifierPos {
@@ -871,8 +882,11 @@ class UsageCollector {
 		if (pack.length <= 0) {
 			return null;
 		}
-		var identifier:Identifier = new Identifier(type, pack.join("."), pos, context.nameMap, context.file, context.type, parentIdentifier);
+		var identifier:Identifier = new Identifier(type, pack.join("."), pos, context.nameMap, context.file, context.type);
 
+		if (parentIdentifier != null) {
+			parentIdentifier.addUse(identifier);
+		}
 		if (typeParamLt != null) {
 			addTypeParameter(context, identifier, typeParamLt);
 		}

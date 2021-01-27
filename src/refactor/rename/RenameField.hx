@@ -60,7 +60,6 @@ class RenameField {
 		}
 	}
 
-
 	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
 		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
 		var scopeEnd:Int = 0;

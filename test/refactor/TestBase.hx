@@ -1,6 +1,5 @@
 package refactor;
 
-import refactor.discover.TypeList;
 import haxe.PosInfos;
 import refactor.Refactor;
 import refactor.RefactorResult;
@@ -9,6 +8,7 @@ import refactor.TestEditableDocument;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
+import refactor.discover.TypeList;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.FileEdit;
@@ -25,8 +25,9 @@ class TestBase implements ITest {
 			usageCollector: new UsageCollector(),
 			nameMap: new NameMap(),
 			fileList: new FileList(),
-			typeList:  new TypeList(),
-			type: null
+			typeList: new TypeList(),
+			type: null,
+			cache: null
 		};
 
 		TraverseSources.traverseSources(srcFolders, usageContext);
@@ -48,7 +49,7 @@ class TestBase implements ITest {
 		var result:RefactorResult = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
-			typeList:usageContext.typeList,
+			typeList: usageContext.typeList,
 			what: what,
 			forRealExecute: true,
 			docFactory: (fileName) -> editList.newDoc(fileName),
