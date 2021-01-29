@@ -61,8 +61,8 @@ class TestBase implements ITest {
 		for (index in 0...edits.length) {
 			var expected:TestEdit = edits[index];
 			var actual:TestEdit = editList.edits[index];
-			Assert.equals(expected.fileName, actual.fileName, pos);
-			Assert.equals(fileEditToString(expected.edit), fileEditToString(actual.edit), pos);
+			Assert.equals(expected.fileName, actual.fileName, expected.pos);
+			Assert.equals(fileEditToString(expected.edit), fileEditToString(actual.edit), expected.pos);
 		}
 	}
 
@@ -79,31 +79,35 @@ class TestBase implements ITest {
 		}
 	}
 
-	function makeMoveTestEdit(oldFileName:String, newFileName):TestEdit {
+	function makeMoveTestEdit(oldFileName:String, newFileName, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: oldFileName,
-			edit: Move(newFileName)
+			edit: Move(newFileName),
+			pos: pos
 		}
 	}
 
-	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int):TestEdit {
+	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
-			edit: ReplaceText(text, {fileName: fileName, start: start, end: end})
+			edit: ReplaceText(text, {fileName: fileName, start: start, end: end}),
+			pos: pos
 		}
 	}
 
-	function makeInsertTestEdit(fileName:String, text:String, pos:Int):TestEdit {
+	function makeInsertTestEdit(fileName:String, text:String, insertPos:Int, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
-			edit: InsertText(text, {fileName: fileName, start: pos, end: pos})
+			edit: InsertText(text, {fileName: fileName, start: insertPos, end: insertPos}),
+			pos: pos
 		}
 	}
 
-	function makeRemoveTestEdit(fileName:String, start:Int, end:Int):TestEdit {
+	function makeRemoveTestEdit(fileName:String, start:Int, end:Int, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
-			edit: RemoveText({fileName: fileName, start: start, end: end})
+			edit: RemoveText({fileName: fileName, start: start, end: end}),
+			pos: pos
 		}
 	}
 }

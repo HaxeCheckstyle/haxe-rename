@@ -1,5 +1,6 @@
 package refactor;
 
+import haxe.PosInfos;
 import refactor.edits.FileEdit;
 import refactor.edits.IEditableDocument;
 
@@ -25,7 +26,8 @@ class TestEditableDocument implements IEditableDocument {
 		}
 		editList.edits.push({
 			fileName: fileName,
-			edit: edit
+			edit: edit,
+			pos: null
 		});
 	}
 
@@ -37,6 +39,7 @@ class TestEditableDocument implements IEditableDocument {
 typedef TestEdit = {
 	var fileName:String;
 	var edit:FileEdit;
+	var pos:PosInfos;
 }
 
 class TestEditList {

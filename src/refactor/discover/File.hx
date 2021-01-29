@@ -1,5 +1,7 @@
 package refactor.discover;
 
+import sys.FileSystem;
+import sys.FileStat;
 import haxe.io.Path;
 
 class File {
@@ -9,9 +11,15 @@ class File {
 	public var importList:Array<Import>;
 	public var typeList:Array<Type>;
 	public var importInsertPos:Int;
+	public var fileDate:Float;
+	public var fileSize:Int;
 
 	public function new(name:String) {
 		this.name = name;
+
+		var stat:FileStat = FileSystem.stat(name);
+		fileDate = stat.mtime.getTime();
+		fileSize = stat.size;
 	}
 
 	public function init(packageIdent:Null<Identifier>, imports:Array<Import>, types:Array<Type>, posForImport:Int) {

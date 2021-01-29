@@ -18,6 +18,9 @@ class UsageCollector {
 			var file:Null<File> = context.cache.getFile(context.fileName, context.nameMap);
 			if (file != null) {
 				context.fileList.addFile(file);
+				for (type in file.typeList) {
+					context.typeList.addType(type);
+				}
 				return;
 			}
 		}

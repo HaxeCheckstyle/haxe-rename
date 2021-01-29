@@ -7,6 +7,17 @@ class ClassTest extends TestBase {
 		setupData(["testcases/classes"]);
 	}
 
+	public function testRenameChildsTypeName() {
+		var edits:Array<TestEdit> = [
+			makeMoveTestEdit("testcases/classes/Childs.hx", "testcases/classes/ChildName.hx"),
+			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 24, 30),
+			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 106, 112),
+			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 167, 173),
+			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 212, 218),
+		];
+		refactorAndCheck({fileName: "testcases/classes/Childs.hx", toName: "ChildName", pos: 25}, edits);
+	}
+
 	public function testRenameBaseClassMethod() {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 239, 250),

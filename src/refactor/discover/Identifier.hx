@@ -25,6 +25,10 @@ class Identifier {
 		nameMap.addIdentifier(this);
 	}
 
+	public function reset() {
+		edited = false;
+	}
+
 	public function addUse(identifier:Null<Identifier>) {
 		if (identifier == null) {
 			return;
@@ -99,5 +103,8 @@ class Identifier {
 			}
 		}
 		return null;
+	}
+	public function toString():String{
+		return '$name ${pos.fileName}@${pos.start}-${pos.end}';
 	}
 }

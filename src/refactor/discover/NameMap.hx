@@ -27,6 +27,7 @@ class NameMap {
 				list.push(identifier);
 			}
 		}
+		identifier.reset();
 		addToMap(names, identifier.name);
 		var nameParts:Array<String> = identifier.name.split(".");
 		for (part in nameParts) {

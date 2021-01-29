@@ -170,10 +170,14 @@ class RenameHelper {
 				case TypedefField(_):
 					fieldCandidate = use;
 				case EnumField(_):
-					fieldCandidate = use;
+					return KnownType(use.defineType, []);
 				case ScopedLocal(scopeEnd, _):
 					if ((pos >= use.pos.start) && (pos <= scopeEnd)) {
 						candidate = use;
+					}
+				case CaseLabel(switchIdentifier):
+					if (use.pos.start == pos) {
+						return findFieldOrScopedLocal(context, containerType, switchIdentifier.name, switchIdentifier.pos.start);
 					}
 				default:
 			}
