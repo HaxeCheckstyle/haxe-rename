@@ -70,7 +70,7 @@ class Refactor {
 			case CaseLabel(_):
 				Unsupported;
 			case ScopedLocal(scopeEnd, type):
-				context.verboseLog('rename scoped local "${identifier.name}" ($type)');
+				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()})');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 		}
 	}
