@@ -14,7 +14,7 @@ class RenameEnumField {
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();
 		var typeName:String = identifier.defineType.name.name;
-		var fullModuleypeName:String = identifier.defineType.getFullModulName();
+		var fullModuleTypeName:String = identifier.defineType.getFullModulName();
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$typeName.${identifier.name}');
 		for (use in allUses) {
 			switch (use.file.importsModule(packName, mainModuleName, typeName)) {
@@ -31,22 +31,13 @@ class RenameEnumField {
 			RenameHelper.replaceTextWithPrefix(use, typeName, context.what.toName, changelist);
 		}
 
-		allUses = context.nameMap.getIdentifiers('$fullModuleypeName.${identifier.name}');
+		allUses = context.nameMap.getIdentifiers('$fullModuleTypeName.${identifier.name}');
 		for (use in allUses) {
-			RenameHelper.replaceTextWithPrefix(use, fullModuleypeName, context.what.toName, changelist);
+			RenameHelper.replaceTextWithPrefix(use, fullModuleTypeName, context.what.toName, changelist);
 		}
 
-		allUses = context.nameMap.getIdentifiers('${identifier.name}');
+		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
 		for (use in allUses) {
-			switch (use.file.importsModule(packName, mainModuleName, typeName)) {
-				case None:
-					continue;
-				case ImportedWithAlias(_):
-					continue;
-				case Global:
-				case SamePackage:
-				case Imported:
-			}
 			switch (use.type) {
 				case Access:
 				case CaseLabel(switchIdentifier):

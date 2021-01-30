@@ -104,7 +104,8 @@ class Identifier {
 		}
 		return null;
 	}
-	public function toString():String{
-		return '$name ${pos.fileName}@${pos.start}-${pos.end}';
+
+	public function toString():String {
+		return '$name ${pos.fileName}@${pos.start}-${pos.end} (${type.typeToString()})';
 	}
 }

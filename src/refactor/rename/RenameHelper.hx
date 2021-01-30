@@ -86,18 +86,8 @@ class RenameHelper {
 	}
 
 	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Bool {
-		function printTypeHint(hintType:TypeHintType):String {
-			return switch (hintType) {
-				case KnownType(type, params):
-					'KnownType($type, ${params.map((i) -> i.name)})';
-				case UnknownType(name, params):
-					'UnknownType($name, ${params.map((i) -> i.name)})';
-			}
-		}
-
 		var identifierType:Null<TypeHintType> = findTypeOfIdentifier(context, searchTypeOf);
 		if (identifierType == null) {
-			context.verboseLog('could not find type of candidate "${searchTypeOf.name}" for static extension of ${printTypeHint(searchType)}');
 			return false;
 		}
 		switch ([identifierType, searchType]) {
@@ -128,7 +118,7 @@ class RenameHelper {
 				}
 				return true;
 			default:
-				context.verboseLog('types do not match for static extension ${searchTypeOf.name}:${printTypeHint(identifierType)} != ${printTypeHint(searchType)}');
+				context.verboseLog('types do not match for static extension ${searchTypeOf.name}:${identifierType.printTypeHint()} != ${searchType.printTypeHint()}');
 				return false;
 		}
 	}
@@ -140,6 +130,7 @@ class RenameHelper {
 		var type:Null<TypeHintType> = findFieldOrScopedLocal(context, searchTypeOf.defineType, part, searchTypeOf.pos);
 		switch (type) {
 			case null:
+				context.verboseLog('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}');
 				return null;
 			case KnownType(t, params):
 				for (part in parts) {
@@ -197,7 +188,11 @@ class RenameHelper {
 						case ScopedLocal(_, ForLoop(_)):
 							continue;
 						default:
-							var iteratorVar:Null<TypeHintType> = findFieldOrScopedLocal(context, containerType, child.name, child.pos.start);
+							var iteratorVar:Null<TypeHintType> = findTypeOfIdentifier(context, {
+								name: child.name,
+								pos: child.pos.start,
+								defineType: containerType
+							});
 							switch (iteratorVar) {
 								case null:
 								case KnownType(_, typeParams) | UnknownType(_, typeParams):

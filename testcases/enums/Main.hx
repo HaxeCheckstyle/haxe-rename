@@ -48,4 +48,46 @@ class Main {
 			default:
 		}
 	}
+
+	function list(items:Array<Identifier>) {
+		for (item in items) {
+			switch (item.type) {
+				case PackageName:
+				case Call:
+				case Access:
+				case ScopedLocal(scopeEnd):
+					new ScopedLocal(scopeEnd);
+				case ScopedGlobal(scopeEnd):
+				case StringConst:
+			}
+		}
+	}
+
+	function listChilds(identifier:Identifier) {
+		for (item in identifier.children) {
+			switch (item.type) {
+				case PackageName:
+				case Call:
+				case Access:
+				case ScopedLocal(scopeEnd):
+					new ScopedLocal(scopeEnd);
+				case ScopedGlobal(scopeEnd):
+				case StringConst:
+			}
+		}
+	}
+
+	function listParentChilds(identifier:Identifier) {
+		for (item in identifier.parent.children) {
+			switch (item.type) {
+				case PackageName:
+				case Call:
+				case Access:
+				case ScopedLocal(scopeEnd):
+					new ScopedLocal(scopeEnd);
+				case ScopedGlobal(scopeEnd):
+				case StringConst:
+			}
+		}
+	}
 }

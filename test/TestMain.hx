@@ -6,7 +6,7 @@ import refactor.ModuleLevelStaticTest;
 import refactor.ScopedLocalTest;
 import refactor.TypedefTest;
 import utest.Runner;
-import utest.ui.Report;
+import utest.ui.text.DiagnosticsReport;
 
 class TestMain {
 	static function main() {
@@ -27,7 +27,7 @@ class TestMain {
 		});
 		#end
 
-		Report.create(runner);
+		new DiagnosticsReport(runner);
 		for (test in tests) {
 			runner.addCase(test);
 		}

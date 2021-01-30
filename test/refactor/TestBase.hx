@@ -57,7 +57,7 @@ class TestBase implements ITest {
 		});
 		Assert.equals(Done, result, pos);
 		Assert.equals(editList.docCounter, editList.docFinishedCounter, pos);
-		Assert.equals(edits.length, editList.edits.length);
+		Assert.equals(edits.length, editList.edits.length, pos);
 		for (index in 0...edits.length) {
 			var expected:TestEdit = edits[index];
 			var actual:TestEdit = editList.edits[index];
