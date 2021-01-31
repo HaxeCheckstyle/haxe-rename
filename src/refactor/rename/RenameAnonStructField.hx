@@ -34,7 +34,7 @@ class RenameAnonStructField {
 					continue;
 			}
 		}
-		return Unsupported;
+		return Unsupported(identifier.toString());
 	}
 
 	static function renameFieldsOfType(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>, fromName:String) {

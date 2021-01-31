@@ -124,8 +124,8 @@ class Cli {
 				Sys.println("nothing to do");
 			case NotFound:
 				Sys.println("could not find identifier at " + loc);
-			case Unsupported:
-				Sys.println("renaming not supported at " + loc);
+			case Unsupported(name):
+				Sys.println("renaming not supported for " + name);
 			case DryRun:
 				Sys.println("");
 			case Done:

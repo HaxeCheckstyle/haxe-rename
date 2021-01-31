@@ -29,7 +29,7 @@ class Refactor {
 				context.verboseLog('rename package name "${identifier.name}"');
 				RenamePackage.refactorPackageName(context, file, identifier);
 			case ImportModul | UsingModul:
-				Unsupported;
+				Unsupported(identifier.toString());
 			case ImportAlias:
 				context.verboseLog('rename import alias "${identifier.name}"');
 				RenameImportAlias.refactorImportAlias(context, file, identifier);
@@ -40,7 +40,7 @@ class Refactor {
 				context.verboseLog('rename module level static "${identifier.name}"');
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
-				Unsupported;
+				Unsupported(identifier.toString());
 			case Property:
 				context.verboseLog('rename property "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, false);
@@ -51,9 +51,9 @@ class Refactor {
 				context.verboseLog('rename class method "${identifier.name}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
-				Unsupported;
+				Unsupported(identifier.toString());
 			case TypedefBase:
-				Unsupported;
+				Unsupported(identifier.name);
 			case TypedefField(fields):
 				RenameAnonStructField.refactorAnonStructField(context, file, identifier, fields);
 			case StructureField(fields):
@@ -68,7 +68,7 @@ class Refactor {
 				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
 				findActualWhat(context, file, identifier);
 			case CaseLabel(_):
-				Unsupported;
+				Unsupported(identifier.toString());
 			case ScopedLocal(scopeEnd, type):
 				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()})');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
@@ -78,7 +78,7 @@ class Refactor {
 	static function findActualWhat(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
 		var parts:Array<String> = identifier.name.split(".");
 		if (parts.length <= 0) {
-			return Unsupported;
+			return Unsupported(identifier.toString());
 		}
 		var firstPart:String = parts.shift();
 		var onlyFields:Bool = false;
@@ -90,7 +90,7 @@ class Refactor {
 		}
 		if (context.what.pos > identifier.pos.start + firstPart.length + offset) {
 			// rename position is not in first part of dotted identifiier
-			return Unsupported;
+			return Unsupported(identifier.toString());
 		}
 		var allUses:Array<Identifier> = file.findAllIdentifiers((i) -> i.name == firstPart);
 		var candidate:Null<Identifier> = null;
@@ -114,6 +114,6 @@ class Refactor {
 			context.what.pos = candidate.pos.start;
 			return rename(context);
 		}
-		return Unsupported;
+		return Unsupported(identifier.toString());
 	}
 }

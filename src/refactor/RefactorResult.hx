@@ -3,7 +3,7 @@ package refactor;
 enum RefactorResult {
 	NoChange;
 	NotFound;
-	Unsupported;
+	Unsupported(name:String);
 	DryRun;
 	Done;
 }
