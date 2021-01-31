@@ -44,7 +44,7 @@ class RenameModuleLevelStatic {
 					var uses:Array<Identifier> = use.file.findAllIdentifiers((i) -> i.name == identifier.name);
 					for (u in uses) {
 						switch (u.type) {
-							case Call | Access:
+							case Call(false) | Access:
 								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos), u);
 							case ScopedLocal(_):
 							default:

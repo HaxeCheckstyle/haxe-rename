@@ -64,7 +64,9 @@ class Refactor {
 			case EnumField(_):
 				context.verboseLog('rename enum field "${identifier.name}"');
 				RenameEnumField.refactorEnumField(context, file, identifier);
-			case Call | Access:
+			case Call(true):
+				Unsupported(identifier.toString());
+			case Call(false) | Access:
 				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
 				findActualWhat(context, file, identifier);
 			case CaseLabel(_):

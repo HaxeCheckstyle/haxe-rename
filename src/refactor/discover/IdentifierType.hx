@@ -32,7 +32,7 @@ enum IdentifierType {
 	TypeHint;
 	EnumField(params:Array<Identifier>);
 	CaseLabel(switchIdentifier:Identifier);
-	Call;
+	Call(isNew:Bool);
 	Access;
 	ScopedLocal(scopeEnd:Int, scopeType:ScopedLocalType);
 	StringConst;

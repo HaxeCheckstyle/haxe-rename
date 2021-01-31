@@ -39,7 +39,6 @@ class RenameEnumField {
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
 		for (use in allUses) {
 			switch (use.type) {
-				case Access:
 				case CaseLabel(switchIdentifier):
 					if (!RenameHelper.matchesType(context, {
 						name: switchIdentifier.name,
@@ -47,6 +46,21 @@ class RenameEnumField {
 						defineType: switchIdentifier.defineType
 					}, KnownType(identifier.defineType, []))) {
 						continue;
+					}
+				case Access | Call(false):
+					switch (use.parent.type) {
+						case Call(_):
+						default:
+							continue;
+					}
+					switch (use.file.importsModule(packName, mainModuleName, typeName)) {
+						case None:
+							continue;
+						case ImportedWithAlias(alias):
+							if (alias != typeName) {
+								continue;
+							}
+						case Global | SamePackage | Imported:
 					}
 				default:
 					continue;

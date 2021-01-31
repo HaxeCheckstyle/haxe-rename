@@ -89,5 +89,12 @@ class Main {
 				case StringConst:
 			}
 		}
+		printType("", ScopedLocal(100));
+		printType("", ScopedGlobal(100));
+		printType("", new ScopedLocal(100).type);
+	}
+
+	function printType(prefix:String, type:IdentifierType) {
+		Sys.println(prefix + type);
 	}
 }

@@ -829,6 +829,7 @@ class UsageCollector {
 		var pack:Array<String> = [];
 		var typeParamLt:Null<TokenTree> = null;
 		var typeHintColon:Null<TokenTree> = null;
+		var parent:TokenTree = nameToken.parent;
 		while (nameToken != null) {
 			switch (nameToken.tok) {
 				case Kwd(KwdThis) | Kwd(KwdNull) | Const(CIdent(_)):
@@ -861,7 +862,11 @@ class UsageCollector {
 					break;
 				case POpen:
 					if (type.match(Access)) {
-						type = Call;
+						if (parent.matches(Kwd(KwdNew))) {
+							type = Call(true);
+						}else{
+							type = Call(false);
+						}
 					}
 					break;
 				case DblDot:

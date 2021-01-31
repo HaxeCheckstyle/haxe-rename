@@ -132,7 +132,6 @@ class Cli {
 				Sys.println("changes were made");
 		}
 
-		// printStats(Timer.stamp() - startTime);
 		Sys.println(Timer.stamp() - startTime);
 		Sys.exit(exitCode);
 	}
