@@ -420,6 +420,8 @@ class UsageCollector {
 					makeIdentifier(context, child.getFirstChild(), Implements, identifier);
 				case BrOpen:
 					addFields(context, identifier, child);
+				case Sharp(_):
+					addFields(context, identifier, child);
 				case Kwd(KwdFunction):
 					var nameToken:TokenTree = child.getFirstChild();
 					var method:Identifier = makeIdentifier(context, nameToken, Method(nameToken.access().firstOf(Kwd(KwdStatic)).exists()), identifier);
@@ -864,7 +866,7 @@ class UsageCollector {
 					if (type.match(Access)) {
 						if (parent.matches(Kwd(KwdNew))) {
 							type = Call(true);
-						}else{
+						} else {
 							type = Call(false);
 						}
 					}

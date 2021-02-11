@@ -32,4 +32,9 @@ class UseChild {
 			parent: child.parent
 		};
 	}
+	#if php
+	function accessParentExt(child:ChildClass) {
+		child.parent.doSomething([]);
+	}
+	#end
 }
