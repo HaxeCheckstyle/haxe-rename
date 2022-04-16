@@ -12,8 +12,6 @@ class RenameAnonStructField {
 	public static function refactorAnonStructField(context:RefactorContext, file:File, identifier:Identifier,
 			fields:Array<TypedefFieldType>):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
-		// var packName:String = file.getPackage();
-		// var mainModuleName = file.getMainModulName();
 
 		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
 

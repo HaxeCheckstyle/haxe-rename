@@ -11,7 +11,6 @@ import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.EditableDocument;
 
-// import refactor.cache.FileCache;
 class Cli {
 	var verbose:Bool = false;
 	var forReal:Bool = false;
@@ -109,7 +108,6 @@ class Cli {
 		var startTime = Timer.stamp();
 		TraverseSources.traverseSources(paths, usageContext);
 		usageContext.usageCollector.updateImportHx(usageContext);
-		// usageContext.cache.save();
 
 		var result:Promise<RefactorResult> = Refactor.rename({
 			nameMap: usageContext.nameMap,

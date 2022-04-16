@@ -211,7 +211,6 @@ class RenameHelper {
 											}
 											return typeFromTypeHint(context, typeParams[index]);
 									}
-									// return Promise.resolve(null);
 									return Promise.reject("not found");
 								}));
 						}
@@ -387,7 +386,6 @@ class RenameHelper {
 			context.verboseLog("could not find first parameter for static extension");
 			return Promise.resolve(null);
 		}
-		// var firstParamType:Null<TypeHintType> = null;
 		var changes:Array<Promise<Void>> = [];
 		for (use in firstParam.uses) {
 			switch (use.type) {

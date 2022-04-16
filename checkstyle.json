@@ -17,6 +17,9 @@
 			"type": "CatchParameterName"
 		},
 		{
+			"type": "CommentedOutCode"
+		},
+		{
 			"props": {
 				"ignoreExtern": true,
 				"format": "^[A-Z][A-Z0-9]*(_[A-Z0-9_]+)*$"
