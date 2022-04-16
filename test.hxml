@@ -6,6 +6,7 @@
 -lib tokentree
 -lib hxargs
 -lib utest
+-lib hxnodejs
 -lib instrument
 -lib test-adapter
 
@@ -21,5 +22,8 @@
 # -D debug_instrumentation
 -D instrument-quiet
 
---run TestMain
+--main TestMain
 
+--js out/tests.js
+
+--cmd node out/tests.js

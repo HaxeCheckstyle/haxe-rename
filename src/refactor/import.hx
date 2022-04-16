@@ -1,4 +1,5 @@
 import haxe.macro.Expr;
+import js.lib.Promise;
 import haxeparser.Data;
 import tokentree.TokenTree;
 import tokentree.TokenTreeAccessHelper;

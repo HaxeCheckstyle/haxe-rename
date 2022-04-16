@@ -7,7 +7,7 @@ import refactor.discover.Identifier;
 import refactor.edits.Changelist;
 
 class RenameEnumField {
-	public static function refactorEnumField(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+	public static function refactorEnumField(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
 
@@ -37,16 +37,21 @@ class RenameEnumField {
 		}
 
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
+
+		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
 			switch (use.type) {
 				case CaseLabel(switchIdentifier):
-					if (!RenameHelper.matchesType(context, {
+					changes.push(RenameHelper.matchesType(context, {
 						name: switchIdentifier.name,
 						pos: switchIdentifier.pos.start,
 						defineType: switchIdentifier.defineType
-					}, KnownType(identifier.defineType, []))) {
-						continue;
-					}
+					}, KnownType(identifier.defineType, [])).then(function(matched:Bool) {
+						if (matched) {
+							RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
+						}
+					}));
+					continue;
 				case Access | Call(false):
 					switch (use.parent.type) {
 						case Call(_):
@@ -67,6 +72,8 @@ class RenameEnumField {
 			}
 			RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
 		}
-		return changelist.execute();
+		return Promise.all(changes).then(function(_):RefactorResult {
+			return changelist.execute();
+		});
 	}
 }

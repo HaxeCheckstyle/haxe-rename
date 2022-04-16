@@ -9,19 +9,21 @@ import refactor.discover.Type;
 import refactor.edits.Changelist;
 
 class RenameAnonStructField {
-	public static function refactorAnonStructField(context:RefactorContext, file:File, identifier:Identifier, fields:Array<TypedefFieldType>):RefactorResult {
+	public static function refactorAnonStructField(context:RefactorContext, file:File, identifier:Identifier,
+			fields:Array<TypedefFieldType>):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
-		var packName:String = file.getPackage();
-		var mainModuleName = file.getMainModulName();
+		// var packName:String = file.getPackage();
+		// var mainModuleName = file.getMainModulName();
 
 		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
 
-		renameFieldsOfType(context, changelist, identifier.defineType, fields, identifier.name);
-
-		return changelist.execute();
+		return renameFieldsOfType(context, changelist, identifier.defineType, fields, identifier.name).then(function(result):RefactorResult {
+			return changelist.execute();
+		});
 	}
 
-	public static function refactorStructureField(context:RefactorContext, file:File, identifier:Identifier, fieldNames:Array<String>):RefactorResult {
+	public static function refactorStructureField(context:RefactorContext, file:File, identifier:Identifier,
+			fieldNames:Array<String>):Promise<RefactorResult> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
 		for (use in allUses) {
 			switch (use.type) {
@@ -34,15 +36,17 @@ class RenameAnonStructField {
 					continue;
 			}
 		}
-		return Unsupported(identifier.toString());
+		return Promise.resolve(Unsupported(identifier.toString()));
 	}
 
-	static function renameFieldsOfType(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>, fromName:String) {
+	static function renameFieldsOfType(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>,
+			fromName:String):Promise<Void> {
 		var packName:String = type.file.getPackage();
 		var mainModuleName = type.file.getMainModulName();
 		fields = fields.concat(findBaseTypes(context, type));
 
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(fromName, true);
+		var promises:Array<Promise<Void>> = [];
 		for (use in allUses) {
 			switch (use.type) {
 				case StructureField(fieldNames):
@@ -50,7 +54,7 @@ class RenameAnonStructField {
 						continue;
 					}
 				case Call(false) | Access:
-					RenameHelper.replaceSingleAccessOrCall(context, changelist, use, fromName, [type]);
+					promises.push(RenameHelper.replaceSingleAccessOrCall(context, changelist, use, fromName, [type]));
 					continue;
 				default:
 					continue;
@@ -63,18 +67,22 @@ class RenameAnonStructField {
 			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 		}
 
-		findAllExtending(context, changelist, type, fields, fromName);
+		promises.push(findAllExtending(context, changelist, type, fields, fromName));
+		return Promise.all(promises).then(null);
 	}
 
-	static function findAllExtending(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>, fromName:String) {
+	static function findAllExtending(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>,
+			fromName:String):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(type.name.name);
+		var promises:Array<Promise<Void>> = [];
 		for (use in allUses) {
 			switch (use.type) {
 				case TypedefBase:
-					renameFieldsOfType(context, changelist, use.defineType, getFieldsOfTypedef(use.defineType), fromName);
+					promises.push(renameFieldsOfType(context, changelist, use.defineType, getFieldsOfTypedef(use.defineType), fromName));
 				default:
 			}
 		}
+		return Promise.all(promises).then(null);
 	}
 
 	static function matchesFields(fields:Array<TypedefFieldType>, fieldNames:Array<String>):Bool {

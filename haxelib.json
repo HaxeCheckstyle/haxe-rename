@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "1.0.0",
-	"releasenote": "inital release",
+	"version": "2.0.0",
+	"releasenote": "added external typer api; refactored codebase for asynchronous operation",
 	"contributors": [
 		"AlexHaxe"
 	],

@@ -7,7 +7,7 @@ class ScopedLocalTest extends TestBase {
 		setupData(["testcases/scopedlocal"]);
 	}
 
-	public function testRenameContextParameter() {
+	public function testRenameContextParameter(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 460, 467),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 526, 533),
@@ -22,36 +22,36 @@ class ScopedLocalTest extends TestBase {
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 2017, 2024),
 
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 463}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 463}, edits, async);
 	}
 
-	public function testRenameScopeEndCaseCapture() {
+	public function testRenameScopeEndCaseCapture(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "endPos", 1964, 1972),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "endPos", 2044, 2052),
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "endPos", pos: 1968}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "endPos", pos: 1968}, edits, async);
 	}
 
-	public function testRenamePackNameParameter() {
+	public function testRenamePackNameParameter(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "packageName", 171, 179),
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "packageName", 276, 284),
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/StringInterpolation.hx", toName: "packageName", pos: 175}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/StringInterpolation.hx", toName: "packageName", pos: 175}, edits, async);
 	}
 
-	public function testRenameBaseTypeParameter() {
+	public function testRenameBaseTypeParameter(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "base", 188, 196),
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "base", 287, 295),
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "base", 1124, 1132),
 			makeReplaceTestEdit("testcases/scopedlocal/StringInterpolation.hx", "base", 1428, 1436),
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/StringInterpolation.hx", toName: "base", pos: 191}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/StringInterpolation.hx", toName: "base", pos: 191}, edits, async);
 	}
 
-	public function testRenameBaseTypeParameterFromUse() {
+	public function testRenameBaseTypeParameterFromUse(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 460, 467),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 526, 533),
@@ -66,15 +66,15 @@ class ScopedLocalTest extends TestBase {
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 2017, 2024),
 
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 2020}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 2020}, edits, async);
 	}
 
-	public function testRenameFileNameParameterWithStructureFields() {
+	public function testRenameFileNameParameterWithStructureFields(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 99, 107),
 			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 182, 190),
 			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 229, 237),
 		];
-		refactorAndCheck({fileName: "testcases/scopedlocal/Structure.hx", toName: "file", pos: 102}, edits);
+		refactorAndCheck({fileName: "testcases/scopedlocal/Structure.hx", toName: "file", pos: 102}, edits, async);
 	}
 }

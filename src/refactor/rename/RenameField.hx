@@ -7,17 +7,16 @@ import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
-import refactor.rename.RenameHelper.SearchTypeOf;
-import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameField {
-	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):RefactorResult {
+	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packName:String = file.getPackage();
 		var types:Array<Type> = RenameHelper.findDescendantTypes(context, packName, identifier.defineType);
 
 		types.push(identifier.defineType);
+		var changes:Array<Promise<Void>> = [];
 		for (type in types) {
 			// use of field inside interfaces / classes (self + extending / implementing)
 			replaceInType(changelist, type, "", identifier.name, context.what.toName);
@@ -42,22 +41,26 @@ class RenameField {
 				replaceStaticUse(context, changelist, type, identifier.name);
 				switch (identifier.type) {
 					case Method(true):
-						RenameHelper.replaceStaticExtension(context, changelist, identifier);
+						changes.push(RenameHelper.replaceStaticExtension(context, changelist, identifier));
 					default:
 				}
 			}
 
 			// TODO imports with alias
 		}
-		replaceAccessOrCalls(context, changelist, identifier, types);
-		return changelist.execute();
+		changes.push(replaceAccessOrCalls(context, changelist, identifier, types));
+		return Promise.all(changes).then(function(_):RefactorResult {
+			return changelist.execute();
+		});
 	}
 
-	public static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>) {
+	public static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
+		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
-			RenameHelper.replaceSingleAccessOrCall(context, changelist, use, identifier.name, types);
+			changes.push(RenameHelper.replaceSingleAccessOrCall(context, changelist, use, identifier.name, types));
 		}
+		return Promise.all(changes).then(null);
 	}
 
 	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {

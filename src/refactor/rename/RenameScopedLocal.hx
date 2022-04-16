@@ -8,7 +8,7 @@ import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RenameScopedLocal {
-	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeEnd:Int):RefactorResult {
+	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeEnd:Int):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var identifierDot:String = identifier.name + ".";
 		var scopeStart:Int = identifier.pos.start;
@@ -56,6 +56,6 @@ class RenameScopedLocal {
 				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
 			}
 		}
-		return changelist.execute();
+		return Promise.resolve(changelist.execute());
 	}
 }
