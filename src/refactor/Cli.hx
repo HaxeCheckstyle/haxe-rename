@@ -1,5 +1,6 @@
 package refactor;
 
+import haxe.PosInfos;
 import haxe.Timer;
 import refactor.RefactorContext.VerboseLogger;
 import refactor.discover.FileList;
@@ -47,7 +48,7 @@ class Cli {
 		var toName:String = "";
 		var help:Bool = false;
 		var execute:Bool = false;
-		var verboseLog:VerboseLogger = function(text:String) {};
+		var verboseLog:VerboseLogger = function(text:String, ?pos:PosInfos) {};
 		var argHandler = hxargs.Args.generate([
 			@doc("file or directory with .hx files (multiple allowed)")
 			["-s", "--source"] => function(path:String) paths.push(path),
@@ -110,33 +111,38 @@ class Cli {
 		usageContext.usageCollector.updateImportHx(usageContext);
 		// usageContext.cache.save();
 
-		var result:RefactorResult = Refactor.rename({
+		var result:Promise<RefactorResult> = Refactor.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			typeList: usageContext.typeList,
 			what: what,
 			forRealExecute: execute && forReal,
 			docFactory: EditableDocument.new,
-			verboseLog: verboseLog
+			verboseLog: verboseLog,
+			typer: null
 		});
-		switch (result) {
-			case NoChange:
-				Sys.println("nothing to do");
-			case NotFound:
-				Sys.println("could not find identifier at " + loc);
-			case Unsupported(name):
-				Sys.println("renaming not supported for " + name);
-			case DryRun:
-				Sys.println("");
-			case Done:
-				Sys.println("changes were made");
-		}
-
-		Sys.println(Timer.stamp() - startTime);
-		Sys.exit(exitCode);
+		result.then(function(result:RefactorResult) {
+			switch (result) {
+				case NoChange:
+					Sys.println("nothing to do");
+				case NotFound:
+					Sys.println("could not find identifier at " + loc);
+				case Unsupported(name):
+					Sys.println("renaming not supported for " + name);
+				case DryRun:
+					Sys.println("");
+				case Done:
+					Sys.println("changes were made");
+			}
+		}).catchError(function(msg:String) {
+			Sys.println('renaming failed $msg');
+		}).finally(function() {
+			Sys.println(Timer.stamp() - startTime);
+			Sys.exit(exitCode);
+		});
 	}
 
-	function logMessage(text:String) {
+	function logMessage(text:String, ?pos:PosInfos) {
 		Sys.println(text);
 	}
 

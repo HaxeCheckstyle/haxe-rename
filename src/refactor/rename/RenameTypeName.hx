@@ -10,7 +10,7 @@ import refactor.edits.Changelist;
 import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameTypeName {
-	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();
@@ -38,6 +38,8 @@ class RenameTypeName {
 			}
 		}
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
+
+		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
 			if (use.defineType == null) {
 				continue;
@@ -51,34 +53,42 @@ class RenameTypeName {
 					}
 				case Global | SamePackage | Imported:
 			}
-			var typeHint:Null<TypeHintType> = RenameHelper.findTypeOfIdentifier(context, {
+			changes.push(RenameHelper.findTypeOfIdentifier(context, {
 				name: use.name,
 				pos: use.pos.start,
 				defineType: use.defineType
-			});
-			switch (typeHint) {
-				case null:
-				case KnownType(type, _):
-					if (type != identifier.defineType) {
-						continue;
-					}
-				case UnknownType(_):
-					continue;
-			}
-			if (use.name == identifier.name) {
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
-				continue;
-			}
-			if (use.name.startsWith('${identifier.name}.')) {
-				var newPos:IdentifierPos = {
-					fileName: use.pos.fileName,
-					start: use.pos.start,
-					end: use.pos.start + identifier.name.length
+			}).then(function(typeHint:TypeHintType) {
+				switch (typeHint) {
+					case null:
+					case KnownType(type, _):
+						if (type != identifier.defineType) {
+							return;
+						}
+					case UnknownType(_):
+						return;
 				}
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos), use);
-			}
+				if (use.name == identifier.name) {
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+					return;
+				}
+				if (use.name.startsWith('${identifier.name}.')) {
+					var newPos:IdentifierPos = {
+						fileName: use.pos.fileName,
+						start: use.pos.start,
+						end: use.pos.start + identifier.name.length
+					}
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos), use);
+				}
+			}));
 		}
 
-		return changelist.execute();
+		return Promise.all(changes).then(function(_) {
+			return Promise.resolve(changelist.execute());
+		});
 	}
+}
+
+typedef TypeHintUse = {
+	var use:Identifier;
+	var promise:Promise<TypeHintType>;
 }

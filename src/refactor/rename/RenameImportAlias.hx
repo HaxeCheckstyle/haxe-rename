@@ -7,7 +7,7 @@ import refactor.discover.Identifier;
 import refactor.edits.Changelist;
 
 class RenameImportAlias {
-	public static function refactorImportAlias(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+	public static function refactorImportAlias(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
 		var isImportHx:Bool = (file.getMainModulName() == "import");
 
@@ -23,6 +23,6 @@ class RenameImportAlias {
 				}
 			}
 		}
-		return changelist.execute();
+		return Promise.resolve(changelist.execute());
 	}
 }

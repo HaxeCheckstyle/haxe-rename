@@ -1,6 +1,7 @@
 package refactor;
 
 import haxe.PosInfos;
+import refactor.edits.Changelist;
 import refactor.edits.FileEdit;
 import refactor.edits.IEditableDocument;
 
@@ -56,5 +57,37 @@ class TestEditList {
 	public function newDoc(fileName:String):IEditableDocument {
 		docCounter++;
 		return new TestEditableDocument(fileName, this);
+	}
+
+	public function sortEdits() {
+		edits.sort(sortFileEdits);
+	}
+
+	function sortFileEdits(a:TestEdit, b:TestEdit):Int {
+		if (a.fileName > b.fileName) {
+			return 1;
+		}
+		if (a.fileName < b.fileName) {
+			return -1;
+		}
+		var offsetA:Int = switch (a.edit) {
+			case Move(_): 0;
+			case InsertText(_, pos): pos.start;
+			case ReplaceText(_, pos): pos.start;
+			case RemoveText(pos): pos.start;
+		};
+		var offsetB:Int = switch (b.edit) {
+			case Move(_): 0;
+			case InsertText(_, pos): pos.start;
+			case ReplaceText(_, pos): pos.start;
+			case RemoveText(pos): pos.start;
+		};
+		if (offsetA < offsetB) {
+			return -1;
+		}
+		if (offsetA > offsetB) {
+			return 1;
+		}
+		return 0;
 	}
 }

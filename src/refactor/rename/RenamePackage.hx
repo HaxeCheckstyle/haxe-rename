@@ -9,7 +9,7 @@ import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RenamePackage {
-	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var mainTypeName:String = file.getMainModulName();
 
@@ -76,7 +76,7 @@ class RenamePackage {
 		// TODO remove redundant imports
 
 		moveFileToPackage(context, file, changelist, packageName);
-		return changelist.execute();
+		return Promise.resolve(changelist.execute());
 	}
 
 	static function moveFileToPackage(context:RefactorContext, file:File, changelist:Changelist, packageName:String) {

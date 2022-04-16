@@ -1,8 +1,8 @@
 package refactor.discover;
 
-import sys.FileSystem;
-import sys.FileStat;
 import haxe.io.Path;
+import sys.FileStat;
+import sys.FileSystem;
 
 class File {
 	public var name:String;

@@ -557,11 +557,6 @@ class UsageCollector {
 				case Kwd(KwdFunction):
 					var method:Identifier = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
 					readMethod(context, method, child.getFirstChild());
-				// case Kwd(KwdIf):
-				// case Kwd(KwdFor):
-				// case Kwd(KwdDo):
-				// case Kwd(KwdWhile):
-				// case Kwd(KwdTry):
 				default:
 					readExpression(context, identifier, child);
 			}
@@ -583,9 +578,8 @@ class UsageCollector {
 							return GoDeeper;
 						}
 						switch (prev.tok) {
-							case BkOpen | POpen:
-								// method chaining
-								var newIdent:Identifier = makeIdentifier(context, token, Access, identifier);
+							case BkClose | POpen:
+								var newIdent:Identifier = makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
 								readBlock(context, newIdent, token);
 								return SkipSubtree;
 							default:
@@ -855,7 +849,7 @@ class UsageCollector {
 				break;
 			}
 			switch (nameToken.tok) {
-				case Dot:
+				case Dot | BkOpen:
 					pos.end = nameToken.pos.max;
 				case Binop(OpLt):
 					if (TokenTreeCheckUtils.isTypeParameter(nameToken)) {

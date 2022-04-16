@@ -44,4 +44,18 @@ class PrintHelper {
 				'UnknownType($name, ${params.map((i) -> i.name)})';
 		}
 	}
+	public static function printRefactorResult(result:RefactorResult):String {
+		return switch (result) {
+			case NoChange:
+				"nothing to do";
+			case NotFound:
+				"could not find identifier to rename";
+			case Unsupported(name):
+				"renaming not supported for " + name;
+			case DryRun:
+				"dry run - no chnages were made";
+			case Done:
+				"rename succesful";
+		}
+	}
 }

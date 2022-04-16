@@ -14,11 +14,15 @@ class Type {
 	}
 
 	public function getFullModulName():String {
+		var modulName:String = '${file.getMainModulName()}.';
+		if (file.getMainModulName() == name.name) {
+			modulName = "";
+		}
 		var packageName:String = file.getPackage();
 		if (packageName.length <= 0) {
-			return name.name;
+			return modulName + name.name;
 		}
-		return '$packageName.${name.name}';
+		return '$packageName.$modulName${name.name}';
 	}
 
 	public function addIdentifier(identifier:Identifier) {

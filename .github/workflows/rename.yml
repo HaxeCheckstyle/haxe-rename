@@ -40,9 +40,9 @@ jobs:
         npx haxe -version
         npx neko -version
         npx haxelib list
-    - name: Build NodeJs version
+    - name: Build Nodejs version
       run: npx haxe build.hxml
-    - name: Run eval tests
+    - name: Run Nodejs tests
       run: npx haxe -D codecov_json test.hxml
     - name: Upload results to codecov
       if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.1.5'

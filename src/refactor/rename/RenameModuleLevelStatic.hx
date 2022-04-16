@@ -8,7 +8,7 @@ import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RenameModuleLevelStatic {
-	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):RefactorResult {
+	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packageName:String = file.getPackage();
@@ -53,8 +53,9 @@ class RenameModuleLevelStatic {
 				default:
 			}
 		}
-		RenameHelper.replaceStaticExtension(context, changelist, identifier);
-		return changelist.execute();
+		return RenameHelper.replaceStaticExtension(context, changelist, identifier).then(function(_) {
+			return changelist.execute();
+		});
 	}
 
 	static function refactorIdentifier(context:RefactorContext, changelist:Changelist, searchName:String, replaceName:String,

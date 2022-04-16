@@ -12,7 +12,7 @@ class ChildClass extends BaseClass {
 	}
 
 	function findIdent(identifier:MyIdentifier, scopeStart:Int):Array<MyIdentifier> {
-		return identifier.defineType.findAllIdentifiers(function(ident:MyIdentifier) {
+		return identifier.defineType.findAllIdentifiers(function(ident:MyIdentifier):Bool {
 			if (ident.pos.start < scopeStart) {
 				return false;
 			}
@@ -24,6 +24,23 @@ class ChildClass extends BaseClass {
 			}
 			return false;
 		});
+	}
+
+	function hasIdent(name:String):Bool {
+		var list:Array<MyIdentifier> = [];
+
+		for (id in list) {
+			if (id.name == name) {
+				return true;
+			}
+		}
+
+		for (i in 0...list.length) {
+			if (list[i].name == name) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
