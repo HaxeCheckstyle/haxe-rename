@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class ModuleLevelStaticTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/modulelevelstatics"]);
+		setupTestSources(["testcases/modulelevelstatics"]);
 	}
 
 	public function testRenameSomeFunction(async:Async) {

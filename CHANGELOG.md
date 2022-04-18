@@ -2,6 +2,8 @@
 
 ## dev branch / next version (2.x.x)
 
+- added support for handling shadowed identifiers during local var/param rename
+
 ## 2.0.0 (2022-04-16)
 
 - added external typer interface to utilise type information from Haxe compiler ([#2](https://github.com/HaxeCheckstyle/haxe-rename/issues/2))

@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class ImportAliasTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/importalias"]);
+		setupTestSources(["testcases/importalias"]);
 	}
 
 	public function testRenameImportHxAlias(async:Async) {

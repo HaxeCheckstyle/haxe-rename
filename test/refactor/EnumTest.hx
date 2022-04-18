@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class EnumTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/enums"]);
+		setupTestSources(["testcases/enums"]);
 	}
 
 	public function testRenameEnumType(async:Async) {

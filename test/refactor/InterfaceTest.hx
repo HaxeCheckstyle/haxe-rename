@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class InterfaceTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/interfaces"]);
+		setupTestSources(["testcases/interfaces"]);
 	}
 
 	public function testRenameInterface(async:Async) {

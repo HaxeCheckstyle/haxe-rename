@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class ClassTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/classes"]);
+		setupTestSources(["testcases/classes"]);
 	}
 
 	public function testRenameChildsTypeName(async:Async) {
@@ -38,6 +38,10 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 162, 166),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 174, 178),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 248, 252),
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 336, 340),
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 407, 411),
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 425, 429),
+
 		];
 		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 44}, edits, async);
 	}
@@ -159,5 +163,32 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 620, 625),
 		];
 		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "jsonWidth", pos: 74}, edits, async);
+	}
+
+	public function testRenameBaseClassParamterWithShadow(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 227, 228),
+			makeInsertTestEdit("testcases/classes/BaseClass.hx", "this.", 248),
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 260, 261),
+		];
+		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 227}, edits, async);
+	}
+
+	public function testRenameBaseClassParamterWithShadowLocalVar(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
+	}
+
+	public function testRenameBaseClassParamterWithShadow2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 386, 387),
+			makeInsertTestEdit("testcases/classes/BaseClass.hx", "this.", 407),
+		];
+		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 386}, edits, async);
+	}
+
+	public function testRenameBaseClassParamterWithShadowCase(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
 	}
 }

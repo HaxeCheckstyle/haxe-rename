@@ -26,29 +26,29 @@ class Refactor {
 		}
 		return switch (identifier.type) {
 			case PackageName:
-				context.verboseLog('rename package name "${identifier.name}"');
+				context.verboseLog('rename package name "${identifier.name}" to "${context.what.toName}"');
 				RenamePackage.refactorPackageName(context, file, identifier);
 			case ImportModul | UsingModul:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case ImportAlias:
-				context.verboseLog('rename import alias "${identifier.name}"');
+				context.verboseLog('rename import alias "${identifier.name}" to "${context.what.toName}"');
 				RenameImportAlias.refactorImportAlias(context, file, identifier);
 			case Abstract | Class | Enum | Interface | Typedef:
-				context.verboseLog('rename type name "${identifier.name}"');
+				context.verboseLog('rename type name "${identifier.name}" to "${context.what.toName}"');
 				RenameTypeName.refactorTypeName(context, file, identifier);
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
-				context.verboseLog('rename module level static "${identifier.name}"');
+				context.verboseLog('rename module level static "${identifier.name}" to "${context.what.toName}"');
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case Property:
-				context.verboseLog('rename property "${identifier.name}"');
+				context.verboseLog('rename property "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, false);
 			case FieldVar(isStatic):
-				context.verboseLog('rename field "${identifier.name}"');
+				context.verboseLog('rename field "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case Method(isStatic):
-				context.verboseLog('rename class method "${identifier.name}"');
+				context.verboseLog('rename class method "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
@@ -59,10 +59,10 @@ class Refactor {
 			case StructureField(fields):
 				RenameAnonStructField.refactorStructureField(context, file, identifier, fields);
 			case InterfaceProperty | InterfaceVar | InterfaceMethod:
-				context.verboseLog('rename interface field "${identifier.name}"');
+				context.verboseLog('rename interface field "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, false);
 			case EnumField(_):
-				context.verboseLog('rename enum field "${identifier.name}"');
+				context.verboseLog('rename enum field "${identifier.name}" to "${context.what.toName}"');
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call(true):
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
@@ -72,7 +72,7 @@ class Refactor {
 			case CaseLabel(_):
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case ScopedLocal(scopeEnd, type):
-				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()})');
+				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()}) to "${context.what.toName}"');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeEnd);
 		}
 	}

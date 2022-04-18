@@ -383,7 +383,6 @@ class RenameHelper {
 			}
 		}
 		if (firstParam == null) {
-			context.verboseLog("could not find first parameter for static extension");
 			return Promise.resolve(null);
 		}
 		var changes:Array<Promise<Void>> = [];
@@ -393,7 +392,7 @@ class RenameHelper {
 					changes.push(RenameHelper.typeFromTypeHint(context, use).then(function(firstParamType):Promise<Void> {
 						if (firstParamType == null) {
 							context.verboseLog("could not find type of first parameter for static extension");
-							return Promise.resolve();
+							return Promise.resolve(null);
 						}
 
 						var innerChanges:Array<Promise<Void>> = [];

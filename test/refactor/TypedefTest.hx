@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class TypedefTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/typedefs"]);
+		setupTestSources(["testcases/typedefs"]);
 	}
 
 	public function testRenameTypedefType(async:Async) {

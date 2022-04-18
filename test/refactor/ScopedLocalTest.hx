@@ -4,7 +4,7 @@ import refactor.TestEditableDocument.TestEdit;
 
 class ScopedLocalTest extends TestBase {
 	function setupClass() {
-		setupData(["testcases/scopedlocal"]);
+		setupTestSources(["testcases/scopedlocal"]);
 	}
 
 	public function testRenameContextParameter(async:Async) {

@@ -11,9 +11,13 @@ class RenameScopedLocal {
 	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeEnd:Int):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var identifierDot:String = identifier.name + ".";
+		var toNameDot:String = context.what.toName + ".";
 		var scopeStart:Int = identifier.pos.start;
 		var allUses:Array<Identifier> = identifier.defineType.findAllIdentifiers(function(ident:Identifier) {
 			if (ident.pos.start < scopeStart) {
+				return false;
+			}
+			if (ident.pos.start > scopeEnd) {
 				return false;
 			}
 			if (ident.name == identifier.name) {
@@ -24,14 +28,38 @@ class RenameScopedLocal {
 			}
 			return false;
 		});
+		var allShadows:Array<Identifier> = identifier.defineType.findAllIdentifiers(function(ident:Identifier) {
+			if (ident.pos.start < scopeStart) {
+				return false;
+			}
+			if (ident.pos.start > scopeEnd) {
+				return false;
+			}
+			if (ident.name == context.what.toName) {
+				return true;
+			}
+			if (ident.name.startsWith(toNameDot)) {
+				return true;
+			}
+			return false;
+		});
+
+		for (use in allShadows) {
+			switch (use.type) {
+				case Access | Call(_):
+					var pos:IdentifierPos = {
+						fileName: use.pos.fileName,
+						start: use.pos.start,
+						end: use.pos.start
+					};
+					changelist.addChange(use.pos.fileName, InsertText("this.", pos), use);
+				case ScopedLocal(scopeEnd, scopeType):
+					return Promise.reject('local var "${context.what.toName}" exists');
+				default:
+			}
+		}
 
 		for (use in allUses) {
-			if (use.pos.start < scopeStart) {
-				continue;
-			}
-			if (use.pos.start > scopeEnd) {
-				continue;
-			}
 			switch (use.type) {
 				case ScopedLocal(scopeEnd, _):
 					if (use.pos.start != identifier.pos.start) {
