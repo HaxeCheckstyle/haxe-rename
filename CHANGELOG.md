@@ -2,7 +2,7 @@
 
 ## dev branch / next version (2.x.x)
 
-## 2.1.0 (2022-x-x)
+## 2.1.0 (2022-04-19)
 
 - added support for handling shadowed identifiers during local var/param rename
 - fixed detecting local var shadows when renaming a field
