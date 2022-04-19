@@ -83,14 +83,33 @@ class RenameField {
 	}
 
 	static function replaceInTypeWithFieldAccess(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
-		var allUses:Array<Identifier> = type.getStartsWith('$prefix$from.');
-		for (use in allUses) {
+		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
+		var allAccess:Array<Identifier> = type.getStartsWith('$prefix$from.');
+		var shadowed:Bool = false;
+		for (access in allAccess) {
+			for (use in allUses) {
+				if (use.pos.start > access.pos.start) {
+					break;
+				}
+				switch (use.type) {
+					case ScopedLocal(end, _):
+						if (end > access.pos.start) {
+							shadowed = true;
+							break;
+						}
+					case StructureField(_):
+					default:
+				}
+			}
+			if (shadowed) {
+				continue;
+			}
 			var pos:IdentifierPos = {
-				fileName: use.pos.fileName,
-				start: use.pos.start + prefix.length,
-				end: use.pos.start + prefix.length + from.length
+				fileName: access.pos.fileName,
+				start: access.pos.start + prefix.length,
+				end: access.pos.start + prefix.length + from.length
 			};
-			changelist.addChange(use.pos.fileName, ReplaceText(to, pos), use);
+			changelist.addChange(access.pos.fileName, ReplaceText(to, pos), access);
 		}
 	}
 

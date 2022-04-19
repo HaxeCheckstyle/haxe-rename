@@ -12,7 +12,7 @@
 
 -D coverage-console-summary-reporter
 -D coverage-console-package-summary-reporter
-#-D coverage-console-file-summary-reporter
+# -D coverage-console-file-summary-reporter
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
 

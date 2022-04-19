@@ -71,4 +71,10 @@ class TypedefTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/typedefs/Main.hx", toName: "lineNumber", pos: 552}, edits, async);
 	}
+
+	public function testRenameTypedefBase(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/typedefs/Types.hx", toName: "Position", pos: 140},
+			"renaming not supported for IdentifierPos testcases/typedefs/Types.hx@134-147 (TypedefBase)", async);
+	}
 }
