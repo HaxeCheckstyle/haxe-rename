@@ -290,13 +290,13 @@ class RenameHelper {
 				case Class:
 					var baseType:Null<Type> = findBaseClass(context.typeList, containerType);
 					if (baseType == null) {
-						return null;
+						return Promise.resolve(null);
 					}
 					return findField(context, baseType, name);
 				case Typedef:
 				default:
 			}
-			return null;
+			return Promise.resolve(null);
 		}
 		for (use in candidate.uses) {
 			switch (use.type) {
@@ -305,7 +305,7 @@ class RenameHelper {
 				default:
 			}
 		}
-		return Promise.reject();
+		return Promise.resolve(null);
 	}
 
 	public static function findBaseClass(typeList:TypeList, type:Type):Null<Type> {
@@ -371,7 +371,7 @@ class RenameHelper {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 
 		if (identifier.uses == null) {
-			return Promise.resolve();
+			return Promise.resolve(null);
 		}
 		var firstParam:Null<Identifier> = null;
 		for (use in identifier.uses) {
@@ -424,8 +424,10 @@ class RenameHelper {
 								name: object,
 								pos: use.pos.start,
 								defineType: use.defineType
-							}, firstParamType).then(function(_) {
-								RenameHelper.replaceTextWithPrefix(use, '$object.', context.what.toName, changelist);
+							}, firstParamType).then(function(matches:Bool) {
+								if (matches) {
+									RenameHelper.replaceTextWithPrefix(use, '$object.', context.what.toName, changelist);
+								}
 							}));
 						}
 						return Promise.all(innerChanges).then(null);

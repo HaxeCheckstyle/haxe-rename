@@ -40,7 +40,6 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 248, 252),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 407, 411),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 425, 429),
-
 		];
 		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 44}, edits, async);
 	}
@@ -69,7 +68,8 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/EnumType.hx", "ItemClass", 75, 85),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 142, 152),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 159, 169),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 280, 290),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 264, 274),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 355, 365),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 111, 121),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
@@ -118,7 +118,8 @@ class ClassTest extends TestBase {
 	public function testRenameStaticExtensionPrint(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 210, 215),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 293, 298),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 368, 373),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 386, 391),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "printChild", 151, 156),
 		];
 		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "printChild", pos: 153}, edits, async);
@@ -126,7 +127,7 @@ class ClassTest extends TestBase {
 
 	public function testRenameStaticExtensionPrintText(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 248, 257),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 323, 332),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "logText", 225, 234),
 		];
 		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "logText", pos: 229}, edits, async);
