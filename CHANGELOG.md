@@ -2,7 +2,7 @@
 
 ## dev branch / next version (2.x.x)
 
-## 2.1.1 (2022-xx-xx)
+## 2.1.1 (2022-04-23)
 
 - fixed identifier collection
 
