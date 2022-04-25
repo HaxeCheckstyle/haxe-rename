@@ -2,6 +2,10 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.1.2 (2022-04-25)
+
+- fixed handling of loop iterator shadowing, fixes [vshaxe/vshaxe#136](https://github.com/vshaxe/vshaxe/issues/136)
+
 ## 2.1.1 (2022-04-23)
 
 - fixed identifier collection

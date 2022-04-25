@@ -20,7 +20,6 @@ class ScopedLocalTest extends TestBase {
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1332, 1339),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1806, 1813),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 2017, 2024),
-
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 463}, edits, async);
 	}
@@ -64,7 +63,6 @@ class ScopedLocalTest extends TestBase {
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1332, 1339),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 1806, 1813),
 			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "refactorContext", 2017, 2024),
-
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "refactorContext", pos: 2020}, edits, async);
 	}
@@ -76,5 +74,47 @@ class ScopedLocalTest extends TestBase {
 			makeReplaceTestEdit("testcases/scopedlocal/Structure.hx", "file", 229, 237),
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/Structure.hx", toName: "file", pos: 102}, edits, async);
+	}
+
+	public function testRenameFooVar(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2104, 2107),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2139, 2142),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2187, 2190),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2105}, edits, async);
+	}
+
+	public function testRenameFooArray(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2104, 2107),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2139, 2142),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2187, 2190),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2140}, edits, async);
+	}
+
+	public function testRenameFooItem(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2132, 2135),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2155, 2158),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2133}, edits, async);
+	}
+
+	public function testRenameFooItem2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2173, 2176),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2203, 2206),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2174}, edits, async);
+	}
+
+	public function testRenameValItem(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2180, 2183),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "file", 2218, 2221),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2181}, edits, async);
 	}
 }

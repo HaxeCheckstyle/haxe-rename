@@ -66,7 +66,7 @@ class Refactor {
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call(true):
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
-			case Call(false) | Access | ArrayAccess(_):
+			case Call(false) | Access | ArrayAccess(_) | ForIterator:
 				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
 				findActualWhat(context, file, identifier);
 			case CaseLabel(_):
@@ -103,6 +103,10 @@ class Refactor {
 						continue;
 					}
 					if (candidate == null) {
+						candidate = use;
+					}
+				case ScopedLocal(scopeEnd, ForLoop(scopeStart, _)) if (!onlyFields):
+					if ((scopeStart < identifier.pos.start) && (identifier.pos.start < scopeEnd)) {
 						candidate = use;
 					}
 				case ScopedLocal(scopeEnd, _) if (!onlyFields):

@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "2.1.1",
-	"releasenote": "fixed identifier collection",
+	"version": "2.1.2",
+	"releasenote": "fixed handling of loop iterator shadowing",
 	"contributors": [
 		"AlexHaxe"
 	],

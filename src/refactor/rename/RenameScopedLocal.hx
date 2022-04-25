@@ -53,14 +53,23 @@ class RenameScopedLocal {
 						end: use.pos.start
 					};
 					changelist.addChange(use.pos.fileName, InsertText("this.", pos), use);
-				case ScopedLocal(scopeEnd, scopeType):
+				case ScopedLocal(_, _):
 					return Promise.reject('local var "${context.what.toName}" exists');
 				default:
 			}
 		}
 
+		var skipForIterator:Bool = false;
 		for (use in allUses) {
 			switch (use.type) {
+				case ScopedLocal(scopeEnd, ForLoop(start, _)):
+					if (use.pos.start == identifier.pos.start) {
+						scopeStart = start;
+						skipForIterator = true;
+					} else {
+						scopeStart = scopeEnd;
+						continue;
+					}
 				case ScopedLocal(scopeEnd, _):
 					if (use.pos.start != identifier.pos.start) {
 						// new parameter with identical name, so we skip its scope
@@ -69,7 +78,15 @@ class RenameScopedLocal {
 					}
 				case StructureField(_):
 					continue;
+				case ForIterator:
+					if (skipForIterator) {
+						skipForIterator = false;
+						continue;
+					}
 				default:
+					if (use.pos.start < scopeStart) {
+						continue;
+					}
 			}
 			if (use.name == identifier.name) {
 				// exact match

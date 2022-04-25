@@ -29,8 +29,8 @@ class PrintHelper {
 		return switch (scopeType) {
 			case Parameter(params):
 				'Parameter(${params.map((i) -> '"${i.name}"')})';
-			case ForLoop(loopIdentifiers):
-				'ForLoop(${loopIdentifiers.map((i) -> '"${i.name}"')})';
+			case ForLoop(scopeStart, loopIdentifiers):
+				'ForLoop(${loopIdentifiers.map((i) -> '"${i.name}"')}) - scopeStart: $scopeStart';
 			default:
 				'$scopeType';
 		}

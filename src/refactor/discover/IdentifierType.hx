@@ -35,6 +35,7 @@ enum IdentifierType {
 	Call(isNew:Bool);
 	ArrayAccess(posClosing:Int);
 	Access;
+	ForIterator;
 	ScopedLocal(scopeEnd:Int, scopeType:ScopedLocalType);
 	StringConst;
 }
@@ -43,7 +44,7 @@ enum ScopedLocalType {
 	Parameter(params:Array<Identifier>);
 	Var;
 	CaseCapture;
-	ForLoop(loopIdentifiers:Array<Identifier>);
+	ForLoop(scopeStart:Int, loopIdentifiers:Array<Identifier>);
 }
 
 enum TypedefFieldType {

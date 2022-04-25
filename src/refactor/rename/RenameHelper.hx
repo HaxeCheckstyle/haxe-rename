@@ -190,12 +190,12 @@ class RenameHelper {
 
 			var typeHint:Null<Identifier> = candidate.getTypeHint();
 			switch (candidate.type) {
-				case ScopedLocal(_, ForLoop(loopIdent)):
+				case ScopedLocal(_, ForLoop(_, loopIdent)):
 					var index:Int = loopIdent.indexOf(candidate);
 					var changes:Array<Promise<TypeHintType>> = [];
 					for (child in loopIdent) {
 						switch (child.type) {
-							case ScopedLocal(_, ForLoop(_)):
+							case ScopedLocal(_, ForLoop(_, _)):
 								continue;
 							default:
 								changes.push(findTypeOfIdentifier(context, {

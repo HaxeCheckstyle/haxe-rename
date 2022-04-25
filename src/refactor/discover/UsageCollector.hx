@@ -682,7 +682,12 @@ class UsageCollector {
 	function readForIteration(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
 		var loopIdentifiers:Array<Identifier> = [];
 
-		var ident:Identifier = makeIdentifier(context, token, ScopedLocal(scopeEnd, ForLoop(loopIdentifiers)), identifier);
+		var pClose:Null<TokenTree> = token.access().parent().firstOf(PClose).token;
+		var scopeStart:Int = token.pos.min;
+		if (pClose != null) {
+			scopeStart = pClose.pos.max;
+		}
+		var ident:Identifier = makeIdentifier(context, token, ScopedLocal(scopeEnd, ForLoop(scopeStart, loopIdentifiers)), identifier);
 		loopIdentifiers.push(ident);
 		if (!token.hasChildren()) {
 			return;
@@ -690,12 +695,17 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Binop(OpArrow):
-					ident = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, ForLoop(loopIdentifiers)), identifier);
+					ident = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, ForLoop(scopeStart, loopIdentifiers)), identifier);
 					loopIdentifiers.push(ident);
 				default:
 					readExpression(context, ident, child);
 					if (ident.uses != null) {
 						for (use in ident.uses) {
+							switch (use.type) {
+								case Access:
+									use.type = ForIterator;
+								default:
+							}
 							loopIdentifiers.push(use);
 						}
 					}
@@ -879,6 +889,13 @@ class UsageCollector {
 					case Binop(OpAssign):
 						if (!parent.matches(Kwd(KwdTypedef))) {
 							pOpenToken = child;
+						}
+					case Binop(OpIn):
+					case Binop(OpArrow):
+						switch (type) {
+							case ScopedLocal(_, ForLoop(_)):
+							default:
+								pOpenToken = child;
 						}
 					case BkOpen | Binop(_):
 						pOpenToken = child;

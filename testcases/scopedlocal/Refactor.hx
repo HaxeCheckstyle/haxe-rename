@@ -67,5 +67,15 @@ class Refactor {
 			case StringConst:
 				Unsupported;
 		}
+
+		var foo = [1, 23, 4, 5];
+		for (foo in foo) {
+			trace(foo);
+		}
+
+		for (foo => val in foo) {
+			trace(foo);
+			trace(val);
+		}
 	}
 }

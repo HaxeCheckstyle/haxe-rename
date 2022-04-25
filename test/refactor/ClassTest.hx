@@ -192,6 +192,33 @@ class ClassTest extends TestBase {
 		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
 	}
 
+	public function testRenameBaseClassCaseLabel(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
+			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))", async);
+	}
+
+	public function testRenameUseChildClassParentSubPart(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 233}, "could not find identifier to rename", async);
+	}
+
+	public function testRenameBaseClassDataToData(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
+	}
+
+	public function testRenameBaseClassNoIdentifier(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
+	}
+
+	public function testRenameStaticUsingConstructorCall(async:Async) {
+		var edits:Array<TestEdit> = [];
+		failRefactor({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
+			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
+	}
+
 	public function testRenameBaseClassParamterWithShadow2(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 386, 387),
