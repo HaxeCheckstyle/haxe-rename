@@ -22,59 +22,58 @@ class RenamePackage {
 			changelist.addChange(file.name, InsertText('package ${context.what.toName};\n', {fileName: file.name, start: 0, end: 0}), identifier);
 		}
 
+		var newMainModulName:String = context.what.toName + "." + mainTypeName;
+		var mainModule:String = packageNamePrefix + mainTypeName;
+		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(mainModule);
+		for (use in allUses) {
+			changelist.addChange(use.pos.fileName, ReplaceText(newMainModulName, use.pos), use);
+		}
 		for (type in file.typeList) {
-			var typeName:String = if (mainTypeName == type.name.name) {
-				type.name.name;
-			} else {
-				mainTypeName + "." + type.name;
+			if (mainTypeName == type.name.name) {
+				continue;
 			}
+			var typeName:String = type.name.name;
+
 			var fullModulName:String = packageNamePrefix + typeName;
 			var newFullModulName:String = context.what.toName + "." + typeName;
-			var allUses:Array<Identifier> = context.nameMap.getIdentifiers(fullModulName);
-			if (allUses != null) {
-				for (use in allUses) {
-					changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos), use);
-				}
+			allUses = context.nameMap.getIdentifiers(fullModulName);
+			for (use in allUses) {
+				changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos), use);
 			}
 
-			allUses = context.nameMap.getIdentifiers(type.name.name);
-			allUses = allUses.concat(context.nameMap.getStartsWith(type.name.name + "."));
-			var uniqueFiles:Array<String> = [];
-			if (allUses != null) {
-				for (use in allUses) {
-					if (use.pos.fileName == identifier.pos.fileName) {
-						// ignore self
-						continue;
-					}
-					if (uniqueFiles.contains(use.pos.fileName)) {
-						// only add once per file
-						continue;
-					}
-					var useFile:Null<File> = context.fileList.getFile(use.pos.fileName);
-					if (useFile == null) {
-						continue;
-					}
-					switch (useFile.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
-						case None | SamePackage:
-						case Global | Imported | ImportedWithAlias(_):
-							// imported old location -> skip (we renamed import in previous loop)
-							continue;
-					}
-					switch (useFile.importsModule(context.what.toName, type.file.getMainModulName(), type.name.name)) {
-						case None:
-						case Global | SamePackage | Imported | ImportedWithAlias(_):
-							// already imports new location -> skip
-							continue;
-					}
-					var importPos:IdentifierPos = {fileName: use.pos.fileName, start: useFile.importInsertPos, end: useFile.importInsertPos}
-					changelist.addChange(use.pos.fileName, InsertText('import $newFullModulName;\n', importPos), use);
+			fullModulName = packageNamePrefix + mainTypeName + "." + typeName;
+			newFullModulName = context.what.toName + "." + mainTypeName + "." + typeName;
+			allUses = context.nameMap.getIdentifiers(fullModulName);
+			for (use in allUses) {
+				changelist.addChange(use.pos.fileName, ReplaceText(newFullModulName, use.pos), use);
+			}
+		}
+		var uniqueFiles:Array<String> = [];
+
+		allUses = context.nameMap.getIdentifiers(mainTypeName);
+		for (use in allUses) {
+			if (use.file.name == file.name) {
+				continue;
+			}
+			if (use.file.getPackage() != packageName) {
+				continue;
+			}
+			if (uniqueFiles.contains(use.pos.fileName)) {
+				// only add once per file
+				continue;
+			}
+			switch (use.file.importsModule(packageName, mainTypeName, mainTypeName)) {
+				case None:
+				case Global | SamePackage:
+					var importPos:IdentifierPos = {fileName: use.pos.fileName, start: use.file.importInsertPos, end: use.file.importInsertPos}
+					changelist.addChange(use.pos.fileName, InsertText('import $newMainModulName;\n', importPos), use);
 					uniqueFiles.push(use.pos.fileName);
-				}
+				case Imported:
+				case ImportedWithAlias(_):
 			}
 		}
 
 		// TODO remove redundant imports
-
 		moveFileToPackage(context, file, changelist, packageName);
 		return Promise.resolve(changelist.execute());
 	}

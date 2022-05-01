@@ -3,6 +3,7 @@ import refactor.EnumTest;
 import refactor.ImportAliasTest;
 import refactor.InterfaceTest;
 import refactor.ModuleLevelStaticTest;
+import refactor.PackageTest;
 import refactor.ScopedLocalTest;
 import refactor.TypedefTest;
 import utest.Runner;
@@ -16,6 +17,7 @@ class TestMain {
 			new ImportAliasTest(),
 			new InterfaceTest(),
 			new ModuleLevelStaticTest(),
+			new PackageTest(),
 			new ScopedLocalTest(),
 			new TypedefTest()
 		];

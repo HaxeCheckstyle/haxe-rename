@@ -1,7 +1,5 @@
 package refactor;
 
-import refactor.TestEditableDocument.TestEdit;
-
 class ImportAliasTest extends TestBase {
 	function setupClass() {
 		setupTestSources(["testcases/importalias"]);

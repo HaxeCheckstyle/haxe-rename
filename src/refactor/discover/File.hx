@@ -40,12 +40,9 @@ class File {
 		if (packName.length <= 0) {
 			return Global;
 		}
-		if (packName == getPackage()) {
-			return SamePackage;
-		}
 		var fullModule:String = '$packName.$moduleName';
 		var fullSubModule:Null<String> = null;
-		if (moduleName == typeName) {
+		if (moduleName != typeName) {
 			fullSubModule = '$fullModule.$typeName';
 		}
 		for (importEntry in importList) {
@@ -64,9 +61,21 @@ class File {
 		}
 
 		if (importHxFile == null) {
+			if (packName == getPackage()) {
+				return SamePackage;
+			}
+			if (packName == getPackage()) {
+				return SamePackage;
+			}
 			return None;
 		}
-		return importHxFile.importsModule(packName, moduleName, typeName);
+		var result:ImportStatus = importHxFile.importsModule(packName, moduleName, typeName);
+		if (result == None) {
+			if (packName == getPackage()) {
+				return SamePackage;
+			}
+		}
+		return result;
 	}
 
 	public function getMainModulName():String {

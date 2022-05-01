@@ -2,6 +2,10 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.1.3 (2022-05-01)
+
+- fixed package renaming
+
 ## 2.1.2 (2022-04-25)
 
 - fixed handling of loop iterator shadowing, fixes [vshaxe/vshaxe#136](https://github.com/vshaxe/vshaxe/issues/136)

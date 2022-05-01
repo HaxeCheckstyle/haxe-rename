@@ -1,7 +1,5 @@
 package refactor;
 
-import refactor.TestEditableDocument.TestEdit;
-
 class TypedefTest extends TestBase {
 	function setupClass() {
 		setupTestSources(["testcases/typedefs"]);
