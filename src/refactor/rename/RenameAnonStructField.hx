@@ -60,7 +60,7 @@ class RenameAnonStructField {
 			switch (use.file.importsModule(packName, mainModuleName, type.name.name)) {
 				case None:
 					continue;
-				case Global | SamePackage | Imported | ImportedWithAlias(_):
+				case Global | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
 			}
 			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
 		}
@@ -140,7 +140,7 @@ class RenameAnonStructField {
 			switch (baseTypeName.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), baseTypeName.name)) {
 				case None:
 					continue;
-				case Global | SamePackage | Imported | ImportedWithAlias(_):
+				case Global | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
 			}
 			return use.defineType;
 		}

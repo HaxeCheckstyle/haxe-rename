@@ -51,7 +51,7 @@ class RenameTypeName {
 					if (alias != identifier.name) {
 						continue;
 					}
-				case Global | SamePackage | Imported:
+				case Global | SamePackage | Imported | StarImported:
 			}
 			changes.push(RenameHelper.findTypeOfIdentifier(context, {
 				name: use.name,

@@ -21,10 +21,10 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "addData", 121, 132),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 145, 156),
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "addData", 187, 198),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 239, 250),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 355, 366),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 464, 475),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 652, 663),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 228, 239),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 344, 355),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 453, 464),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 641, 652),
 		];
 		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "addData", pos: 128}, edits, async);
 	}
@@ -71,14 +71,13 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 111, 121),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 38, 48),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 67, 77),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 143, 153),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 210, 220),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 299, 309),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 423, 433),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 510, 520),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 623, 633),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 56, 66),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 132, 142),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 199, 209),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 288, 298),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 412, 422),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 499, 509),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 612, 622),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ItemClass", pos: 28}, edits, async);
 	}
@@ -91,8 +90,7 @@ class ClassTest extends TestBase {
 			makeInsertTestEdit("testcases/classes/EnumType.hx", "import classes.pack.ChildClass;\n", 18),
 			makeInsertTestEdit("testcases/classes/StaticUsing.hx", "import classes.pack.ChildClass;\n", 18),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "classes.pack.ChildClass", 30, 48),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 30, 48),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 59, 77),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 48, 66),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "classes.pack", pos: 10}, edits, async);
 	}
@@ -100,7 +98,7 @@ class ClassTest extends TestBase {
 	public function testRenameTypedef(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ChildList", 868, 880),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ChildList", 107, 119),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ChildList", 96, 108),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 872}, edits, async);
 	}
@@ -109,6 +107,7 @@ class ClassTest extends TestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "sumChilds", 62, 65),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "sumChilds", 182, 185),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "sumChilds", 706, 709),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildHelper.hx", toName: "sumChilds", pos: 64}, edits, async);
 	}
@@ -135,11 +134,11 @@ class ClassTest extends TestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "parentBase", 67, 73),
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "parentBase", 310, 316),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 232, 238),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 348, 354),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 457, 463),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 566, 572),
-			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 645, 651),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 221, 227),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 337, 343),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 446, 452),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 555, 561),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 634, 640),
 		];
 		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits, async);
 	}
@@ -176,6 +175,19 @@ class ClassTest extends TestBase {
 		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "jsonWidth", pos: 74}, edits, async);
 	}
 
+	public function testRenameJsonClass(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeMoveTestEdit("testcases/classes/JsonClass.hx", "testcases/classes/JsonImporter.hx"),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 24, 33),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 276, 285),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 287, 296),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 319, 328),
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 336, 345),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "JsonImporter", 744, 753),
+		];
+		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "JsonImporter", pos: 28}, edits, async);
+	}
+
 	public function testRenameBaseClassParamterWithShadow(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 227, 228),
@@ -198,7 +210,7 @@ class ClassTest extends TestBase {
 
 	public function testRenameUseChildClassParentSubPart(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failRefactor({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 233}, "could not find identifier to rename", async);
+		failRefactor({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameBaseClassDataToData(async:Async) {

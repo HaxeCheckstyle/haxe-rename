@@ -2,6 +2,10 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.1.4 (2022-05-02)
+
+- fixed handling of star imports
+
 ## 2.1.3 (2022-05-01)
 
 - fixed package renaming

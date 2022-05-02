@@ -42,8 +42,10 @@ class File {
 		}
 		var fullModule:String = '$packName.$moduleName';
 		var fullSubModule:Null<String> = null;
+		var isMainModule:Bool = true;
 		if (moduleName != typeName) {
 			fullSubModule = '$fullModule.$typeName';
+			isMainModule = false;
 		}
 		for (importEntry in importList) {
 			if (importEntry.moduleName.name == fullModule) {
@@ -57,6 +59,11 @@ class File {
 					return ImportedWithAlias(importEntry.alias.name);
 				}
 				return Imported;
+			}
+			if (isMainModule && importEntry.starImport) {
+				if (importEntry.moduleName.name == packName) {
+					return StarImported;
+				}
 			}
 		}
 
@@ -152,4 +159,5 @@ enum ImportStatus {
 	SamePackage;
 	Imported;
 	ImportedWithAlias(alias:String);
+	StarImported;
 }

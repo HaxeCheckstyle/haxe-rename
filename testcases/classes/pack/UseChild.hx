@@ -1,6 +1,6 @@
 package classes.pack;
 
-import classes.ChildClass.*;
+import classes.*;
 import classes.ChildClass;
 
 class UseChild {
@@ -38,4 +38,10 @@ class UseChild {
 		child.parent.doSomething([]);
 	}
 	#end
+
+	function helperSum() {
+		ChildHelper.sum(list[0]);
+	}
+
+	function json(json:JsonClass) {}
 }

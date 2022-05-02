@@ -64,7 +64,7 @@ class RenamePackage {
 			}
 			switch (use.file.importsModule(packageName, mainTypeName, mainTypeName)) {
 				case None:
-				case Global | SamePackage:
+				case Global | SamePackage | StarImported:
 					var importPos:IdentifierPos = {fileName: use.pos.fileName, start: use.file.importInsertPos, end: use.file.importInsertPos}
 					changelist.addChange(use.pos.fileName, InsertText('import $newMainModulName;\n', importPos), use);
 					uniqueFiles.push(use.pos.fileName);

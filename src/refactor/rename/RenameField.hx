@@ -122,7 +122,7 @@ class RenameField {
 					continue;
 				case ImportedWithAlias(_):
 					continue;
-				case Global | SamePackage | Imported:
+				case Global | SamePackage | Imported | StarImported:
 			}
 			RenameHelper.replaceTextWithPrefix(use, '${type.name.name}.', context.what.toName, changelist);
 		}

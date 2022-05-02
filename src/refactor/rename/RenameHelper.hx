@@ -53,7 +53,7 @@ class RenameHelper {
 					var search:String = switch (use.file.importsModule(baseType.file.getPackage(), baseType.file.getMainModulName(), baseType.name.name)) {
 						case None:
 							continue;
-						case Global | SamePackage | Imported:
+						case Global | SamePackage | Imported | StarImported:
 							baseType.name.name;
 						case ImportedWithAlias(alias):
 							alias;
@@ -316,7 +316,7 @@ class RenameHelper {
 				switch (type.file.importsModule(candidate.file.getPackage(), candidate.file.getMainModulName(), candidate.name.name)) {
 					case None:
 					case ImportedWithAlias(_):
-					case Global | SamePackage | Imported:
+					case Global | SamePackage | Imported | StarImported:
 						return candidate;
 				}
 			}
@@ -359,7 +359,7 @@ class RenameHelper {
 			switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
 				case None:
 				case ImportedWithAlias(_):
-				case Global | SamePackage | Imported:
+				case Global | SamePackage | Imported | StarImported:
 					return Promise.resolve(KnownType(type, typeParams));
 			}
 		}
