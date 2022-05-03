@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "2.1.4",
-	"releasenote": "fixed handling of star imports",
+	"version": "2.2.0",
+	"releasenote": "added canRename API call - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],

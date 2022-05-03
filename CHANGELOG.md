@@ -2,6 +2,10 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.2.0 (2022-05-03)
+
+- added canRename API call
+
 ## 2.1.4 (2022-05-02)
 
 - fixed handling of star imports

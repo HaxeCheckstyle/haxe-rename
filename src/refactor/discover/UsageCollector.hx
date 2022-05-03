@@ -14,15 +14,8 @@ class UsageCollector {
 	public function new() {}
 
 	public function parseFile(content:ByteData, context:UsageContext) {
-		if (context.cache != null) {
-			var file:Null<File> = context.cache.getFile(context.fileName, context.nameMap);
-			if (file != null) {
-				context.fileList.addFile(file);
-				for (type in file.typeList) {
-					context.typeList.addType(type);
-				}
-				return;
-			}
+		if (isCached(context)) {
+			return;
 		}
 		var root:Null<TokenTree> = null;
 		try {
@@ -35,6 +28,21 @@ class UsageCollector {
 				t = lexer.token(haxeparser.HaxeLexer.tok);
 			}
 			root = TokenTreeBuilder.buildTokenTree(tokens, content, TypeLevel);
+			parseFileWithTokens(root, context);
+		} catch (e:ParserError) {
+			throw 'failed to parse ${context.fileName} - ParserError: $e (${e.pos})';
+		} catch (e:LexerError) {
+			throw 'failed to parse ${context.fileName} - LexerError: ${e.msg} (${e.pos})';
+		} catch (e:Exception) {
+			throw 'failed to parse ${context.fileName} - ${e.details()}';
+		}
+	}
+
+	public function parseFileWithTokens(root:TokenTree, context:UsageContext) {
+		if (isCached(context)) {
+			return;
+		}
+		try {
 			var file:File = new File(context.fileName);
 			context.file = file;
 			context.type = null;
@@ -45,13 +53,24 @@ class UsageCollector {
 			if (context.cache != null) {
 				context.cache.storeFile(file);
 			}
-		} catch (e:ParserError) {
-			throw 'failed to parse ${context.fileName} - ParserError: $e (${e.pos})';
-		} catch (e:LexerError) {
-			throw 'failed to parse ${context.fileName} - LexerError: ${e.msg} (${e.pos})';
 		} catch (e:Exception) {
 			throw 'failed to parse ${context.fileName} - ${e.details()}';
 		}
+	}
+
+	function isCached(context:UsageContext):Bool {
+		if (context.cache != null) {
+			var file:Null<File> = context.cache.getFile(context.fileName, context.nameMap);
+			if (file == null) {
+				return false;
+			}
+			context.fileList.addFile(file);
+			for (type in file.typeList) {
+				context.typeList.addType(type);
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public function updateImportHx(context:UsageContext) {

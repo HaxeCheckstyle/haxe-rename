@@ -1,6 +1,5 @@
 package refactor;
 
-import haxe.CallStack;
 import haxe.Exception;
 import haxe.PosInfos;
 import js.lib.Promise;
@@ -75,36 +74,47 @@ class TestBase implements ITest {
 
 	function doRefactor(what:RefactorWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
-		return Refactor.rename({
+		return Refactor.canRename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			typeList: usageContext.typeList,
 			what: what,
-			forRealExecute: true,
-			docFactory: (fileName) -> editList.newDoc(fileName),
 			verboseLog: function(text:String, ?pos:PosInfos) {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
 			typer: null
-		}).then(function(success:RefactorResult) {
-			editList.sortEdits();
-			Assert.equals(Done, success, pos);
-			Assert.equals(editList.docCounter, editList.docFinishedCounter, pos);
-			Assert.equals(edits.length, editList.edits.length, pos);
-			if (edits.length == editList.edits.length) {
-				for (index in 0...edits.length) {
-					var expected:TestEdit = edits[index];
-					var actual:TestEdit = editList.edits[index];
-					Assert.equals(expected.fileName, actual.fileName, expected.pos);
-					Assert.equals(fileEditToString(expected.edit), fileEditToString(actual.edit), expected.pos);
+		}).then(function(success:CanRefactorResult) {
+			return Refactor.rename({
+				nameMap: usageContext.nameMap,
+				fileList: usageContext.fileList,
+				typeList: usageContext.typeList,
+				what: what,
+				forRealExecute: true,
+				docFactory: (fileName) -> editList.newDoc(fileName),
+				verboseLog: function(text:String, ?pos:PosInfos) {
+					Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
+				},
+				typer: null
+			}).then(function(success:RefactorResult) {
+				editList.sortEdits();
+				Assert.equals(Done, success, pos);
+				Assert.equals(editList.docCounter, editList.docFinishedCounter, pos);
+				Assert.equals(edits.length, editList.edits.length, pos);
+				if (edits.length == editList.edits.length) {
+					for (index in 0...edits.length) {
+						var expected:TestEdit = edits[index];
+						var actual:TestEdit = editList.edits[index];
+						Assert.equals(expected.fileName, actual.fileName, expected.pos);
+						Assert.equals(fileEditToString(expected.edit), fileEditToString(actual.edit), expected.pos);
+					}
+				} else {
+					for (edit in editList.edits) {
+						Sys.println(fileEditToString(edit.edit));
+					}
+					Assert.fail("length mismatch - edits were not checked", pos);
 				}
-			} else {
-				for (edit in editList.edits) {
-					Sys.println(fileEditToString(edit.edit));
-				}
-				Assert.fail("length mismatch - edits were not checked", pos);
-			}
-			return Promise.resolve(success);
+				return Promise.resolve(success);
+			});
 		});
 	}
 

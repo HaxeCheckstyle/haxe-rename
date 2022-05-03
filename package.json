@@ -1,6 +1,6 @@
 {
     "name": "@haxecheckstyle/haxe-rename",
-    "version": "2.1.4",
+    "version": "2.2.0",
     "description": "Renaming tool for Haxe",
     "repository": {
         "type": "git",

@@ -2,6 +2,7 @@ package refactor;
 
 import refactor.discover.File;
 import refactor.discover.Identifier;
+import refactor.discover.IdentifierPos;
 import refactor.rename.RenameAnonStructField;
 import refactor.rename.RenameEnumField;
 import refactor.rename.RenameField;
@@ -12,6 +13,48 @@ import refactor.rename.RenameScopedLocal;
 import refactor.rename.RenameTypeName;
 
 class Refactor {
+	public static function canRename(context:CanRefactorContext):Promise<CanRefactorResult> {
+		var file:Null<File> = context.fileList.getFile(context.what.fileName);
+		if (file == null) {
+			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+		}
+		var identifier:Identifier = file.getIdentifier(context.what.pos);
+		if (identifier == null) {
+			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+		}
+		return switch (identifier.type) {
+			case PackageName | ImportAlias | Abstract | Class | Enum | Interface | Typedef | ModuleLevelStaticVar | ModuleLevelStaticMethod | Property |
+				FieldVar(_) | Method(_) | TypedefField(_) | StructureField(_) | InterfaceProperty | InterfaceVar | InterfaceMethod | EnumField(_) |
+				ScopedLocal(_, _):
+				Promise.resolve({name: identifier.name, pos: identifier.pos});
+			case ImportModul | UsingModul | Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst | TypedParameter |
+				TypedefBase | Call(true) | CaseLabel(_):
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+			case Call(false) | Access | ArrayAccess(_) | ForIterator:
+				var candidate:Null<Identifier> = findActualWhat(context, file, identifier);
+				if (candidate == null) {
+					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				}
+				if (identifier.name.startsWith(candidate.name)) {
+					var pos:IdentifierPos = {
+						fileName: identifier.pos.fileName,
+						start: identifier.pos.start,
+						end: identifier.pos.start + context.what.toName.length
+					}
+					return Promise.resolve({name: candidate.name, pos: pos});
+				}
+				if (identifier.name.endsWith(candidate.name)) {
+					var pos:IdentifierPos = {
+						fileName: identifier.pos.fileName,
+						start: identifier.pos.end - context.what.toName.length,
+						end: identifier.pos.end
+					}
+					return Promise.resolve({name: candidate.name, pos: pos});
+				}
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+		}
+	}
+
 	public static function rename(context:RefactorContext):Promise<RefactorResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
@@ -68,7 +111,12 @@ class Refactor {
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case Call(false) | Access | ArrayAccess(_) | ForIterator:
 				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
-				findActualWhat(context, file, identifier);
+				var candidate:Null<Identifier> = findActualWhat(context, file, identifier);
+				if (candidate == null) {
+					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				}
+				context.what.pos = candidate.pos.start;
+				rename(context);
 			case CaseLabel(_):
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case ScopedLocal(scopeEnd, type):
@@ -77,10 +125,10 @@ class Refactor {
 		}
 	}
 
-	static function findActualWhat(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	static function findActualWhat(context:CanRefactorContext, file:File, identifier:Identifier):Null<Identifier> {
 		var parts:Array<String> = identifier.name.split(".");
 		if (parts.length <= 0) {
-			return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+			return null;
 		}
 		var firstPart:String = parts.shift();
 		var onlyFields:Bool = false;
@@ -92,7 +140,7 @@ class Refactor {
 		}
 		if (context.what.pos > identifier.pos.start + firstPart.length + offset) {
 			// rename position is not in first part of dotted identifiier
-			return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+			return null;
 		}
 		var allUses:Array<Identifier> = file.findAllIdentifiers((i) -> i.name == firstPart);
 		var candidate:Null<Identifier> = null;
@@ -116,10 +164,6 @@ class Refactor {
 				default:
 			}
 		}
-		if (candidate != null) {
-			context.what.pos = candidate.pos.start;
-			return rename(context);
-		}
-		return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+		return candidate;
 	}
 }
