@@ -170,8 +170,11 @@ class RenameHelper {
 						fieldCandidate = use;
 					case EnumField(_):
 						return Promise.resolve(KnownType(use.defineType, []));
-					case ScopedLocal(scopeEnd, _):
-						if ((pos >= use.pos.start) && (pos <= scopeEnd)) {
+					case ScopedLocal(scopeStart, scopeEnd, _):
+						if ((pos >= scopeStart) && (pos <= scopeEnd)) {
+							candidate = use;
+						}
+						if (pos == use.pos.start) {
 							candidate = use;
 						}
 					case CaseLabel(switchIdentifier):
@@ -190,12 +193,12 @@ class RenameHelper {
 
 			var typeHint:Null<Identifier> = candidate.getTypeHint();
 			switch (candidate.type) {
-				case ScopedLocal(_, ForLoop(_, loopIdent)):
+				case ScopedLocal(_, _, ForLoop(loopIdent)):
 					var index:Int = loopIdent.indexOf(candidate);
 					var changes:Array<Promise<TypeHintType>> = [];
 					for (child in loopIdent) {
 						switch (child.type) {
-							case ScopedLocal(_, ForLoop(_, _)):
+							case ScopedLocal(_, _, ForLoop(_)):
 								continue;
 							default:
 								changes.push(findTypeOfIdentifier(context, {
@@ -223,7 +226,7 @@ class RenameHelper {
 						}
 						return Promise.reject("type not found");
 					});
-				case ScopedLocal(_, Parameter(params)):
+				case ScopedLocal(_, _, Parameter(params)):
 					if (typeHint != null) {
 						return typeFromTypeHint(context, typeHint);
 					}
@@ -376,7 +379,7 @@ class RenameHelper {
 		var firstParam:Null<Identifier> = null;
 		for (use in identifier.uses) {
 			switch (use.type) {
-				case ScopedLocal(_, Parameter(_)):
+				case ScopedLocal(_, _, Parameter(_)):
 					firstParam = use;
 					break;
 				default:

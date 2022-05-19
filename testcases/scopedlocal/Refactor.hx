@@ -78,4 +78,21 @@ class Refactor {
 			trace(val);
 		}
 	}
+
+	var value:String;
+
+	function setValue(value:Int) {
+		var value = '$value';
+		this.value = value;
+	}
+
+	function clearValue() {
+		var value = '$value';
+		this.value = "";
+	}
+
+	function setValue2(value:Int) {
+		var value = value;
+		this.value = '$value';
+	}
 }

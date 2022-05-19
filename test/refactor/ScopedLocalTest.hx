@@ -115,4 +115,63 @@ class ScopedLocalTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "file", pos: 2181}, edits, async);
 	}
+
+	public function testRenameParameterValue(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2271, 2276),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2300, 2305),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2274}, edits, async);
+	}
+
+	public function testRenameParameterValue2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2426, 2431),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2453, 2458),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2429}, edits, async);
+	}
+
+	public function testRenameLocalValue(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2290, 2295),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2323, 2328),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2291}, edits, async);
+	}
+
+	public function testRenameLocalValue2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2290, 2295),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2323, 2328),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2326}, edits, async);
+	}
+
+	public function testRenameLocalValue3(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2445, 2450),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2477, 2482),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2447}, edits, async);
+	}
+
+	public function testRenameLocalValue4(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2445, 2450),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2477, 2482),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2479}, edits, async);
+	}
+
+	public function testRenameFieldValue(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2237, 2242),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2315, 2320),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2375, 2380),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2390, 2395),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "data", 2467, 2472),
+		];
+		refactorAndCheck({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2239}, edits, async);
+	}
 }

@@ -18,8 +18,8 @@ class PrintHelper {
 				'EnumField(${params.map((p) -> '"${p.name}"')})';
 			case CaseLabel(switchIdentifier):
 				'CaseLabel(${switchIdentifier.name})';
-			case ScopedLocal(scopeEnd, scopeType):
-				'ScopedLocal($scopeEnd, ${scopeType.scopeTypeToString()})';
+			case ScopedLocal(scopeStart, scopeEnd, scopeType):
+				'ScopedLocal($scopeStart - $scopeEnd, ${scopeType.scopeTypeToString()})';
 			default:
 				'$identType';
 		}
@@ -29,8 +29,8 @@ class PrintHelper {
 		return switch (scopeType) {
 			case Parameter(params):
 				'Parameter(${params.map((i) -> '"${i.name}"')})';
-			case ForLoop(scopeStart, loopIdentifiers):
-				'ForLoop(${loopIdentifiers.map((i) -> '"${i.name}"')}) - scopeStart: $scopeStart';
+			case ForLoop(loopIdentifiers):
+				'ForLoop(${loopIdentifiers.map((i) -> '"${i.name}"')})';
 			default:
 				'$scopeType';
 		}

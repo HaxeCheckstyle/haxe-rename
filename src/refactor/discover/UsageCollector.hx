@@ -560,11 +560,14 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Kwd(KwdVar):
-					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
+					child = child.getFirstChild();
+					makeIdentifier(context, child, ScopedLocal(child.getPos().max, scopeEnd, Var), identifier);
 				case Kwd(KwdFinal):
-					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
+					child = child.getFirstChild();
+					makeIdentifier(context, child, ScopedLocal(child.getPos().max, scopeEnd, Var), identifier);
 				case Kwd(KwdFunction):
-					var method:Identifier = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
+					child = child.getFirstChild();
+					var method:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Var), identifier);
 					readMethod(context, method, child.getFirstChild());
 				case Dot:
 				case Semicolon:
@@ -599,17 +602,19 @@ class UsageCollector {
 			case Kwd(KwdVar):
 				var fullPos:Position = token.parent.getPos();
 				var scopeEnd:Int = fullPos.max;
-				var variable:Identifier = makeIdentifier(context, token.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
-				readVarInit(context, variable, token.getFirstChild());
+				var token:TokenTree = token.getFirstChild();
+				var variable:Identifier = makeIdentifier(context, token, ScopedLocal(token.getPos().max, scopeEnd, Var), identifier);
+				readVarInit(context, variable, token);
 				return;
 			case Kwd(KwdFunction):
 				var fullPos:Position = token.parent.getPos();
 				var scopeEnd:Int = fullPos.max;
-				var method:Null<Identifier> = makeIdentifier(context, token.getFirstChild(), ScopedLocal(scopeEnd, Var), identifier);
+				var child:TokenTree = token.getFirstChild();
+				var method:Null<Identifier> = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Var), identifier);
 				if (method == null) {
 					readMethod(context, identifier, token);
 				} else {
-					readMethod(context, method, token.getFirstChild());
+					readMethod(context, method, child);
 				}
 				return;
 			case Kwd(KwdThis):
@@ -706,7 +711,7 @@ class UsageCollector {
 		if (pClose != null) {
 			scopeStart = pClose.pos.max;
 		}
-		var ident:Identifier = makeIdentifier(context, token, ScopedLocal(scopeEnd, ForLoop(scopeStart, loopIdentifiers)), identifier);
+		var ident:Identifier = makeIdentifier(context, token, ScopedLocal(scopeStart, scopeEnd, ForLoop(loopIdentifiers)), identifier);
 		loopIdentifiers.push(ident);
 		if (!token.hasChildren()) {
 			return;
@@ -714,7 +719,7 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Binop(OpArrow):
-					ident = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, ForLoop(scopeStart, loopIdentifiers)), identifier);
+					ident = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeStart, scopeEnd, ForLoop(loopIdentifiers)), identifier);
 					loopIdentifiers.push(ident);
 				default:
 					readExpression(context, ident, child);
@@ -744,7 +749,8 @@ class UsageCollector {
 				case Const(CIdent(_)):
 					readCaseConst(context, identifier, child, scopeEnd);
 				case Kwd(KwdVar):
-					makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, CaseCapture), identifier);
+					child = child.getFirstChild();
+					makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, CaseCapture), identifier);
 				case BkOpen:
 					readCaseArray(context, identifier, child, scopeEnd);
 				case BrOpen:
@@ -780,7 +786,7 @@ class UsageCollector {
 			return;
 		}
 		for (child in token.children) {
-			makeIdentifier(context, child, ScopedLocal(scopeEnd, CaseCapture), identifier);
+			makeIdentifier(context, child, ScopedLocal(child.pos.max, scopeEnd, CaseCapture), identifier);
 		}
 	}
 
@@ -809,7 +815,7 @@ class UsageCollector {
 					}
 					if (field.uses != null) {
 						for (use in field.uses) {
-							use.type = ScopedLocal(scopeEnd, CaseCapture);
+							use.type = ScopedLocal(use.pos.start, scopeEnd, CaseCapture);
 						}
 					}
 				default:
@@ -823,10 +829,11 @@ class UsageCollector {
 		for (child in token.children) {
 			switch (child.tok) {
 				case Question:
-					var paramIdent:Identifier = makeIdentifier(context, child.getFirstChild(), ScopedLocal(scopeEnd, Parameter(params)), identifier);
+					child = child.getFirstChild();
+					var paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Parameter(params)), identifier);
 					params.push(paramIdent);
-				case Const(CIdent(s)):
-					var paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(scopeEnd, Parameter(params)), identifier);
+				case Const(CIdent(_)):
+					var paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Parameter(params)), identifier);
 					params.push(paramIdent);
 				default:
 			}
@@ -912,7 +919,7 @@ class UsageCollector {
 					case Binop(OpIn):
 					case Binop(OpArrow):
 						switch (type) {
-							case ScopedLocal(_, ForLoop(_)):
+							case ScopedLocal(_, _, ForLoop(_)):
 							default:
 								pOpenToken = child;
 						}

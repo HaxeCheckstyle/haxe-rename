@@ -8,11 +8,13 @@ import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 
 class RenameScopedLocal {
-	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeEnd:Int):Promise<RefactorResult> {
+	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeStart:Int,
+			scopeEnd:Int):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var identifierDot:String = identifier.name + ".";
 		var toNameDot:String = context.what.toName + ".";
-		var scopeStart:Int = identifier.pos.start;
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+
 		var allUses:Array<Identifier> = identifier.defineType.findAllIdentifiers(function(ident:Identifier) {
 			if (ident.pos.start < scopeStart) {
 				return false;
@@ -60,20 +62,20 @@ class RenameScopedLocal {
 		}
 
 		var skipForIterator:Bool = false;
+		var innerScopeStart:Int = 0;
+		var innerScopeEnd:Int = -1;
 		for (use in allUses) {
+			if ((innerScopeStart < use.pos.start) && (use.pos.start < innerScopeEnd)) {
+				continue;
+			}
 			switch (use.type) {
-				case ScopedLocal(scopeEnd, ForLoop(start, _)):
+				case ScopedLocal(start, scopeEnd, _):
 					if (use.pos.start == identifier.pos.start) {
 						scopeStart = start;
 						skipForIterator = true;
 					} else {
-						scopeStart = scopeEnd;
-						continue;
-					}
-				case ScopedLocal(scopeEnd, _):
-					if (use.pos.start != identifier.pos.start) {
-						// new parameter with identical name, so we skip its scope
-						scopeStart = scopeEnd;
+						innerScopeStart = start;
+						innerScopeEnd = scopeEnd;
 						continue;
 					}
 				case StructureField(_):

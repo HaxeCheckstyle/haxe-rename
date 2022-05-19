@@ -65,14 +65,17 @@ class RenameField {
 
 	static function replaceInType(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
 		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
-		var scopeEnd:Int = 0;
+		var innerScopeStart:Int = 0;
+		var innerScopeEnd:Int = -1;
 		for (use in allUses) {
-			if (use.pos.start <= scopeEnd) {
+			if ((innerScopeStart < use.pos.start) && (use.pos.start < innerScopeEnd)) {
 				continue;
 			}
+
 			switch (use.type) {
-				case ScopedLocal(end, _):
-					scopeEnd = end;
+				case ScopedLocal(start, end, _):
+					innerScopeStart = start;
+					innerScopeEnd = end;
 					continue;
 				case StructureField(_):
 					continue;
@@ -92,7 +95,7 @@ class RenameField {
 					break;
 				}
 				switch (use.type) {
-					case ScopedLocal(end, _):
+					case ScopedLocal(_, end, _):
 						if (end > access.pos.start) {
 							shadowed = true;
 							break;

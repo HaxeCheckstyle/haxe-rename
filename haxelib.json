@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "2.2.0",
-	"releasenote": "added canRename API call - see CHANGELOG",
+	"version": "2.2.1",
+	"releasenote": "fixed local var scope - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],
