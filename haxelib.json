@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "2.2.1",
-	"releasenote": "fixed local var scope - see CHANGELOG",
+	"version": "2.2.2",
+	"releasenote": "fixed bug in readBlock passing incorrect child token - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],

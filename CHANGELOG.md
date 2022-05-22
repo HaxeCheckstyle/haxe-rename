@@ -2,6 +2,10 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.2.2 (2022-05-23)
+
+- fixed bug in readBlock passing incorrect child token
+
 ## 2.2.1 (2022-05-20)
 
 - fixed local var scope

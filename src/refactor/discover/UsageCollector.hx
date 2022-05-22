@@ -568,7 +568,7 @@ class UsageCollector {
 				case Kwd(KwdFunction):
 					child = child.getFirstChild();
 					var method:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Var), identifier);
-					readMethod(context, method, child.getFirstChild());
+					readMethod(context, method, child);
 				case Dot:
 				case Semicolon:
 				default:

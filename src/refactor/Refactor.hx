@@ -120,7 +120,7 @@ class Refactor {
 			case CaseLabel(_):
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
 			case ScopedLocal(scopeStart, scopeEnd, type):
-				context.verboseLog('rename scoped local "${identifier.name} [$scopeStart - $scopeEnd]" (${type.scopeTypeToString()}) to "${context.what.toName}"');
+				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()}) to "${context.what.toName}"');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeStart, scopeEnd);
 		}
 	}
