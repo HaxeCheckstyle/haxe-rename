@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Formatter sources
       uses: actions/checkout@v1
     - name: Use Node.js 18
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: 18
     - name: Run npm install
@@ -44,6 +44,8 @@ jobs:
       run: npx haxe build.hxml
     - name: Run Nodejs tests
       run: npx haxe -D codecov_json test.hxml
-    - name: Upload results to codecov
-      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.3.4'
-      run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+    - name: Coverage report
+      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version != 'nightly'
+      uses: livewing/lcov-job-summary@v1.1.0
+      with:
+        lcov: lcov.info
