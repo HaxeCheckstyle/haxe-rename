@@ -24,3 +24,6 @@ core
 demo/
 .refactorCache
 off
+todo*
+TODO*
+cmd.txt
