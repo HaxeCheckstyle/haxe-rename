@@ -84,7 +84,11 @@ class RenamePackage {
 
 		var dotPath:String = path.dir.replace("/", ".").replace("\\", ".");
 
-		var index:Int = dotPath.indexOf(packageName);
+		var index:Int = dotPath.lastIndexOf("." + packageName) + 1;
+		if (index < 0) {
+			index = dotPath.indexOf(packageName);
+		}
+
 		var pathParts:Array<String> = context.what.toName.split(".");
 
 		var rootPath:String = Path.join(dotPath.substr(0, index).split("."));

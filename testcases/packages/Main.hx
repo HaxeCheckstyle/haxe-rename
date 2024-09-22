@@ -1,5 +1,6 @@
 package packages;
 
+import kages.ECTypeA;
 import packages.MoreTypes;
 import packages.Types.Type3;
 import packages.Types;
@@ -12,5 +13,6 @@ class Main {
 		var test4:packages.OtherTypes.OtherTypeA = {};
 		var test5:packages.Type1 = {};
 		var test6:HelperTypes;
+		var test7:ECTypeA;
 	}
 }
