@@ -577,6 +577,32 @@ class UsageCollector {
 		}
 	}
 
+	function readIdentifier(context:UsageContext, identifier:Identifier, token:Null<TokenTree>) {
+		var parent:TokenTree = token.parent;
+		if (parent.tok.match(Dot)) {
+			var prev:Null<TokenTree> = parent.previousSibling;
+			if (prev != null) {
+				switch (prev.tok) {
+					case BkClose | PClose:
+						makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
+					default:
+				}
+			}
+		} else {
+			makeIdentifier(context, token, Access, identifier);
+		}
+		if (token.hasChildren()) {
+			for (child in token.children) {
+				switch (child.tok) {
+					case Dot | Comma:
+					case POpen | Binop(OpAssign):
+					default:
+						readExpression(context, identifier, child);
+				}
+			}
+		}
+	}
+
 	function readExpression(context:UsageContext, identifier:Identifier, token:Null<TokenTree>) {
 		if (token == null) {
 			return;
@@ -584,21 +610,8 @@ class UsageCollector {
 
 		switch (token.tok) {
 			case Const(CIdent(_)):
-				var parent:TokenTree = token.parent;
-				if (parent.tok.match(Dot)) {
-					var prev:Null<TokenTree> = parent.previousSibling;
-					if (prev != null) {
-						switch (prev.tok) {
-							case BkClose | PClose:
-								makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
-								return;
-							default:
-						}
-					}
-				} else {
-					makeIdentifier(context, token, Access, identifier);
-					return;
-				}
+				readIdentifier(context, identifier, token);
+				return;
 			case Kwd(KwdVar):
 				var fullPos:Position = token.parent.getPos();
 				var scopeEnd:Int = fullPos.max;
@@ -723,7 +736,7 @@ class UsageCollector {
 					loopIdentifiers.push(ident);
 				default:
 					readExpression(context, ident, child);
-					if (ident.uses != null) {
+					if (ident?.uses != null) {
 						for (use in ident.uses) {
 							switch (use.type) {
 								case Access:

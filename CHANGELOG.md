@@ -2,6 +2,15 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.2.3 (2024-09-22)
+
+- fixed package rename when identifier has multiple matches in folder structure, fixes [#3](https://github.com/HaxeCheckstyle/haxe-rename/issues/3)
+- fixed failing to rename local symbol, fixes [#4](https://github.com/HaxeCheckstyle/haxe-rename/issues/4)
+- fixed failing to rename simple public symbols, fixes [#5](https://github.com/HaxeCheckstyle/haxe-rename/issues/5)
+- fixed crash on string interpolation, fixes [#6](https://github.com/HaxeCheckstyle/haxe-rename/issues/6)
+- fixed crash when parsing a return macro @:pos, fixes [#8](https://github.com/HaxeCheckstyle/haxe-rename/issues/8)
+- fixed crash with array comprehension, fixes [#9](https://github.com/HaxeCheckstyle/haxe-rename/issues/9)
+
 ## 2.2.2 (2022-05-23)
 
 - fixed bug in readBlock passing incorrect child token

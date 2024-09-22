@@ -253,4 +253,39 @@ class ClassTest extends TestBase {
 		failRefactor({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
 			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)", async);
 	}
+
+	public function testRenameDemoClassAMemberVar(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 235, 245),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
+		];
+		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 237}, edits, async);
+	}
+
+	public function testRenameDemoClassAMemberVar2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 235, 245),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
+		];
+		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 531}, edits, async);
+	}
+
+	public function testRenameDemoClassAMemberVar3(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 235, 245),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
+		];
+		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 548}, edits, async);
+	}
+
+	public function testRenameDemoClassASomeValue(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 59, 68),
+			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 515, 524),
+		];
+		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 61}, edits, async);
+	}
 }

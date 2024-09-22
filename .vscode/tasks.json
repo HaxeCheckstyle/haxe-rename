@@ -15,18 +15,6 @@
 		},
 		{
 			"type": "hxml",
-			"file": "buildEval.hxml",
-			"problemMatcher": [
-				"$haxe-absolute",
-				"$haxe",
-				"$haxe-error",
-				"$haxe-trace"
-			],
-			"group": "build",
-			"label": "haxe: buildEval.hxml"
-		},
-		{
-			"type": "hxml",
 			"file": "test.hxml",
 			"problemMatcher": [
 				"$haxe-absolute",
