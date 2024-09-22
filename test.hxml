@@ -7,20 +7,8 @@
 -lib hxargs
 -lib utest
 -lib hxnodejs
--lib instrument
 -lib test-adapter
 
--D coverage-console-summary-reporter
--D coverage-console-package-summary-reporter
-# -D coverage-console-file-summary-reporter
--D coverage-lcov-reporter
--D coverage-codecov-reporter
-
---macro instrument.Instrumentation.coverage(['refactor'], ['src'], [])
-# --macro instrument.Instrumentation.profiling(['tokentree'], ['src'], [])
-# -D profiler-console-detail-reporter
-# -D debug_instrumentation
--D instrument-quiet
 
 --main TestMain
 

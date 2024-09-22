@@ -6,6 +6,7 @@
 -lib hxnodejs
 -lib hxargs
 -lib utest
+-lib test-adapter
 
 -js bin/refactor.js
 

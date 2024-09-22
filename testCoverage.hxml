@@ -1,0 +1,30 @@
+-cp src
+-cp test
+-cp testcases
+
+-lib haxeparser
+-lib tokentree
+-lib hxargs
+-lib utest
+-lib hxnodejs
+-lib instrument
+-lib test-adapter
+
+-D coverage-console-summary-reporter
+-D coverage-console-package-summary-reporter
+# -D coverage-console-file-summary-reporter
+-D coverage-lcov-reporter
+-D coverage-codecov-reporter
+
+--macro instrument.Instrumentation.coverage(['refactor'], ['src'], [])
+# --macro instrument.Instrumentation.profiling(['tokentree'], ['src'], [])
+# -D profiler-console-detail-reporter
+# -D debug_instrumentation
+# -D debug_log_expression
+-D instrument-quiet
+
+--main TestMain
+
+--js out/tests.js
+
+--cmd node out/tests.js

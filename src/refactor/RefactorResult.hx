@@ -7,4 +7,3 @@ enum RefactorResult {
 	DryRun;
 	Done;
 }
-
