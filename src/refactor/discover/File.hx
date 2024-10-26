@@ -20,6 +20,8 @@ class File {
 		var stat:FileStat = FileSystem.stat(name);
 		fileDate = stat.mtime.getTime();
 		fileSize = stat.size;
+		importList = [];
+		typeList = [];
 	}
 
 	public function init(packageIdent:Null<Identifier>, imports:Array<Import>, types:Array<Type>, posForImport:Int) {

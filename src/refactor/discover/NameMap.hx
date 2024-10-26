@@ -18,6 +18,22 @@ class NameMap {
 		return results;
 	}
 
+	public function getIdentifier(name:String, file:String, pos:Int):Null<Identifier> {
+		var results:Null<Array<Identifier>> = names.get(name);
+		if (results == null) {
+			return null;
+		}
+		for (ident in results) {
+			if (ident.file.name != file) {
+				continue;
+			}
+			if (ident.pos.start == pos) {
+				return ident;
+			}
+		}
+		return null;
+	}
+
 	public function addIdentifier(identifier:Identifier) {
 		function addToMap(map:IdentifierMap, key:String) {
 			var list:Null<Array<Identifier>> = map.get(key);

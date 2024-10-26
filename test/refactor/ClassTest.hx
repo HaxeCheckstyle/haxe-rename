@@ -288,4 +288,18 @@ class ClassTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 61}, edits, async);
 	}
+
+	public function testRenamePrinter(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeMoveTestEdit("testcases/classes/Printer.hx", "testcases/classes/PrinterRenamed.hx"),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 383, 390),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 545, 552),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 699, 706),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 930, 937),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1073, 1080),
+			makeReplaceTestEdit("testcases/classes/import.hx", "PrinterRenamed", 80, 87),
+			makeReplaceTestEdit("testcases/classes/pack/UsePrinter.hx", "PrinterRenamed", 58, 65),
+		];
+		refactorAndCheck({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1076}, edits, async);
+	}
 }

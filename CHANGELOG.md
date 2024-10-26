@@ -2,6 +2,8 @@
 
 ## dev branch / next version (2.x.x)
 
+- fixed discovery of identifiers in callback functions, fixes [#10](https://github.com/HaxeCheckstyle/haxe-rename/issues/10)
+
 ## 2.2.3 (2024-09-22)
 
 - fixed package rename when identifier has multiple matches in folder structure, fixes [#3](https://github.com/HaxeCheckstyle/haxe-rename/issues/3)

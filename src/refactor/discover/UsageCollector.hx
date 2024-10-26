@@ -595,11 +595,22 @@ class UsageCollector {
 			for (child in token.children) {
 				switch (child.tok) {
 					case Dot | Comma:
-					case POpen | Binop(OpAssign):
+					case POpen:
+						readCallParams(context, child);
+					case Binop(OpAssign):
 					default:
 						readExpression(context, identifier, child);
 				}
 			}
+		}
+	}
+
+	function readCallParams(context:UsageContext, token:Null<TokenTree>) {
+		if (!token.hasChildren()) {
+			return;
+		}
+		for (child in token.children) {
+			readExpression(context, null, child);
 		}
 	}
 
@@ -875,7 +886,7 @@ class UsageCollector {
 		var pack:Array<String> = [];
 		var typeParamLt:Null<TokenTree> = null;
 		var typeHintColon:Null<TokenTree> = null;
-		var pOpenToken:Null<TokenTree> = null;
+		var pOpenToken:Array<TokenTree> = [];
 		var parent:TokenTree = nameToken.parent;
 
 		var lastNamePart:TokenTree = nameToken;
@@ -923,21 +934,21 @@ class UsageCollector {
 							} else {
 								type = Call(false);
 							}
-							pOpenToken = child;
+							pOpenToken.push(child);
 						}
 					case Binop(OpAssign):
 						if (!parent.matches(Kwd(KwdTypedef))) {
-							pOpenToken = child;
+							pOpenToken.push(child);
 						}
 					case Binop(OpIn):
 					case Binop(OpArrow):
 						switch (type) {
 							case ScopedLocal(_, _, ForLoop(_)):
 							default:
-								pOpenToken = child;
+								pOpenToken.push(child);
 						}
 					case BkOpen | Binop(_):
-						pOpenToken = child;
+						pOpenToken.push(child);
 					case DblDot:
 						switch (TokenTreeCheckUtils.getColonType(child)) {
 							case SwitchCase:
@@ -950,6 +961,8 @@ class UsageCollector {
 							case At:
 							case Unknown:
 						}
+					case Dot:
+						pOpenToken.push(child);
 					default:
 				}
 			}
@@ -958,7 +971,11 @@ class UsageCollector {
 		if (pack.length <= 0) {
 			return null;
 		}
-		var identifier:Identifier = new Identifier(type, pack.join("."), pos, context.nameMap, context.file, context.type);
+		var name:String = pack.join(".");
+		var identifier:Null<Identifier> = context.nameMap.getIdentifier(name, context.file.name, pos.start);
+		if (identifier == null) {
+			identifier = new Identifier(type, name, pos, context.nameMap, context.file, context.type);
+		}
 
 		if (parentIdentifier != null) {
 			parentIdentifier.addUse(identifier);
@@ -969,10 +986,10 @@ class UsageCollector {
 		if (typeHintColon != null) {
 			readTypeHint(context, identifier, typeHintColon, TypeHint);
 		}
-		if (pOpenToken != null) {
-			readExpression(context, identifier, pOpenToken);
-			if (pOpenToken.nextSibling != null) {
-				readExpression(context, identifier, pOpenToken.nextSibling);
+		for (child in pOpenToken) {
+			readExpression(context, identifier, child);
+			if (child.nextSibling != null) {
+				readExpression(context, identifier, child.nextSibling);
 			}
 		}
 		return identifier;
