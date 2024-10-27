@@ -2,6 +2,7 @@
 
 ## dev branch / next version (2.x.x)
 
+- added file reader interface
 - fixed discovery of identifiers in callback functions, fixes [#10](https://github.com/HaxeCheckstyle/haxe-rename/issues/10)
 
 ## 2.2.3 (2024-09-22)

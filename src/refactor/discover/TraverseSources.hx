@@ -25,7 +25,16 @@ class TraverseSources {
 	}
 
 	static function collectIdentifierData(usageContext:UsageContext) {
-		var content:String = File.getContent(usageContext.fileName);
-		usageContext.usageCollector.parseFile(ByteData.ofString(content), usageContext);
+		var content:FileContentType = usageContext.fileReader(usageContext.fileName);
+		switch (content) {
+			case Text(text):
+				usageContext.usageCollector.parseFile(ByteData.ofString(text), usageContext);
+			case Token(root):
+				usageContext.usageCollector.parseFileWithTokens(root, usageContext);
+		}
 	}
+}
+
+function simpleFileReader(path:String):FileContentType {
+	return Text(File.getContent(path));
 }

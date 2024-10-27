@@ -95,6 +95,7 @@ class Cli {
 		}
 
 		var usageContext:UsageContext = {
+			fileReader: simpleFileReader,
 			fileName: "",
 			file: null,
 			usageCollector: new UsageCollector(),

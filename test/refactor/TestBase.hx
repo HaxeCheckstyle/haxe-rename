@@ -23,6 +23,7 @@ class TestBase implements ITest {
 
 	function setupTestSources(srcFolders:Array<String>) {
 		usageContext = {
+			fileReader: simpleFileReader,
 			fileName: "",
 			file: null,
 			usageCollector: new UsageCollector(),
