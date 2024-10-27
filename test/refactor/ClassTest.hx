@@ -296,10 +296,11 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 545, 552),
 			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 699, 706),
 			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 930, 937),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1073, 1080),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1076, 1083),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1219, 1226),
 			makeReplaceTestEdit("testcases/classes/import.hx", "PrinterRenamed", 80, 87),
 			makeReplaceTestEdit("testcases/classes/pack/UsePrinter.hx", "PrinterRenamed", 58, 65),
 		];
-		refactorAndCheck({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1076}, edits, async);
+		refactorAndCheck({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1222}, edits, async);
 	}
 }

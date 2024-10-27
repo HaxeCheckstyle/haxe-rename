@@ -35,6 +35,13 @@ import tink.core.Promise;
 				default:
 			}
 		});
+
+		new TextLoader().load["TextLoader"].handle(result -> {
+			switch (result) {
+				case Success(text): new Printer(text);
+				default:
+			}
+		});
 	}
 }
 
