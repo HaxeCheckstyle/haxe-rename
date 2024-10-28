@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "2.2.3",
-	"releasenote": "fixed parser crashes and identifier discovery - see CHANGELOG",
+	"version": "2.3.0",
+	"releasenote": "fixed discovery of identifiers in callback functions - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],
