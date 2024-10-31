@@ -579,17 +579,26 @@ class UsageCollector {
 
 	function readIdentifier(context:UsageContext, identifier:Identifier, token:Null<TokenTree>) {
 		var parent:TokenTree = token.parent;
-		if (parent.tok.match(Dot)) {
-			var prev:Null<TokenTree> = parent.previousSibling;
-			if (prev != null) {
-				switch (prev.tok) {
-					case BkClose | PClose:
-						makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
-					default:
+		switch (parent.tok) {
+			case Dot:
+				var prev:Null<TokenTree> = parent.previousSibling;
+				if (prev != null) {
+					switch (prev.tok) {
+						case BkClose | PClose:
+							makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
+						default:
+					}
 				}
-			}
-		} else {
-			makeIdentifier(context, token, Access, identifier);
+			case POpen:
+				switch (TokenTreeCheckUtils.getPOpenType(parent)) {
+					case Parameter:
+						var posScope = parent.getPos();
+						makeIdentifier(context, token, ScopedLocal(posScope.min, posScope.max, Parameter([])), identifier);
+					case At | Call | SwitchCondition | WhileCondition | IfCondition | SharpCondition | Catch | ForLoop | Expression:
+						makeIdentifier(context, token, Access, identifier);
+				}
+			default:
+				makeIdentifier(context, token, Access, identifier);
 		}
 		if (token.hasChildren()) {
 			for (child in token.children) {

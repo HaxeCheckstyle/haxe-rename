@@ -316,4 +316,17 @@ class ClassTest extends TestBase {
 		];
 		refactorAndCheck({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1222}, edits, async);
 	}
+
+	public function testRenameFooX(async:Async) {
+		var edits:Array<TestEdit> = [makeReplaceTestEdit("testcases/classes/Foo.hx", "xRenamed", 218, 219),];
+		refactorAndCheck({fileName: "testcases/classes/Foo.hx", toName: "xRenamed", pos: 218}, edits, async);
+	}
+
+	public function testRenameFooResp(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/Foo.hx", "respRenamed", 170, 174),
+			makeReplaceTestEdit("testcases/classes/Foo.hx", "respRenamed", 182, 186),
+		];
+		refactorAndCheck({fileName: "testcases/classes/Foo.hx", toName: "respRenamed", pos: 173}, edits, async);
+	}
 }

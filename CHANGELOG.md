@@ -2,6 +2,11 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.3.1 (2024-11-01)
+
+- fixed classification of parameters in arrow functions
+- fixed discovery of vars in pattern extraction, fixes [#11](https://github.com/HaxeCheckstyle/haxe-rename/issues/11)
+
 ## 2.3.0 (2024-10-28)
 
 - added file reader interface
