@@ -36,7 +36,9 @@ class Identifier {
 		if (uses == null) {
 			uses = [];
 		}
-		uses.push(identifier);
+		if (!uses.contains(identifier)) {
+			uses.push(identifier);
+		}
 		identifier.parent = this;
 	}
 

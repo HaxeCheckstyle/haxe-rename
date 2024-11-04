@@ -24,11 +24,14 @@ class File {
 		typeList = [];
 	}
 
-	public function init(packageIdent:Null<Identifier>, imports:Array<Import>, types:Array<Type>, posForImport:Int) {
+	public function initHeader(packageIdent:Null<Identifier>, imports:Array<Import>, posForImport:Int) {
 		packageIdentifier = packageIdent;
 		importList = imports;
-		typeList = types;
 		importInsertPos = posForImport;
+	}
+
+	public function setTypes(types:Array<Type>) {
+		typeList = types;
 	}
 
 	public function getPackage():String {
@@ -141,6 +144,13 @@ class File {
 		}
 		results.sort(Identifier.sortIdentifier);
 		return results;
+	}
+
+	public function clear() {
+		packageIdentifier = null;
+		importHxFile = null;
+		importList = [];
+		typeList = [];
 	}
 }
 

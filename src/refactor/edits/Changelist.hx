@@ -57,8 +57,12 @@ class Changelist {
 			Sys.println('$file');
 			for (edit in edits) {
 				switch (edit) {
+					case CreateFile(newFileName):
+						Sys.println('* create file "$newFileName"');
+					case DeleteFile(fileName):
+						Sys.println('* delete file "$fileName"');
 					case Move(newFileName):
-						Sys.println('* rename to "$newFileName"');
+						Sys.println('* rename to file "$newFileName"');
 					case InsertText(text, pos):
 						Sys.println('* insert text "$text" @${pos.start}-${pos.end}');
 						Sys.println('+++ $text');
@@ -76,12 +80,16 @@ class Changelist {
 
 	function sortFileEdits(a:FileEdit, b:FileEdit):Int {
 		var offsetA:Int = switch (a) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
 			case InsertText(_, pos): pos.start;
 			case ReplaceText(_, pos): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		var offsetB:Int = switch (b) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
 			case InsertText(_, pos): pos.start;
 			case ReplaceText(_, pos): pos.start;

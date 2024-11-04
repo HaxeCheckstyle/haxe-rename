@@ -16,6 +16,10 @@ class TestEditableDocument implements IEditableDocument {
 
 	public function addChange(edit:FileEdit) {
 		switch (edit) {
+			case CreateFile(newFileName):
+				Assert.notEquals(fileName, newFileName);
+			case DeleteFile(oldFileName):
+				Assert.notEquals(fileName, oldFileName);
 			case Move(newFileName):
 				Assert.notEquals(fileName, newFileName);
 			case ReplaceText(_, pos):
@@ -71,12 +75,16 @@ class TestEditList {
 			return -1;
 		}
 		var offsetA:Int = switch (a.edit) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
 			case InsertText(_, pos): pos.start;
 			case ReplaceText(_, pos): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		var offsetB:Int = switch (b.edit) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
 			case InsertText(_, pos): pos.start;
 			case ReplaceText(_, pos): pos.start;

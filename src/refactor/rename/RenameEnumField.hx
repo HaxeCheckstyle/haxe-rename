@@ -14,7 +14,7 @@ class RenameEnumField {
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();
 		var typeName:String = identifier.defineType.name.name;
-		var fullModuleTypeName:String = identifier.defineType.getFullModulName();
+		var fullModuleTypeName:String = identifier.defineType.fullModuleName;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$typeName.${identifier.name}');
 		for (use in allUses) {
 			switch (use.file.importsModule(packName, mainModuleName, typeName)) {

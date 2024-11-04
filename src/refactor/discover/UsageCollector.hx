@@ -48,7 +48,8 @@ class UsageCollector {
 			context.type = null;
 			var packageName:Null<Identifier> = readPackageName(root, context);
 			var imports:Array<Import> = readImports(root, context);
-			file.init(packageName, imports, readTypes(root, context), findImportInsertPos(root));
+			file.initHeader(packageName, imports, findImportInsertPos(root));
+			file.setTypes(readTypes(root, context));
 			context.fileList.addFile(file);
 			if (context.cache != null) {
 				context.cache.storeFile(file);
@@ -61,14 +62,9 @@ class UsageCollector {
 	function isCached(context:UsageContext):Bool {
 		if (context.cache != null) {
 			var file:Null<File> = context.cache.getFile(context.fileName, context.nameMap);
-			if (file == null) {
-				return false;
+			if (file != null) {
+				return true;
 			}
-			context.fileList.addFile(file);
-			for (type in file.typeList) {
-				context.typeList.addType(type);
-			}
-			return true;
 		}
 		return false;
 	}

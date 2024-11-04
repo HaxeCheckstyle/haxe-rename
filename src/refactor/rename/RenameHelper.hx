@@ -105,7 +105,7 @@ class RenameHelper {
 					}
 					return true;
 				case [KnownType(type1, params1), KnownType(type2, params2)]:
-					if (type1.getFullModulName() != type2.getFullModulName()) {
+					if (type1.fullModuleName != type2.fullModuleName) {
 						return false;
 					}
 					if (params1.length != params2.length) {
@@ -352,7 +352,7 @@ class RenameHelper {
 		var allTypes:Array<Type> = context.typeList.findTypeName(typeName);
 		if (parts.length > 0) {
 			for (type in allTypes) {
-				if (type.getFullModulName() == hint.name) {
+				if (type.fullModuleName == hint.name) {
 					return Promise.resolve(KnownType(type, typeParams));
 				}
 			}

@@ -24,7 +24,7 @@ class TraverseSources {
 		}
 	}
 
-	static function collectIdentifierData(usageContext:UsageContext) {
+	public static function collectIdentifierData(usageContext:UsageContext) {
 		var content:FileContentType = usageContext.fileReader(usageContext.fileName);
 		switch (content) {
 			case Text(text):

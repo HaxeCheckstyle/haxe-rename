@@ -2,6 +2,14 @@
 
 ## dev branch / next version (2.x.x)
 
+## 2.4.0 (2024-11-)
+
+- added invalidateFile / removeFile to allow rescan in case of file changes or deletion
+- added support for create and delete file operations as edits
+- changed Refactor class to Rename
+- changed getFullModulName call to fullModuleName property
+- fixed type name renaming not changing in use locations
+
 ## 2.3.1 (2024-11-01)
 
 - fixed classification of parameters in arrow functions

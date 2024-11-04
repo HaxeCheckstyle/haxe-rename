@@ -26,7 +26,7 @@ class RenameTypeName {
 		var allUses:Array<Identifier>;
 		// find all fully qualified modul names of type
 		if (file.packageIdentifier != null) {
-			var fullName:String = identifier.defineType.getFullModulName();
+			var fullName:String = identifier.defineType.fullModuleName;
 			var parts:Array<String> = fullName.split(".");
 			parts.pop();
 			var prefix:String = parts.join(".") + ".";
@@ -53,15 +53,16 @@ class RenameTypeName {
 					}
 				case Global | SamePackage | Imported | StarImported:
 			}
+			final searchName:String = if (use.name.startsWith(identifier.name)) identifier.name; else identifier.defineType.fullModuleName;
 			changes.push(RenameHelper.findTypeOfIdentifier(context, {
-				name: use.name,
+				name: searchName,
 				pos: use.pos.start,
 				defineType: use.defineType
 			}).then(function(typeHint:TypeHintType) {
 				switch (typeHint) {
 					case null:
 					case KnownType(type, _):
-						if (type != identifier.defineType) {
+						if (type.fullModuleName != identifier.defineType.fullModuleName) {
 							return;
 						}
 					case UnknownType(_):

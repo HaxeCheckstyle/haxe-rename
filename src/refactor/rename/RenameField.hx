@@ -130,7 +130,7 @@ class RenameField {
 			RenameHelper.replaceTextWithPrefix(use, '${type.name.name}.', context.what.toName, changelist);
 		}
 
-		var fullModuleName:String = type.getFullModulName();
+		var fullModuleName:String = type.fullModuleName;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
 		for (use in allUses) {
 			RenameHelper.replaceTextWithPrefix(use, '$fullModuleName.', context.what.toName, changelist);

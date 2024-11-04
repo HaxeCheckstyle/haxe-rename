@@ -12,7 +12,7 @@ import refactor.rename.RenamePackage;
 import refactor.rename.RenameScopedLocal;
 import refactor.rename.RenameTypeName;
 
-class Refactor {
+class Rename {
 	public static function canRename(context:CanRefactorContext):Promise<CanRefactorResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {

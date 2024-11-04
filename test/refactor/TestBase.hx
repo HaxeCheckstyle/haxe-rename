@@ -4,9 +4,9 @@ import haxe.Exception;
 import haxe.PosInfos;
 import js.lib.Promise;
 import utest.Async;
-import refactor.Refactor;
 import refactor.RefactorResult;
 import refactor.RefactorWhat;
+import refactor.Rename;
 import refactor.TestEditableDocument;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
@@ -89,7 +89,7 @@ class TestBase implements ITest {
 
 	function doCanRefactor(what:RefactorWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
-		return Refactor.canRename({
+		return Rename.canRename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			typeList: usageContext.typeList,
@@ -105,7 +105,7 @@ class TestBase implements ITest {
 
 	function doRefactor(what:RefactorWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
-		return Refactor.rename({
+		return Rename.rename({
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			typeList: usageContext.typeList,
@@ -140,6 +140,10 @@ class TestBase implements ITest {
 
 	function fileEditToString(edit:FileEdit):String {
 		return switch (edit) {
+			case CreateFile(newFileName):
+				'Create $newFileName';
+			case DeleteFile(fileName):
+				'Delete $fileName';
 			case Move(newFileName):
 				'Move $newFileName';
 			case ReplaceText(text, pos):
