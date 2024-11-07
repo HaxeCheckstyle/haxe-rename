@@ -1,8 +1,7 @@
-package testcases.classes;
+package classes;
 
 import js.Browser;
-import tink.core.Future;
-import tink.core.Promise;
+import js.lib.Promise;
 
 @:expose class PrinterMain {
 	public static function main():Void {
@@ -59,3 +58,5 @@ class TextLoader {
 		return Promise.resolve(text);
 	}
 }
+
+typedef Future = Any;

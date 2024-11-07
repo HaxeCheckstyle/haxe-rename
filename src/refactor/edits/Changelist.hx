@@ -2,16 +2,16 @@ package refactor.edits;
 
 import haxe.io.Bytes;
 import sys.io.File;
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
+import refactor.rename.RenameContext;
 
 class Changelist {
 	var changes:Map<String, Array<FileEdit>>;
-	var context:RefactorContext;
+	var context:EditContext;
 
-	public function new(context:RefactorContext) {
+	public function new(context:EditContext) {
 		changes = new Map<String, Array<FileEdit>>();
 		this.context = context;
 	}

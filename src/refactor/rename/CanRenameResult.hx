@@ -1,8 +1,8 @@
-package refactor;
+package refactor.rename;
 
 import refactor.discover.IdentifierPos;
 
-typedef CanRefactorResult = {
+typedef CanRenameResult = {
 	var name:String;
 	var pos:IdentifierPos;
 }

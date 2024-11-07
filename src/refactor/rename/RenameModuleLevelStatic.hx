@@ -1,14 +1,14 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameModuleLevelStatic {
-	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorModuleLevelStatic(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packageName:String = file.getPackage();
@@ -58,7 +58,7 @@ class RenameModuleLevelStatic {
 		});
 	}
 
-	static function refactorIdentifier(context:RefactorContext, changelist:Changelist, searchName:String, replaceName:String,
+	static function refactorIdentifier(context:RenameContext, changelist:Changelist, searchName:String, replaceName:String,
 			filesWithStaticImport:Array<String>) {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(searchName);
 		for (use in allUses) {

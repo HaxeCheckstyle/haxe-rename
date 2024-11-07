@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-typedef RefactorWhat = {
+typedef RenameWhat = {
 	var fileName:String;
 	var toName:String;
 	var pos:Int;

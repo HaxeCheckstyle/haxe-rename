@@ -1028,6 +1028,9 @@ class UsageCollector {
 				case BrOpen:
 					readAnonStructure(context, identifier, child);
 					break;
+				case POpen:
+					readExpression(context, identifier, child);
+					break;
 				default:
 			}
 		}

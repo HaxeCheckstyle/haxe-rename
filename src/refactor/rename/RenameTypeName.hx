@@ -1,16 +1,16 @@
 package refactor.rename;
 
 import haxe.io.Path;
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameTypeName {
-	public static function refactorTypeName(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorTypeName(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();

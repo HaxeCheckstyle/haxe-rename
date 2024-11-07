@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class ClassTest extends TestBase {
+class RenameClassTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/classes"]);
 	}
@@ -13,7 +13,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 167, 173),
 			makeReplaceTestEdit("testcases/classes/Childs.hx", "ChildName", 212, 218),
 		];
-		refactorAndCheck({fileName: "testcases/classes/Childs.hx", toName: "ChildName", pos: 25}, edits, async);
+		checkRename({fileName: "testcases/classes/Childs.hx", toName: "ChildName", pos: 25}, edits, async);
 	}
 
 	public function testRenameBaseClassMethod(async:Async) {
@@ -26,7 +26,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 453, 464),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 641, 652),
 		];
-		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "addData", pos: 128}, edits, async);
+		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "addData", pos: 128}, edits, async);
 	}
 
 	public function testRenameBaseClassVar(async:Async) {
@@ -39,7 +39,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 407, 411),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 425, 429),
 		];
-		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 44}, edits, async);
+		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 44}, edits, async);
 	}
 
 	public function testRenameBaseClassVarFromSomewhere(async:Async) {
@@ -52,7 +52,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 407, 411),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "listOfData", 425, 429),
 		];
-		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 163}, edits, async);
+		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "listOfData", pos: 163}, edits, async);
 	}
 
 	public function testRenameChildClass(async:Async) {
@@ -79,7 +79,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 499, 509),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 612, 622),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ItemClass", pos: 28}, edits, async);
+		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "ItemClass", pos: 28}, edits, async);
 	}
 
 	public function testRenameChildPackage(async:Async) {
@@ -92,7 +92,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "classes.pack.ChildClass", 30, 48),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 48, 66),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "classes.pack", pos: 10}, edits, async);
+		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "classes.pack", pos: 10}, edits, async);
 	}
 
 	public function testRenameTypedef(async:Async) {
@@ -100,7 +100,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "ChildList", 868, 880),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ChildList", 96, 108),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 872}, edits, async);
+		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 872}, edits, async);
 	}
 
 	public function testRenameStaticExtentionSum(async:Async) {
@@ -109,7 +109,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "sumChilds", 182, 185),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "sumChilds", 706, 709),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildHelper.hx", toName: "sumChilds", pos: 64}, edits, async);
+		checkRename({fileName: "testcases/classes/ChildHelper.hx", toName: "sumChilds", pos: 64}, edits, async);
 	}
 
 	public function testRenameStaticExtensionPrint(async:Async) {
@@ -119,7 +119,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 386, 391),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "printChild", 151, 156),
 		];
-		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "printChild", pos: 153}, edits, async);
+		checkRename({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "printChild", pos: 153}, edits, async);
 	}
 
 	public function testRenameStaticExtensionPrintText(async:Async) {
@@ -127,7 +127,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 323, 332),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "logText", 225, 234),
 		];
-		refactorAndCheck({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "logText", pos: 229}, edits, async);
+		checkRename({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "logText", pos: 229}, edits, async);
 	}
 
 	public function testRenameChildClassParent(async:Async) {
@@ -140,7 +140,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 555, 561),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "parentBase", 634, 640),
 		];
-		refactorAndCheck({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits, async);
+		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 69}, edits, async);
 	}
 
 	public function testRenameIdentifierPos(async:Async) {
@@ -148,7 +148,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "position", 392, 395),
 			makeReplaceTestEdit("testcases/classes/MyIdentifier.hx", "position", 253, 256),
 		];
-		refactorAndCheck({fileName: "testcases/classes/MyIdentifier.hx", toName: "position", pos: 254}, edits, async);
+		checkRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "position", pos: 254}, edits, async);
 	}
 
 	// requires external typer since built-in will not resolve array access
@@ -172,7 +172,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 463, 468),
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 620, 625),
 		];
-		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "jsonWidth", pos: 74}, edits, async);
+		checkRename({fileName: "testcases/classes/JsonClass.hx", toName: "jsonWidth", pos: 74}, edits, async);
 	}
 
 	public function testRenameJsonClass(async:Async) {
@@ -185,7 +185,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 336, 345),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "JsonImporter", 744, 753),
 		];
-		refactorAndCheck({fileName: "testcases/classes/JsonClass.hx", toName: "JsonImporter", pos: 28}, edits, async);
+		checkRename({fileName: "testcases/classes/JsonClass.hx", toName: "JsonImporter", pos: 28}, edits, async);
 	}
 
 	public function testRenameBaseClassParamterWithShadow(async:Async) {
@@ -194,46 +194,46 @@ class ClassTest extends TestBase {
 			makeInsertTestEdit("testcases/classes/BaseClass.hx", "this.", 248),
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 260, 261),
 		];
-		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 227}, edits, async);
+		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 227}, edits, async);
 	}
 
 	public function testRenameBaseClassParamterWithShadowLocalVar(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
-		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
+		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
 	}
 
 	public function testRenameBaseClassCaseLabel(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
 			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))", async);
-		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
+		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
 			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))", async);
 	}
 
 	public function testRenameUseChildClassParentSubPart(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
-		failRefactor({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
+		failRename({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameBaseClassDataToData(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
-		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
+		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameBaseClassNoIdentifier(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
-		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
+		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameStaticUsingConstructorCall(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
+		failCanRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
 			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
-		failRefactor({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
+		failRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
 			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
 	}
 
@@ -242,28 +242,28 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/BaseClass.hx", "data", 386, 387),
 			makeInsertTestEdit("testcases/classes/BaseClass.hx", "this.", 407),
 		];
-		refactorAndCheck({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 386}, edits, async);
+		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 386}, edits, async);
 	}
 
 	public function testRenameBaseClassParamterWithShadowCase(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
-		failRefactor({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
+		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
 	}
 
 	public function testRenameChildClassExtendsBaseClass(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
+		failCanRename({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
 			"renaming not supported for BaseClass testcases/classes/ChildClass.hx@43-52 (Extends)", async);
-		failRefactor({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
+		failRename({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
 			"renaming not supported for BaseClass testcases/classes/ChildClass.hx@43-52 (Extends)", async);
 	}
 
 	public function testRenameImport(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRefactor({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
+		failCanRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
 			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)", async);
-		failRefactor({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
+		failRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
 			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)", async);
 	}
 
@@ -273,7 +273,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
 		];
-		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 237}, edits, async);
+		checkRename({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 237}, edits, async);
 	}
 
 	public function testRenameDemoClassAMemberVar2(async:Async) {
@@ -282,7 +282,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
 		];
-		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 531}, edits, async);
+		checkRename({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 531}, edits, async);
 	}
 
 	public function testRenameDemoClassAMemberVar3(async:Async) {
@@ -291,7 +291,7 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 529, 539),
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 546, 556),
 		];
-		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 548}, edits, async);
+		checkRename({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 548}, edits, async);
 	}
 
 	public function testRenameDemoClassASomeValue(async:Async) {
@@ -299,27 +299,27 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 59, 68),
 			makeReplaceTestEdit("testcases/classes/DemoClassA.hx", "wasRenamed", 515, 524),
 		];
-		refactorAndCheck({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 61}, edits, async);
+		checkRename({fileName: "testcases/classes/DemoClassA.hx", toName: "wasRenamed", pos: 61}, edits, async);
 	}
 
 	public function testRenamePrinter(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeMoveTestEdit("testcases/classes/Printer.hx", "testcases/classes/PrinterRenamed.hx"),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 383, 390),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 545, 552),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 699, 706),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 930, 937),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1076, 1083),
-			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1219, 1226),
-			makeReplaceTestEdit("testcases/classes/import.hx", "PrinterRenamed", 80, 87),
-			makeReplaceTestEdit("testcases/classes/pack/UsePrinter.hx", "PrinterRenamed", 58, 65),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 345, 352),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 507, 514),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 661, 668),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 892, 899),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1038, 1045),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "PrinterRenamed", 1181, 1188),
+			makeReplaceTestEdit("testcases/classes/import.hx", "PrinterRenamed", 88, 95),
+			makeReplaceTestEdit("testcases/classes/pack/UsePrinter.hx", "PrinterRenamed", 38, 45),
 		];
-		refactorAndCheck({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1222}, edits, async);
+		checkRename({fileName: "testcases/classes/Printer.hx", toName: "PrinterRenamed", pos: 1184}, edits, async);
 	}
 
 	public function testRenameFooX(async:Async) {
 		var edits:Array<TestEdit> = [makeReplaceTestEdit("testcases/classes/Foo.hx", "xRenamed", 218, 219),];
-		refactorAndCheck({fileName: "testcases/classes/Foo.hx", toName: "xRenamed", pos: 218}, edits, async);
+		checkRename({fileName: "testcases/classes/Foo.hx", toName: "xRenamed", pos: 218}, edits, async);
 	}
 
 	public function testRenameFooResp(async:Async) {
@@ -327,6 +327,6 @@ class ClassTest extends TestBase {
 			makeReplaceTestEdit("testcases/classes/Foo.hx", "respRenamed", 170, 174),
 			makeReplaceTestEdit("testcases/classes/Foo.hx", "respRenamed", 182, 186),
 		];
-		refactorAndCheck({fileName: "testcases/classes/Foo.hx", toName: "respRenamed", pos: 173}, edits, async);
+		checkRename({fileName: "testcases/classes/Foo.hx", toName: "respRenamed", pos: 173}, edits, async);
 	}
 }

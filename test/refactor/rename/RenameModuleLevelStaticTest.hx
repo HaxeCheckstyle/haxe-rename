@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class ModuleLevelStaticTest extends TestBase {
+class RenameModuleLevelStaticTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/modulelevelstatics"]);
 	}
@@ -14,7 +14,7 @@ class ModuleLevelStaticTest extends TestBase {
 			makeReplaceTestEdit("testcases/modulelevelstatics/pack/Command.hx", "logText", 163, 175),
 			makeReplaceTestEdit("testcases/modulelevelstatics/pack/Command.hx", "logText", 208, 220),
 		];
-		refactorAndCheck({fileName: "testcases/modulelevelstatics/StaticFuncs.hx", toName: "logText", pos: 177}, edits, async);
+		checkRename({fileName: "testcases/modulelevelstatics/StaticFuncs.hx", toName: "logText", pos: 177}, edits, async);
 	}
 
 	public function testRenameSomeVar(async:Async) {
@@ -23,6 +23,6 @@ class ModuleLevelStaticTest extends TestBase {
 			makeReplaceTestEdit("testcases/modulelevelstatics/StaticFuncs.hx", "logText", 134, 141),
 			makeReplaceTestEdit("testcases/modulelevelstatics/pack/Command.hx", "logText", 185, 192),
 		];
-		refactorAndCheck({fileName: "testcases/modulelevelstatics/StaticFuncs.hx", toName: "logText", pos: 137}, edits, async);
+		checkRename({fileName: "testcases/modulelevelstatics/StaticFuncs.hx", toName: "logText", pos: 137}, edits, async);
 	}
 }

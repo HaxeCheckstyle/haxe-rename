@@ -1,15 +1,14 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameScopedLocal {
-	public static function refactorScopedLocal(context:RefactorContext, file:File, identifier:Identifier, scopeStart:Int,
-			scopeEnd:Int):Promise<RefactorResult> {
+	public static function refactorScopedLocal(context:RenameContext, file:File, identifier:Identifier, scopeStart:Int, scopeEnd:Int):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var identifierDot:String = identifier.name + ".";
 		var toNameDot:String = context.what.toName + ".";

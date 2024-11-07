@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class EnumTest extends TestBase {
+class RenameEnumTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/enums"]);
 	}
@@ -14,7 +14,7 @@ class EnumTest extends TestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 480, 494),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2012, 2026),
 		];
-		refactorAndCheck({fileName: "testcases/enums/IdentifierType.hx", toName: "IdentType", pos: 30}, edits, async);
+		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "IdentType", pos: 30}, edits, async);
 	}
 
 	public function testRenameScopedLocal(async:Async) {
@@ -26,7 +26,7 @@ class EnumTest extends TestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 1734, 1745),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 1869, 1880),
 		];
-		refactorAndCheck({fileName: "testcases/enums/IdentifierType.hx", toName: "LocalScopeVar", pos: 77}, edits, async);
+		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "LocalScopeVar", pos: 77}, edits, async);
 	}
 
 	public function testRenameCall(async:Async) {
@@ -35,7 +35,7 @@ class EnumTest extends TestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 178, 182),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 211, 215),
 		];
-		refactorAndCheck({fileName: "testcases/enums/IdentifierType.hx", toName: "FunctionCall", pos: 55}, edits, async);
+		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "FunctionCall", pos: 55}, edits, async);
 	}
 
 	public function testRenameScopedGlobal(async:Async) {
@@ -47,6 +47,6 @@ class EnumTest extends TestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 1798, 1810),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 1904, 1916),
 		];
-		refactorAndCheck({fileName: "testcases/enums/IdentifierType.hx", toName: "GlobalScopeVar", pos: 103}, edits, async);
+		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "GlobalScopeVar", pos: 103}, edits, async);
 	}
 }

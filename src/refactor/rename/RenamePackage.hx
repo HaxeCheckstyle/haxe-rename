@@ -1,15 +1,15 @@
 package refactor.rename;
 
 import haxe.io.Path;
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenamePackage {
-	public static function refactorPackageName(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorPackageName(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		var mainTypeName:String = file.getMainModulName();
 
@@ -78,7 +78,7 @@ class RenamePackage {
 		return Promise.resolve(changelist.execute());
 	}
 
-	static function moveFileToPackage(context:RefactorContext, file:File, changelist:Changelist, packageName:String) {
+	static function moveFileToPackage(context:RenameContext, file:File, changelist:Changelist, packageName:String) {
 		var path:Path = new Path(file.name);
 		var mainTypeName:String = file.getMainModulName();
 

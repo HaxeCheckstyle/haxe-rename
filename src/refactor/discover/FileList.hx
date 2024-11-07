@@ -16,4 +16,8 @@ class FileList {
 	public function removeFile(fileName:String) {
 		files.remove(fileName);
 	}
+
+	public function clear() {
+		files.clear();
+	}
 }

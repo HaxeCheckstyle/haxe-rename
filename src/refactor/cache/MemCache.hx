@@ -10,13 +10,13 @@ class MemCache implements IFileCache {
 	var files:Map<String, File>;
 
 	public function new() {
-		clear();
+		files = new Map<String, File>();
 	}
 
 	public function save() {}
 
 	public function clear() {
-		files = new Map<String, File>();
+		files.clear();
 	}
 
 	public function storeFile(file:File) {

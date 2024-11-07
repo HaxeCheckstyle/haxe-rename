@@ -1,6 +1,6 @@
-package testcases.classes.pack;
+package classes.pack;
 
-import testcases.classes.Printer;
+import classes.Printer;
 
 function usingPrinter() {
 	new TextLoader();

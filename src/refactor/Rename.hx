@@ -3,7 +3,10 @@ package refactor;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
+import refactor.rename.CanRenameContext;
+import refactor.rename.CanRenameResult;
 import refactor.rename.RenameAnonStructField;
+import refactor.rename.RenameContext;
 import refactor.rename.RenameEnumField;
 import refactor.rename.RenameField;
 import refactor.rename.RenameImportAlias;
@@ -13,7 +16,7 @@ import refactor.rename.RenameScopedLocal;
 import refactor.rename.RenameTypeName;
 
 class Rename {
-	public static function canRename(context:CanRefactorContext):Promise<CanRefactorResult> {
+	public static function canRename(context:CanRenameContext):Promise<CanRenameResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
 			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
@@ -55,7 +58,7 @@ class Rename {
 		}
 	}
 
-	public static function rename(context:RefactorContext):Promise<RefactorResult> {
+	public static function rename(context:RenameContext):Promise<RefactorResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
 			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
@@ -125,7 +128,7 @@ class Rename {
 		}
 	}
 
-	static function findActualWhat(context:CanRefactorContext, file:File, identifier:Identifier):Null<Identifier> {
+	static function findActualWhat(context:CanRenameContext, file:File, identifier:Identifier):Null<Identifier> {
 		var parts:Array<String> = identifier.name.split(".");
 		if (parts.length <= 0) {
 			return null;

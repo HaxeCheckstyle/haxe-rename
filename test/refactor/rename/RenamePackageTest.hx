@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class PackageTest extends TestBase {
+class RenamePackageTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/packages"]);
 	}
@@ -14,7 +14,7 @@ class PackageTest extends TestBase {
 			makeReplaceTestEdit("testcases/packages/Types.hx", "packages.sub", 8, 16),
 
 		];
-		refactorAndCheck({fileName: "testcases/packages/Types.hx", toName: "packages.sub", pos: 12}, edits, async);
+		checkRename({fileName: "testcases/packages/Types.hx", toName: "packages.sub", pos: 12}, edits, async);
 	}
 
 	public function testRenameMoreTypesModul(async:Async) {
@@ -23,7 +23,7 @@ class PackageTest extends TestBase {
 			makeMoveTestEdit("testcases/packages/MoreTypes.hx", "testcases/packages/sub/MoreTypes.hx"),
 			makeReplaceTestEdit("testcases/packages/MoreTypes.hx", "packages.sub", 8, 16),
 		];
-		refactorAndCheck({fileName: "testcases/packages/MoreTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
+		checkRename({fileName: "testcases/packages/MoreTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
 	}
 
 	public function testRenameOtherTypesModul(async:Async) {
@@ -34,7 +34,7 @@ class PackageTest extends TestBase {
 			makeMoveTestEdit("testcases/packages/OtherTypes.hx", "testcases/packages/sub/OtherTypes.hx"),
 			makeReplaceTestEdit("testcases/packages/OtherTypes.hx", "packages.sub", 8, 16),
 		];
-		refactorAndCheck({fileName: "testcases/packages/OtherTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
+		checkRename({fileName: "testcases/packages/OtherTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
 	}
 
 	public function testRenameHelperTypesModul(async:Async) {
@@ -43,7 +43,7 @@ class PackageTest extends TestBase {
 			makeReplaceTestEdit("testcases/packages/HelperTypes.hx", "packages.sub", 8, 16),
 			makeReplaceTestEdit("testcases/packages/import.hx", "packages.sub.HelperTypes", 26, 46),
 		];
-		refactorAndCheck({fileName: "testcases/packages/HelperTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
+		checkRename({fileName: "testcases/packages/HelperTypes.hx", toName: "packages.sub", pos: 12}, edits, async);
 	}
 
 	public function testRenameHelperECTypesModul(async:Async) {
@@ -52,6 +52,6 @@ class PackageTest extends TestBase {
 			makeMoveTestEdit("testcases/packages/kages/ECTypes.hx", "testcases/packages/packages/sub/ECTypes.hx"),
 			makeReplaceTestEdit("testcases/packages/kages/ECTypes.hx", "packages.sub", 8, 13),
 		];
-		refactorAndCheck({fileName: "testcases/packages/kages/ECTypes.hx", toName: "packages.sub", pos: 10}, edits, async);
+		checkRename({fileName: "testcases/packages/kages/ECTypes.hx", toName: "packages.sub", pos: 10}, edits, async);
 	}
 }

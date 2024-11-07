@@ -29,7 +29,7 @@ class TraverseSources {
 		switch (content) {
 			case Text(text):
 				usageContext.usageCollector.parseFile(ByteData.ofString(text), usageContext);
-			case Token(root):
+			case Token(root, _):
 				usageContext.usageCollector.parseFileWithTokens(root, usageContext);
 		}
 	}

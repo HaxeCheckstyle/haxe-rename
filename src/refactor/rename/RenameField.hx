@@ -1,15 +1,15 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameField {
-	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):Promise<RefactorResult> {
+	public static function refactorField(context:RenameContext, file:File, identifier:Identifier, isStatic:Bool):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packName:String = file.getPackage();
@@ -54,7 +54,7 @@ class RenameField {
 		});
 	}
 
-	public static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>):Promise<Void> {
+	public static function replaceAccessOrCalls(context:RenameContext, changelist:Changelist, identifier:Identifier, types:Array<Type>):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
@@ -116,7 +116,7 @@ class RenameField {
 		}
 	}
 
-	static function replaceStaticUse(context:RefactorContext, changelist:Changelist, type:Type, fromName:String) {
+	static function replaceStaticUse(context:RenameContext, changelist:Changelist, type:Type, fromName:String) {
 		var packName:String = type.file.getPackage();
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('${type.name.name}.$fromName');
 		for (use in allUses) {

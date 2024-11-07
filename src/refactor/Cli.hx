@@ -2,7 +2,6 @@ package refactor;
 
 import haxe.PosInfos;
 import haxe.Timer;
-import refactor.RefactorContext.VerboseLogger;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
@@ -10,6 +9,7 @@ import refactor.discover.TypeList;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.EditableDocument;
+import refactor.rename.RenameWhat;
 
 class Cli {
 	var verbose:Bool = false;
@@ -88,7 +88,7 @@ class Cli {
 			printHelp();
 			Sys.exit(0);
 		}
-		var what:Null<RefactorWhat> = makeWhat(loc, toName);
+		var what:Null<RenameWhat> = makeWhat(loc, toName);
 		if (what == null) {
 			printHelp();
 			Sys.exit(1);
@@ -145,7 +145,7 @@ class Cli {
 		Sys.println(text);
 	}
 
-	function makeWhat(location:String, toName:String):Null<RefactorWhat> {
+	function makeWhat(location:String, toName:String):Null<RenameWhat> {
 		var parts:Array<String> = location.split("@");
 		if (parts.length != 2) {
 			return null;

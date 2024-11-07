@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class InterfaceTest extends TestBase {
+class RenameInterfaceTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/interfaces"]);
 	}
@@ -13,7 +13,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "MyInterface", 49, 59),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "MyInterface", 94, 104),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "MyInterface", pos: 36}, edits, async);
+		checkRename({fileName: "testcases/interfaces/IInterface.hx", toName: "MyInterface", pos: 36}, edits, async);
 	}
 
 	public function testMoveInterfacePackage(async:Async) {
@@ -23,7 +23,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/IInterface.hx", "interfaces.pack.sub2", 8, 18),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub2/ISubInterface.hx", "interfaces.pack.sub2.IInterface", 38, 59),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "interfaces.pack.sub2", pos: 13}, edits, async);
+		checkRename({fileName: "testcases/interfaces/IInterface.hx", toName: "interfaces.pack.sub2", pos: 13}, edits, async);
 	}
 
 	public function testRenameInterfaceFieldDoSomething(async:Async) {
@@ -35,7 +35,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 260, 271),
 			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doIt", 392, 403),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "doIt", pos: 78}, edits, async);
+		checkRename({fileName: "testcases/interfaces/IInterface.hx", toName: "doIt", pos: 78}, edits, async);
 	}
 
 	public function testRenameInterfaceFieldDoSomethingElse(async:Async) {
@@ -50,7 +50,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 283, 298),
 			makeReplaceTestEdit("testcases/interfaces/pack/SecondChild.hx", "doMore", 415, 430),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/IInterface.hx", toName: "doMore", pos: 110}, edits, async);
+		checkRename({fileName: "testcases/interfaces/IInterface.hx", toName: "doMore", pos: 110}, edits, async);
 	}
 
 	public function testRenameAnotherInterfaceFieldDoNothing(async:Async) {
@@ -60,7 +60,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "doIt", 211, 220),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "doIt", 134, 143),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 139}, edits, async);
+		checkRename({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 139}, edits, async);
 	}
 
 	public function testRenameAnotherInterfaceFieldDoSomething(async:Async) {
@@ -68,7 +68,7 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "doIt", 137, 148),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "doIt", 70, 81),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 78}, edits, async);
+		checkRename({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "doIt", pos: 78}, edits, async);
 	}
 
 	public function testRenameAnotherInterfaceFieldSomeVar(async:Async) {
@@ -81,6 +81,6 @@ class InterfaceTest extends TestBase {
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/AnotherClass.hx", "state", 307, 315),
 			makeReplaceTestEdit("testcases/interfaces/pack/sub/IAnotherInterface.hx", "state", 157, 165),
 		];
-		refactorAndCheck({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "state", pos: 160}, edits, async);
+		checkRename({fileName: "testcases/interfaces/pack/sub/IAnotherInterface.hx", toName: "state", pos: 160}, edits, async);
 	}
 }

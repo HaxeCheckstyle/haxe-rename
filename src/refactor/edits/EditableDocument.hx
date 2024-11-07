@@ -22,6 +22,10 @@ class EditableDocument implements IEditableDocument {
 
 	public function addChange(edit:FileEdit) {
 		switch (edit) {
+			case CreateFile(newFileName):
+				fileName = newFileName;
+			case DeleteFile(oldFileName):
+				fileName = oldFileName;
 			case Move(newFileName):
 				fileName = newFileName;
 			case ReplaceText(text, pos):

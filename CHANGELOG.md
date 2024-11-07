@@ -6,9 +6,12 @@
 
 - added invalidateFile / removeFile to allow rescan in case of file changes or deletion
 - added support for create and delete file operations as edits
+- added ExtractType refactor module
+- added ExtractInterface refactor module
 - changed Refactor class to Rename
 - changed getFullModulName call to fullModuleName property
 - fixed type name renaming not changing in use locations
+- fixed discovery of arrow functions as type hints
 
 ## 2.3.1 (2024-11-01)
 

@@ -20,7 +20,7 @@ class RenameHelper {
 		}
 	}
 
-	public static function findDescendantTypes(context:RefactorContext, packName:String, baseType:Type):Array<Type> {
+	public static function findDescendantTypes(context:RenameContext, packName:String, baseType:Type):Array<Type> {
 		var types:Array<Type> = [];
 		var fullModulName:String = '$packName.${baseType.name.name}';
 
@@ -85,7 +85,7 @@ class RenameHelper {
 		return types;
 	}
 
-	public static function matchesType(context:RefactorContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Promise<Bool> {
+	public static function matchesType(context:RenameContext, searchTypeOf:SearchTypeOf, searchType:TypeHintType):Promise<Bool> {
 		return findTypeOfIdentifier(context, searchTypeOf).then(function(identifierType:Null<TypeHintType>):Bool {
 			if (identifierType == null) {
 				return false;
@@ -124,14 +124,14 @@ class RenameHelper {
 		});
 	}
 
-	static function findTypeWithTyper(context:RefactorContext, fileName:String, pos:Int):Promise<Null<TypeHintType>> {
+	static function findTypeWithTyper(context:RenameContext, fileName:String, pos:Int):Promise<Null<TypeHintType>> {
 		if (context.typer == null) {
 			return Promise.reject("no typer");
 		}
 		return context.typer.resolveType(fileName, pos);
 	}
 
-	public static function findTypeOfIdentifier(context:RefactorContext, searchTypeOf:SearchTypeOf):Promise<TypeHintType> {
+	public static function findTypeOfIdentifier(context:RenameContext, searchTypeOf:SearchTypeOf):Promise<TypeHintType> {
 		var parts:Array<String> = searchTypeOf.name.split(".");
 
 		var part:String = parts.shift();
@@ -144,8 +144,8 @@ class RenameHelper {
 				var part:String = parts[index++];
 				switch (partType) {
 					case null:
-						context.verboseLog('unable to determine type of "$part" in ${searchTypeOf.defineType.file.name}@${searchTypeOf.pos}');
-						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.file.name}@${searchTypeOf.pos}');
+						context.verboseLog('unable to determine type of "$part" in ${searchTypeOf.defineType?.file.name}@${searchTypeOf.pos}');
+						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType?.file.name}@${searchTypeOf.pos}');
 					case KnownType(t, params):
 						return findField(context, t, part).then(findFieldForPart);
 					case UnknownType(name, _):
@@ -157,7 +157,7 @@ class RenameHelper {
 		});
 	}
 
-	public static function findFieldOrScopedLocal(context:RefactorContext, containerType:Type, name:String, pos:Int):Promise<TypeHintType> {
+	public static function findFieldOrScopedLocal(context:RenameContext, containerType:Type, name:String, pos:Int):Promise<TypeHintType> {
 		return findTypeWithTyper(context, containerType.file.name, pos).catchError(function(msg):Promise<TypeHintType> {
 			var allUses:Array<Identifier> = containerType.getIdentifiers(name);
 			var candidate:Null<Identifier> = null;
@@ -276,7 +276,7 @@ class RenameHelper {
 		});
 	}
 
-	public static function findField(context:RefactorContext, containerType:Type, name:String):Promise<TypeHintType> {
+	public static function findField(context:RenameContext, containerType:Type, name:String):Promise<TypeHintType> {
 		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
 		var candidate:Null<Identifier> = null;
 		for (use in allUses) {
@@ -327,7 +327,7 @@ class RenameHelper {
 		return null;
 	}
 
-	public static function typeFromTypeHint(context:RefactorContext, hint:Identifier):Promise<TypeHintType> {
+	public static function typeFromTypeHint(context:RenameContext, hint:Identifier):Promise<TypeHintType> {
 		if (hint.name == "Null") {
 			if ((hint.uses == null) || (hint.uses.length <= 0)) {
 				return Promise.reject();
@@ -370,7 +370,7 @@ class RenameHelper {
 		return Promise.resolve(UnknownType(hint.name, typeParams));
 	}
 
-	public static function replaceStaticExtension(context:RefactorContext, changelist:Changelist, identifier:Identifier):Promise<Void> {
+	public static function replaceStaticExtension(context:RenameContext, changelist:Changelist, identifier:Identifier):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 
 		if (identifier.uses == null) {
@@ -441,7 +441,7 @@ class RenameHelper {
 		return Promise.all(changes).then(null);
 	}
 
-	public static function replaceSingleAccessOrCall(context:RefactorContext, changelist:Changelist, use:Identifier, fromName:String,
+	public static function replaceSingleAccessOrCall(context:RenameContext, changelist:Changelist, use:Identifier, fromName:String,
 			types:Array<Type>):Promise<Void> {
 		var name:String = use.name;
 		var index:Int = name.lastIndexOf('.$fromName');
@@ -481,7 +481,7 @@ class RenameHelper {
 		});
 	}
 
-	public static function replaceArrayAccess(context:RefactorContext, changelist:Changelist, use:Identifier, fromName:String, types:Array<Type>,
+	public static function replaceArrayAccess(context:RenameContext, changelist:Changelist, use:Identifier, fromName:String, types:Array<Type>,
 			posClosing:Int):Promise<Void> {
 		var name:String = use.name;
 

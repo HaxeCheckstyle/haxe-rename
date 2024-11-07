@@ -17,9 +17,9 @@ class TestEditableDocument implements IEditableDocument {
 	public function addChange(edit:FileEdit) {
 		switch (edit) {
 			case CreateFile(newFileName):
-				Assert.notEquals(fileName, newFileName);
+				Assert.equals(fileName, newFileName);
 			case DeleteFile(oldFileName):
-				Assert.notEquals(fileName, oldFileName);
+				Assert.equals(fileName, oldFileName);
 			case Move(newFileName):
 				Assert.notEquals(fileName, newFileName);
 			case ReplaceText(_, pos):

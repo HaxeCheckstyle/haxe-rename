@@ -87,6 +87,11 @@ class NameMap {
 		}
 		parts = newParts;
 	}
+
+	public function clear() {
+		names.clear();
+		parts.clear();
+	}
 }
 
 typedef IdentifierMap = Map<String, Array<Identifier>>;

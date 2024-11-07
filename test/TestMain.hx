@@ -1,25 +1,29 @@
-import refactor.ClassTest;
-import refactor.EnumTest;
-import refactor.ImportAliasTest;
-import refactor.InterfaceTest;
-import refactor.ModuleLevelStaticTest;
-import refactor.PackageTest;
-import refactor.ScopedLocalTest;
-import refactor.TypedefTest;
+import refactor.refactor.RefactorClassTest;
+import refactor.refactor.RefactorTypedefTest;
+import refactor.rename.RenameClassTest;
+import refactor.rename.RenameEnumTest;
+import refactor.rename.RenameImportAliasTest;
+import refactor.rename.RenameInterfaceTest;
+import refactor.rename.RenameModuleLevelStaticTest;
+import refactor.rename.RenamePackageTest;
+import refactor.rename.RenameScopedLocalTest;
+import refactor.rename.RenameTypedefTest;
 import utest.Runner;
 import utest.ui.text.DiagnosticsReport;
 
 class TestMain {
 	static function main() {
 		var tests:Array<ITest> = [
-			new ClassTest(),
-			new EnumTest(),
-			new ImportAliasTest(),
-			new InterfaceTest(),
-			new ModuleLevelStaticTest(),
-			new PackageTest(),
-			new ScopedLocalTest(),
-			new TypedefTest()
+			new RenameClassTest(),
+			new RenameEnumTest(),
+			new RenameImportAliasTest(),
+			new RenameInterfaceTest(),
+			new RenameModuleLevelStaticTest(),
+			new RenamePackageTest(),
+			new RenameScopedLocalTest(),
+			new RenameTypedefTest(),
+			new RefactorClassTest(),
+			new RefactorTypedefTest(),
 		];
 		var runner:Runner = new Runner();
 

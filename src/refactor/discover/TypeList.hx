@@ -35,4 +35,8 @@ class TypeList implements ITypeList {
 			types.remove(name);
 		}
 	}
+
+	public function clear() {
+		types.clear();
+	}
 }

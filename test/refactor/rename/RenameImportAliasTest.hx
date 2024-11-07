@@ -1,6 +1,6 @@
-package refactor;
+package refactor.rename;
 
-class ImportAliasTest extends TestBase {
+class RenameImportAliasTest extends RenameTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/importalias"]);
 	}
@@ -11,7 +11,7 @@ class ImportAliasTest extends TestBase {
 			makeReplaceTestEdit("testcases/importalias/import.hx", "typeof", 45, 53),
 			makeReplaceTestEdit("testcases/importalias/pack/Child.hx", "typeof", 89, 97),
 		];
-		refactorAndCheck({fileName: "testcases/importalias/import.hx", toName: "typeof", pos: 47}, edits, async);
+		checkRename({fileName: "testcases/importalias/import.hx", toName: "typeof", pos: 47}, edits, async);
 	}
 
 	public function testRenameMainAlias(async:Async) {
@@ -19,6 +19,6 @@ class ImportAliasTest extends TestBase {
 			makeReplaceTestEdit("testcases/importalias/Main.hx", "typeof", 45, 57),
 			makeReplaceTestEdit("testcases/importalias/Main.hx", "typeof", 161, 173),
 		];
-		refactorAndCheck({fileName: "testcases/importalias/Main.hx", toName: "typeof", pos: 50}, edits, async);
+		checkRename({fileName: "testcases/importalias/Main.hx", toName: "typeof", pos: 50}, edits, async);
 	}
 }

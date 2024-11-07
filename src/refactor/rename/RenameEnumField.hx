@@ -1,13 +1,13 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameEnumField {
-	public static function refactorEnumField(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorEnumField(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
 
