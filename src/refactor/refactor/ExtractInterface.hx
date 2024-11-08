@@ -161,6 +161,16 @@ class ExtractInterface {
 		var isPublic:Bool = false;
 		var hasHint:Bool = false;
 
+		if (parent.previousSibling != null) {
+			switch (parent.previousSibling.tok) {
+				case Comment(s):
+					if (s.startsWith("*")) {
+						expandPos(pos, parent.previousSibling.pos);
+					}
+				default:
+			}
+		}
+
 		for (child in nameToken.children) {
 			switch (child.tok) {
 				case Kwd(KwdPrivate) | Kwd(KwdStatic):
@@ -199,6 +209,7 @@ class ExtractInterface {
 			return;
 		}
 		for (child in parent.children) {
+			trace(child);
 			switch (child.tok) {
 				case Kwd(KwdVar) | Kwd(KwdFinal) | Kwd(KwdFunction):
 					addField(child, fields);
