@@ -28,11 +28,11 @@ class EditableDocument implements IEditableDocument {
 				fileName = oldFileName;
 			case Move(newFileName):
 				fileName = newFileName;
-			case ReplaceText(text, pos):
+			case ReplaceText(text, pos, _):
 				refactoredContent.add(originalContent.getString(lastPos, pos.start - lastPos));
 				refactoredContent.add(text);
 				lastPos = pos.end;
-			case InsertText(text, pos):
+			case InsertText(text, pos, _):
 				refactoredContent.add(originalContent.getString(lastPos, pos.start - lastPos));
 				refactoredContent.add(text);
 				lastPos = pos.start;
