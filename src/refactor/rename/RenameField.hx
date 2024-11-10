@@ -112,7 +112,7 @@ class RenameField {
 				start: access.pos.start + prefix.length,
 				end: access.pos.start + prefix.length + from.length
 			};
-			changelist.addChange(access.pos.fileName, ReplaceText(to, pos), access);
+			changelist.addChange(access.pos.fileName, ReplaceText(to, pos, false), access);
 		}
 	}
 

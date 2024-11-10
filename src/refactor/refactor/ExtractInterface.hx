@@ -36,11 +36,13 @@ class ExtractInterface {
 		final fieldDefinition:String = makeFields(extractData, context, fields);
 		final interfaceText:String = 'interface ${extractData.newTypeName} {\n' + fieldDefinition + "}";
 
-		changelist.addChange(extractData.newFileName, InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}), null);
+		changelist.addChange(extractData.newFileName, InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, true),
+			null);
 
 		final implementsText:String = ' implements ${extractData.newTypeName}';
 		final pos:Position = findImplementsPos(extractData);
-		changelist.addChange(extractData.srcFile.name, InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}), null);
+		changelist.addChange(extractData.srcFile.name, InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}, false),
+			null);
 
 		return Promise.resolve(changelist.execute());
 	}
@@ -209,7 +211,6 @@ class ExtractInterface {
 			return;
 		}
 		for (child in parent.children) {
-			trace(child);
 			switch (child.tok) {
 				case Kwd(KwdVar) | Kwd(KwdFinal) | Kwd(KwdFunction):
 					addField(child, fields);

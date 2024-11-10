@@ -40,6 +40,11 @@ class NameMap {
 			if (list == null) {
 				map.set(key, [identifier]);
 			} else {
+				for (id in list) {
+					if (id.pos.fileName == identifier.pos.fileName && id.pos.start == identifier.pos.start) {
+						return;
+					}
+				}
 				list.push(identifier);
 			}
 		}

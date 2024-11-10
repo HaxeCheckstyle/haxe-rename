@@ -22,9 +22,9 @@ class TestEditableDocument implements IEditableDocument {
 				Assert.equals(fileName, oldFileName);
 			case Move(newFileName):
 				Assert.notEquals(fileName, newFileName);
-			case ReplaceText(_, pos):
+			case ReplaceText(_, pos, _):
 				Assert.equals(fileName, pos.fileName);
-			case InsertText(_, pos):
+			case InsertText(_, pos, _):
 				Assert.equals(fileName, pos.fileName);
 			case RemoveText(pos):
 				Assert.equals(fileName, pos.fileName);
@@ -78,16 +78,16 @@ class TestEditList {
 			case CreateFile(_): 0;
 			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		var offsetB:Int = switch (b.edit) {
 			case CreateFile(_): 0;
 			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		if (offsetA < offsetB) {

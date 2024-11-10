@@ -47,7 +47,7 @@ class ExtractType {
 		changelist.addChange(extractData.newFileName, CreateFile(extractData.newFileName), null);
 
 		// copy file header, type and doc comment into new file
-		changelist.addChange(extractData.newFileName, InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}), null);
+		changelist.addChange(extractData.newFileName, InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}, true), null);
 
 		// find all places using type and update their imports
 		findImportLocations(context, extractData, changelist);
@@ -129,13 +129,22 @@ class ExtractType {
 		if (token == null) {
 			return null;
 		}
-		return switch (token.tok) {
+		switch (token.tok) {
 			case Kwd(KwdAbstract) | Kwd(KwdClass) | Kwd(KwdEnum) | Kwd(KwdInterface) | Kwd(KwdTypedef):
-				token;
+				return token;
 			case Root:
-				null;
+				return null;
 			default:
-				findTypeToken(token.parent);
+		}
+		var token = token.parent;
+		if (token == null) {
+			return null;
+		}
+		switch (token.tok) {
+			case Kwd(KwdAbstract) | Kwd(KwdClass) | Kwd(KwdEnum) | Kwd(KwdInterface) | Kwd(KwdTypedef):
+				return token;
+			default:
+				return null;
 		}
 	}
 
@@ -181,7 +190,7 @@ class ExtractType {
 		final newFullName = oldPackageName + "." + extractData.name;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(oldFullName);
 		for (use in allUses) {
-			changelist.addChange(use.file.name, ReplaceText(newFullName, use.pos), use);
+			changelist.addChange(use.file.name, ReplaceText(newFullName, use.pos, false), use);
 		}
 		allUses = context.nameMap.getIdentifiers(extractData.name);
 		var needsImport:Array<File> = [];
@@ -199,7 +208,7 @@ class ExtractType {
 		final importNewModule = "import " + newFullName + ";\n";
 		for (file in needsImport) {
 			var pos:IdentifierPos = {fileName: file.name, start: file.importInsertPos, end: file.importInsertPos};
-			changelist.addChange(file.name, InsertText(importNewModule, pos), null);
+			changelist.addChange(file.name, InsertText(importNewModule, pos, false), null);
 		}
 	}
 }

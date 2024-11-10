@@ -16,7 +16,7 @@
         "parameterNames": true,
         "parameterTypes": false,
         "functionReturnTypes": true,
-        "conditionals": false
+        "conditionals": true
     },
 	"haxe.importsSortOrder": "stdlib -> libs -> project"
 }

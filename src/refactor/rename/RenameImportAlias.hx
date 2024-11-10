@@ -14,12 +14,12 @@ class RenameImportAlias {
 		var changelist:Changelist = new Changelist(context);
 		for (use in allUses) {
 			if (use.file.name == file.name) {
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos,false), use);
 				continue;
 			}
 			if (isImportHx) {
 				if (use.file.importHxFile.name == file.name) {
-					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 				}
 			}
 		}

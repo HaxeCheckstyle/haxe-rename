@@ -12,7 +12,7 @@ class RenameScopedLocal {
 		var changelist:Changelist = new Changelist(context);
 		var identifierDot:String = identifier.name + ".";
 		var toNameDot:String = context.what.toName + ".";
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, false), identifier);
 
 		var allUses:Array<Identifier> = identifier.defineType.findAllIdentifiers(function(ident:Identifier) {
 			if (ident.pos.start < scopeStart) {
@@ -53,7 +53,7 @@ class RenameScopedLocal {
 						start: use.pos.start,
 						end: use.pos.start
 					};
-					changelist.addChange(use.pos.fileName, InsertText("this.", pos), use);
+					changelist.addChange(use.pos.fileName, InsertText("this.", pos, false), use);
 				case ScopedLocal(_, _):
 					return Promise.reject('local var "${context.what.toName}" exists');
 				default:
@@ -91,7 +91,7 @@ class RenameScopedLocal {
 			}
 			if (use.name == identifier.name) {
 				// exact match
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 			} else {
 				// starts with identifier + "." -> replace only identifier part
 				var pos:IdentifierPos = {
@@ -99,7 +99,7 @@ class RenameScopedLocal {
 					start: use.pos.start,
 					end: use.pos.start + identifier.pos.end - identifier.pos.start
 				};
-				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
 			}
 		}
 		return Promise.resolve(changelist.execute());

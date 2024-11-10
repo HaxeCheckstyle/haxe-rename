@@ -63,11 +63,11 @@ class Changelist {
 						Sys.println('* delete file "$fileName"');
 					case Move(newFileName):
 						Sys.println('* rename to file "$newFileName"');
-					case InsertText(text, pos):
-						Sys.println('* insert text "$text" @${pos.start}-${pos.end}');
+					case InsertText(text, pos, format):
+						Sys.println('* insert text "$text" @${pos.start}-${pos.end}${format ? " with format" : ""}');
 						Sys.println('+++ $text');
-					case ReplaceText(text, pos):
-						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}');
+					case ReplaceText(text, pos, format):
+						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}${format ? " with format" : ""}');
 						printDiffLines(pos, text);
 					case RemoveText(pos):
 						Sys.println('* remove text @${pos.start}-${pos.end}');
@@ -83,16 +83,16 @@ class Changelist {
 			case CreateFile(_): 0;
 			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		var offsetB:Int = switch (b) {
 			case CreateFile(_): 0;
 			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		if (offsetA < offsetB) {

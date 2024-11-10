@@ -9,7 +9,7 @@ class RefactorClassTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeRemoveTestEdit("testcases/classes/ChildClass.hx", 860, 901),
 			makeCreateTestEdit("testcases/classes/ListOfChilds.hx"),
-			makeInsertTestEdit("testcases/classes/ListOfChilds.hx", "package classes;\n\ntypedef ListOfChilds = Array<ChildClass>;", 0),
+			makeInsertTestEdit("testcases/classes/ListOfChilds.hx", "package classes;\n\ntypedef ListOfChilds = Array<ChildClass>;", 0, true),
 			makeInsertTestEdit("testcases/classes/pack/UseChild.hx", "import classes.ListOfChilds;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 873, posEnd: 873}, edits, async);
@@ -28,7 +28,7 @@ class RefactorClassTest extends RefactorTestBase {
 				+ "\t\treturn Promise.resolve(text);\n"
 				+ "\t}\n"
 				+ "}",
-				0),
+				0, true),
 			makeInsertTestEdit("testcases/classes/pack/UsePrinter.hx", "import classes.TextLoader;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/Printer.hx", posStart: 1273, posEnd: 1283}, edits, async);
@@ -47,7 +47,7 @@ class RefactorClassTest extends RefactorTestBase {
 				+ "\tfunction doSomething5(d:Array<String>):Void;\n"
 				+ "\tfunction doSomething6(d:Array<String>):Void;\n"
 				+ "}",
-				0),
+				0, true),
 		];
 		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/BaseClass.hx", posStart: 27, posEnd: 27}, edits, async);
 	}

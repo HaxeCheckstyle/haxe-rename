@@ -51,10 +51,10 @@ class TestBase implements ITest {
 				'Delete $fileName';
 			case Move(newFileName):
 				'Move $newFileName';
-			case ReplaceText(text, pos):
-				'ReplaceText "$text" ${pos.fileName}@${pos.start}-${pos.end}';
-			case InsertText(text, pos):
-				'InsertText "$text" ${pos.fileName}@${pos.start}-${pos.end}';
+			case ReplaceText(text, pos, format):
+				'ReplaceText "$text" ${pos.fileName}@${pos.start}-${pos.end}${format ? " with format" : ""}';
+			case InsertText(text, pos, format):
+				'InsertText "$text" ${pos.fileName}@${pos.start}-${pos.end}${format ? " with format" : ""}';
 			case RemoveText(pos):
 				'RemoveText ${pos.fileName}@${pos.start}-${pos.end}';
 		}
@@ -84,18 +84,18 @@ class TestBase implements ITest {
 		}
 	}
 
-	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int, ?pos:PosInfos):TestEdit {
+	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int, format:Bool = false, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
-			edit: ReplaceText(text, {fileName: fileName, start: start, end: end}),
+			edit: ReplaceText(text, {fileName: fileName, start: start, end: end}, format),
 			pos: pos
 		}
 	}
 
-	function makeInsertTestEdit(fileName:String, text:String, insertPos:Int, ?pos:PosInfos):TestEdit {
+	function makeInsertTestEdit(fileName:String, text:String, insertPos:Int, format:Bool = false, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
-			edit: InsertText(text, {fileName: fileName, start: insertPos, end: insertPos}),
+			edit: InsertText(text, {fileName: fileName, start: insertPos, end: insertPos}, format),
 			pos: pos
 		}
 	}

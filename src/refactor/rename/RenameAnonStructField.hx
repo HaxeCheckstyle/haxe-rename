@@ -13,7 +13,7 @@ class RenameAnonStructField {
 			fields:Array<TypedefFieldType>):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, false), identifier);
 
 		return renameFieldsOfType(context, changelist, identifier.defineType, fields, identifier.name).then(function(result):RefactorResult {
 			return changelist.execute();
@@ -60,7 +60,7 @@ class RenameAnonStructField {
 					continue;
 				case Global | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 		}
 
 		promises.push(findAllExtending(context, changelist, type, fields, fromName));

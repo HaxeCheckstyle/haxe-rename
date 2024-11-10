@@ -1,7 +1,7 @@
 package refactor.cache;
 
-import refactor.discover.TypeList;
 import refactor.discover.NameMap;
+import refactor.discover.TypeList;
 
 interface IFileCache {
 	function save():Void;

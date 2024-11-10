@@ -9,14 +9,14 @@ import refactor.edits.Changelist;
 class RenameHelper {
 	public static function replaceTextWithPrefix(use:Identifier, prefix:String, to:String, changelist:Changelist) {
 		if (prefix.length <= 0) {
-			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos, false), use);
 		} else {
 			var pos:IdentifierPos = {
 				fileName: use.pos.fileName,
 				start: use.pos.start + prefix.length,
 				end: use.pos.end
 			};
-			changelist.addChange(use.pos.fileName, ReplaceText(to, pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(to, pos, false), use);
 		}
 	}
 
@@ -407,12 +407,12 @@ class RenameHelper {
 										case null:
 										case KnownType(type, _):
 											if (use.parent.name == type.name.name) {
-												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 												continue;
 											}
 										case UnknownType(name, _):
 											if (use.parent.name == name) {
-												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 												continue;
 											}
 									}
@@ -474,7 +474,7 @@ class RenameHelper {
 							end: use.pos.end
 						};
 						pos.end = pos.start + fromName.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
+						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
 					}
 				case UnknownType(_, _):
 			}
@@ -504,7 +504,7 @@ class RenameHelper {
 							end: use.pos.end
 						};
 						pos.end = pos.start + fromName.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos), use);
+						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
 					}
 				case UnknownType(_, _):
 			}

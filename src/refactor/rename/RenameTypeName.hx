@@ -21,7 +21,7 @@ class RenameTypeName {
 			changelist.addChange(file.name, Move(newFileName), null);
 		}
 		// replace self
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, false), identifier);
 
 		var allUses:Array<Identifier>;
 		// find all fully qualified modul names of type
@@ -38,6 +38,8 @@ class RenameTypeName {
 			}
 		}
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
+		var type = context.typeList.findTypeName("Index");
+		trace(type);
 
 		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
@@ -69,7 +71,7 @@ class RenameTypeName {
 						return;
 				}
 				if (use.name == identifier.name) {
-					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
 					return;
 				}
 				if (use.name.startsWith('${identifier.name}.')) {
@@ -78,7 +80,7 @@ class RenameTypeName {
 						start: use.pos.start,
 						end: use.pos.start + identifier.name.length
 					}
-					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos), use);
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, newPos, false), use);
 				}
 			}));
 		}
