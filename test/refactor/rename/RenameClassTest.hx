@@ -184,6 +184,10 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 319, 328),
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "JsonImporter", 336, 345),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "JsonImporter", 744, 753),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "JsonImporter", 801, 810),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "JsonImporter", 864, 873),
+			makeReplaceTestEdit("testcases/classes/pack/UseJson.hx", "JsonImporter", 38, 47),
+			makeReplaceTestEdit("testcases/classes/pack/UseJson.hx", "JsonImporter", 165, 174),
 		];
 		checkRename({fileName: "testcases/classes/JsonClass.hx", toName: "JsonImporter", pos: 28}, edits, async);
 	}
@@ -328,5 +332,29 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/Foo.hx", "respRenamed", 182, 186),
 		];
 		checkRename({fileName: "testcases/classes/Foo.hx", toName: "respRenamed", pos: 173}, edits, async);
+	}
+
+	public function testRenamePrinterMainResultArrow(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "resultRenamed", 446, 452),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "resultRenamed", 469, 475),
+		];
+		checkRename({fileName: "testcases/classes/Printer.hx", toName: "resultRenamed", pos: 448}, edits, async);
+	}
+
+	public function testRenamePrinterMainTextArrow(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "textRenamed", 644, 648),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "textRenamed", 669, 673),
+		];
+		checkRename({fileName: "testcases/classes/Printer.hx", toName: "textRenamed", pos: 645}, edits, async);
+	}
+
+	public function testRenamePrinterMainResultArrow2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "resultRenamed", 831, 837),
+			makeReplaceTestEdit("testcases/classes/Printer.hx", "resultRenamed", 854, 860),
+		];
+		checkRename({fileName: "testcases/classes/Printer.hx", toName: "resultRenamed", pos: 833}, edits, async);
 	}
 }

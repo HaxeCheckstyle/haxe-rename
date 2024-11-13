@@ -4,20 +4,34 @@ import refactor.discover.File;
 import refactor.refactor.CanRefactorContext.ByteToCharConverterFunc;
 
 class RefactorHelper {
-	public static function findTokenAtPos(token:TokenTree, searchPos:Int):Null<TokenTree> {
-		if (!token.hasChildren()) {
-			return null;
+	public static function findTokensAtPos(root:TokenTree, searchPos:Int):TokensAtPos {
+		var tokens:TokensAtPos = {
+			before: null,
+			after: null
 		}
-		if (token.pos.min <= searchPos && token.pos.max > searchPos) {
-			return token;
-		}
-		for (child in token.children) {
-			var range = child.getPos();
-			if (range.min <= searchPos && range.max > searchPos) {
-				return findTokenAtPos(child, searchPos);
+		var distanceBefore:Int = 10000;
+		var distanceAfter:Int = 10000;
+
+		root.filterCallback(function(token:TokenTree, index:Int):FilterResult {
+			if (token.pos.min <= searchPos) {
+				var distance = searchPos - token.pos.max;
+				if (distanceBefore > distance) {
+					tokens.before = token;
+					distanceBefore = distance;
+				}
 			}
-		}
-		return null;
+
+			if (token.pos.max >= searchPos) {
+				var distance = token.pos.min - searchPos;
+				if (distanceAfter > distance) {
+					tokens.after = token;
+					distanceAfter = distance;
+				}
+			}
+			return GoDeeper;
+		});
+
+		return tokens;
 	}
 
 	public static function extractText(converter:ByteToCharConverterFunc, text:String, start:Int, end:Int):String {
@@ -121,4 +135,9 @@ class RefactorHelper {
 		});
 		return headers.shift();
 	}
+}
+
+typedef TokensAtPos = {
+	var before:Null<TokenTree>;
+	var after:Null<TokenTree>;
 }

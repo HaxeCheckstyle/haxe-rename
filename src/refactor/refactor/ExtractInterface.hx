@@ -6,6 +6,7 @@ import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractInterface {
 	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
@@ -65,13 +66,13 @@ class ExtractInterface {
 			return null;
 		}
 
-		final token:Null<TokenTree> = RefactorHelper.findTokenAtPos(root, context.what.posStart);
-		if (token == null) {
+		final tokens:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posStart);
+		if (tokens.before == null || tokens.after == null || tokens.before.index != tokens.after.index) {
 			return null;
 		}
 		final firstImport:Null<TokenTree> = RefactorHelper.findFirstImport(root);
 
-		final classToken:Null<TokenTree> = token.access().parent().matches(Kwd(KwdClass)).token;
+		final classToken:Null<TokenTree> = tokens.before.access().parent().matches(Kwd(KwdClass)).token;
 		if (classToken == null) {
 			return null;
 		}

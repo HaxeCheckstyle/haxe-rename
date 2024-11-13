@@ -44,4 +44,13 @@ class UseChild {
 	}
 
 	function json(json:JsonClass) {}
+
+	private function doSwitch(action:String):JsonClass {
+		return switch (action) {
+			case "test":
+				new JsonClass(1, "test", 2);
+			default:
+				null;
+		}
+	}
 }

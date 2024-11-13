@@ -895,6 +895,7 @@ class UsageCollector {
 		var parent:TokenTree = nameToken.parent;
 
 		var lastNamePart:TokenTree = nameToken;
+		var parameterList:Array<Identifier> = [];
 
 		function findAllNames(parentPart:TokenTree) {
 			if (!parentPart.hasChildren()) {
@@ -932,6 +933,9 @@ class UsageCollector {
 						if (TokenTreeCheckUtils.isTypeParameter(child)) {
 							typeParamLt = child;
 						}
+					case Arrow:
+						var scopePos = child.getPos();
+						type = ScopedLocal(nameToken.pos.min, scopePos.max, Parameter(parameterList));
 					case POpen:
 						if (type.match(Access)) {
 							if (parent.matches(Kwd(KwdNew))) {
@@ -981,6 +985,7 @@ class UsageCollector {
 		if (identifier == null) {
 			identifier = new Identifier(type, name, pos, context.nameMap, context.file, context.type);
 		}
+		parameterList.push(identifier);
 
 		if (parentIdentifier != null) {
 			parentIdentifier.addUse(identifier);

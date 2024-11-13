@@ -10,6 +10,7 @@ import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractType {
 	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
@@ -73,13 +74,13 @@ class ExtractType {
 			return null;
 		}
 
-		final token:Null<TokenTree> = RefactorHelper.findTokenAtPos(root, context.what.posStart);
-		if (token == null) {
+		final tokens:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posStart);
+		if (tokens.before == null || tokens.after == null || tokens.before.index != tokens.after.index) {
 			return null;
 		}
 		final firstImport:Null<TokenTree> = RefactorHelper.findFirstImport(root);
 
-		final typeToken:Null<TokenTree> = findTypeToken(token);
+		final typeToken:Null<TokenTree> = findTypeToken(tokens.before);
 		if (typeToken == null) {
 			return null;
 		}
