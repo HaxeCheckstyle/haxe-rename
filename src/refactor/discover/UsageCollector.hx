@@ -793,10 +793,10 @@ class UsageCollector {
 	}
 
 	function readCaseConst(context:UsageContext, identifier:Identifier, token:TokenTree, scopeEnd:Int) {
+		var caseIdent:Identifier = makeIdentifier(context, token, CaseLabel(identifier), identifier);
 		if (!token.hasChildren()) {
 			return;
 		}
-		var caseIdent:Identifier = makeIdentifier(context, token, CaseLabel(identifier), identifier);
 		var pOpen:Array<TokenTree> = token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case POpen:

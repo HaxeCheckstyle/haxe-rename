@@ -13,7 +13,7 @@ class RenameField {
 		var changelist:Changelist = new Changelist(context);
 
 		var packName:String = file.getPackage();
-		var types:Array<Type> = RenameHelper.findDescendantTypes(context, packName, identifier.defineType);
+		var types:Array<Type> = TypingHelper.findDescendantTypes(context, packName, identifier.defineType);
 
 		types.push(identifier.defineType);
 		var changes:Array<Promise<Void>> = [];

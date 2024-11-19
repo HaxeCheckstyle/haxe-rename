@@ -1,7 +1,7 @@
 package refactor;
 
-import refactor.rename.RenameHelper.TypeHintType;
+import refactor.discover.Type;
 
 interface ITypeList {
-	function makeTypeHintType(name:String):TypeHintType;
+	function getType(fullName:String):Null<Type>;
 }

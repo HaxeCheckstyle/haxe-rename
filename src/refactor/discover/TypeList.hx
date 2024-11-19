@@ -1,6 +1,6 @@
 package refactor.discover;
 
-import refactor.rename.RenameHelper.TypeHintType;
+import refactor.TypingHelper.TypeHintType;
 
 class TypeList implements ITypeList {
 	public final types:Map<String, Type>;
@@ -17,9 +17,9 @@ class TypeList implements ITypeList {
 		return Lambda.filter({iterator: types.iterator}, (t) -> t.name.name == name);
 	}
 
-	public function makeTypeHintType(name:String):Null<TypeHintType> {
-		if (types.exists(name)) {
-			return KnownType(types.get(name), []);
+	public function getType(fullName:String):Null<Type> {
+		if (types.exists(fullName)) {
+			return types.get(fullName);
 		}
 		return null;
 	}

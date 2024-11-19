@@ -2,12 +2,12 @@ package refactor.rename;
 
 import haxe.io.Path;
 import refactor.RefactorResult;
+import refactor.TypingHelper;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 import refactor.rename.RenameContext;
-import refactor.rename.RenameHelper.TypeHintType;
 
 class RenameTypeName {
 	public static function refactorTypeName(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
@@ -39,7 +39,6 @@ class RenameTypeName {
 		}
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
 		var type = context.typeList.findTypeName("Index");
-		trace(type);
 
 		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
@@ -56,18 +55,20 @@ class RenameTypeName {
 				case Global | SamePackage | Imported | StarImported:
 			}
 			final searchName:String = if (use.name.startsWith(identifier.name)) identifier.name; else identifier.defineType.fullModuleName;
-			changes.push(RenameHelper.findTypeOfIdentifier(context, {
+			changes.push(TypingHelper.findTypeOfIdentifier(context, {
 				name: searchName,
 				pos: use.pos.start,
 				defineType: use.defineType
 			}).then(function(typeHint:TypeHintType) {
 				switch (typeHint) {
 					case null:
-					case KnownType(type, _):
+					case ClasspathType(type, _):
 						if (type.fullModuleName != identifier.defineType.fullModuleName) {
 							return;
 						}
-					case UnknownType(_):
+					case LibType(_) | UnknownType(_):
+						return;
+					case StructType(_) | FunctionType(_, _):
 						return;
 				}
 				if (use.name == identifier.name) {

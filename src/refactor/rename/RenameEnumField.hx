@@ -40,11 +40,11 @@ class RenameEnumField {
 		for (use in allUses) {
 			switch (use.type) {
 				case CaseLabel(switchIdentifier):
-					changes.push(RenameHelper.matchesType(context, {
+					changes.push(TypingHelper.matchesType(context, {
 						name: switchIdentifier.name,
 						pos: switchIdentifier.pos.start,
 						defineType: switchIdentifier.defineType
-					}, KnownType(identifier.defineType, [])).then(function(matched:Bool) {
+					}, ClasspathType(identifier.defineType, [])).then(function(matched:Bool) {
 						if (matched) {
 							RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
 						}

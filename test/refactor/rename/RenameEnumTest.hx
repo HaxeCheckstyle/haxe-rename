@@ -34,6 +34,9 @@ class RenameEnumTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/enums/IdentifierType.hx", "FunctionCall", 53, 57),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 178, 182),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 211, 215),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1101, 1105),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1395, 1399),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1702, 1706),
 		];
 		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "FunctionCall", pos: 55}, edits, async);
 	}
