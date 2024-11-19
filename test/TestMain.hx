@@ -1,4 +1,5 @@
 import refactor.refactor.RefactorClassTest;
+import refactor.refactor.RefactorExtractMethodTest;
 import refactor.refactor.RefactorTypedefTest;
 import refactor.rename.RenameClassTest;
 import refactor.rename.RenameEnumTest;
@@ -24,6 +25,7 @@ class TestMain {
 			new RenameTypedefTest(),
 			new RefactorClassTest(),
 			new RefactorTypedefTest(),
+			new RefactorExtractMethodTest(),
 		];
 		var runner:Runner = new Runner();
 

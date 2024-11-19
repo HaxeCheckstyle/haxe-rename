@@ -151,7 +151,7 @@ class RenameClassTest extends RenameTestBase {
 		checkRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "position", pos: 254}, edits, async);
 	}
 
-	// requires external typer since built-in will not resolve array access
+	// TODO requires external typer since built-in will not resolve array access
 	// public function testRenameIdentifierName(async:Async) {
 	// 	var edits:Array<TestEdit> = [
 	// 		makeReplaceTestEdit("testcases/classes/ChildClass.hx", "id", 454, 458),
@@ -161,8 +161,9 @@ class RenameClassTest extends RenameTestBase {
 	// 		makeReplaceTestEdit("testcases/classes/ChildClass.hx", "id", 796, 800),
 	// 		makeReplaceTestEdit("testcases/classes/MyIdentifier.hx", "id", 228, 232),
 	// 	];
-	// 	refactorAndCheck({fileName: "testcases/classes/MyIdentifier.hx", toName: "id", pos: 229}, edits, async);
+	// 	checkRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "id", pos: 229}, edits, async);
 	// }
+
 	public function testRenameJsonClassWidth(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "jsonWidth", 72, 77),

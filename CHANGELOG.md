@@ -2,16 +2,18 @@
 
 ## dev branch / next version (2.x.x)
 
-## 2.4.0 (2024-11-)
+## 2.4.0 (2024-)
 
 - added invalidateFile / removeFile to allow rescan in case of file changes or deletion
 - added support for create and delete file operations as edits
 - added ExtractType refactor module
 - added ExtractInterface refactor module
+- added ExtractMethod refactor module
 - changed Refactor class to Rename
 - changed getFullModulName call to fullModuleName property
 - fixed type name renaming not changing in use locations
 - fixed discovery of arrow functions as type hints
+- refactored typehint data structure
 
 ## 2.3.1 (2024-11-01)
 
