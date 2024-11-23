@@ -23,10 +23,10 @@ class RefactorClassTest extends RefactorTestBase {
 				"package classes;\n\n"
 				+ "import js.lib.Promise;\n\n"
 				+ "class TextLoader {\n"
-				+ "\tpublic function new() {}\n\n"
-				+ "\tpublic function load(text:String):Promise<String> {\n"
-				+ "\t\treturn Promise.resolve(text);\n"
-				+ "\t}\n"
+				+ "	public function new() {}\n\n"
+				+ "	public function load(text:String):Promise<String> {\n"
+				+ "		return Promise.resolve(text);\n"
+				+ "	}\n"
 				+ "}",
 				0, true),
 			makeInsertTestEdit("testcases/classes/pack/UsePrinter.hx", "import classes.TextLoader;\n", 23),
@@ -41,11 +41,11 @@ class RefactorClassTest extends RefactorTestBase {
 			makeInsertTestEdit("testcases/classes/IBaseClass.hx",
 				"package classes;\n\n"
 				+ "interface IBaseClass {\n"
-				+ "\tfunction doSomething(data:Array<String>):Void;\n"
-				+ "\tfunction doSomething3(d:Array<String>):Void;\n"
-				+ "\tfunction doSomething4(d:Array<String>):Void;\n"
-				+ "\tfunction doSomething5(d:Array<String>):Void;\n"
-				+ "\tfunction doSomething6(d:Array<String>):Void;\n"
+				+ "	function doSomething(data:Array<String>):Void;\n"
+				+ "	function doSomething3(d:Array<String>):Void;\n"
+				+ "	function doSomething4(d:Array<String>):Void;\n"
+				+ "	function doSomething5(d:Array<String>):Void;\n"
+				+ "	function doSomething6(d:Array<String>):Void;\n"
 				+ "}",
 				0, true),
 		];

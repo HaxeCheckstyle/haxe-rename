@@ -138,7 +138,7 @@ class TypingHelper {
 
 	public static function findTypeWithTyper(context:CacheAndTyperContext, fileName:String, pos:Int):Promise<Null<TypeHintType>> {
 		if (context.typer == null) {
-			return Promise.reject("no typer");
+			return Promise.reject("no typer for " + fileName + "@" + pos);
 		}
 		return context.typer.resolveType(fileName, pos);
 	}
@@ -421,12 +421,6 @@ typedef SearchTypeOf = {
 	var name:String;
 	var pos:Int;
 	var defineType:Type;
-}
-
-enum TypeHintTypeOld {
-	ClasspathType(type:Type, typeParams:String);
-	LibType(name:String, typeParams:String);
-	UnknownType(name:String);
 }
 
 enum TypeHintType {

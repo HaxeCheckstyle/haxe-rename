@@ -2,8 +2,6 @@ package refactor.refactor;
 
 import haxe.Exception;
 import haxe.PosInfos;
-import haxe.io.Path;
-import js.html.AbortController;
 import js.lib.Promise;
 import byte.ByteData;
 import haxeparser.HaxeLexer;
@@ -90,7 +88,7 @@ class RefactorTestBase extends TestBase {
 			verboseLog: function(text:String, ?pos:PosInfos) {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
-			typer: null,
+			typer: typer,
 			converter: (string, byteOffset) -> byteOffset,
 			fileReader: testFileReader,
 		}).then(function(success:RefactorResult) {

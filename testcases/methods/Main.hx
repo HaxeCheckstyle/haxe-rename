@@ -54,6 +54,22 @@ class Main {
 
 		// ...
 	}
+
+	public function calculateTotal2(items:Array<Item>):Float {
+		var total:Float = 0;
+
+		// Selected code block to extract
+		for (item in items) {
+			var price = item.price;
+			var quantity = item.quantity;
+			if (quantity < 0) {
+				return total;
+			}
+			total += price * quantity;
+		}
+
+		return total;
+	}
 }
 
 typedef Item = {

@@ -5,6 +5,12 @@ import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
+import refactor.refactor.refactormethod.CodeGenAsExpression;
+import refactor.refactor.refactormethod.CodeGenEmptyReturn;
+import refactor.refactor.refactormethod.CodeGenNoReturn;
+import refactor.refactor.refactormethod.CodeGenOpenEnded;
+import refactor.refactor.refactormethod.CodeGenReturnIsLast;
+import refactor.refactor.refactormethod.ICodeGen;
 
 class ExtractMethod {
 	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
@@ -18,45 +24,60 @@ class ExtractMethod {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractMethodData(context);
 		if (extractData == null) {
-			return Promise.reject("failed to collect extract method data");
+			return Promise.resolve(RefactorResult.Unsupported("failed to collect extract method data"));
 		}
 		final changelist:Changelist = new Changelist(context);
 
-		var neededIdentifiers:Array<Identifier> = findParameters(extractData, context);
+		// identifier of top-level containing function
+		final functionIdentifier = getFunctionIdentifier(extractData, context);
+		if (functionIdentifier == null) {
+			return Promise.resolve(RefactorResult.Unsupported("failed to find identifier of containing function"));
+		}
 
-		var returnType = findReturnType(extractData, context, neededIdentifiers);
-		if (returnType == Invalid) {
-			return Promise.reject("could not extract method from selected code");
+		// find all parameters for extracted method
+		// e.g. all scoped vars used inside selected code
+		var neededIdentifiers:Array<Identifier> = findParameters(extractData, context, functionIdentifier);
+
+		// determine type of selected code
+		var codeGen:Null<ICodeGen> = findCodeGen(extractData, context, functionIdentifier, neededIdentifiers);
+		if (codeGen == null) {
+			return Promise.resolve(RefactorResult.Unsupported("could not extract method from selected code - no codegen"));
 		}
 
 		var parameterList:String = "";
 		var returnTypeHint:String = "";
 
+		// resolve all parameter types either from typehint or using a hover request with Haxe server
 		var parameterPromise = Promise.all(makeParameterList(extractData, context, neededIdentifiers)).then(function(params):Promise<Bool> {
 			parameterList = params.join(", ");
 			return Promise.resolve(true);
 		});
-		var returnHintPromise = makeReturnTypeHint(extractData, context, returnType).then(function(typeHint) {
+		// resolve function return typehint
+
+		var returnHintPromise = codeGen.makeReturnTypeHint().then(function(typeHint) {
 			returnTypeHint = typeHint;
 			return Promise.resolve(true);
 		});
 
+		// all necessary types resolved
 		return Promise.all([parameterPromise, returnHintPromise]).then(function(_) {
-			final extractedCall:String = makeCallSite(extractData, context, neededIdentifiers, returnType);
-
-			final staticModifier = extractData.isStatic ? "static " : "";
-
-			final functionDefinition:String = '${staticModifier}function ${extractData.newMethodName}($parameterList)$returnTypeHint';
-			final body:String = makeBody(extractData, context, returnType);
+			// replace selected code with call to newly extracted method
+			final extractedCall:String = codeGen.makeCallSite();
 
 			changelist.addChange(context.what.fileName,
 				ReplaceText(extractedCall, {fileName: context.what.fileName, start: extractData.startToken.pos.min, end: extractData.endToken.pos.max}, true),
 				null);
 
+			// insert new method with function signature and body after current function
+			final staticModifier = extractData.isStatic ? "static " : "";
+			final functionDefinition:String = '${staticModifier}function ${extractData.newMethodName}($parameterList)$returnTypeHint';
+			final body:String = codeGen.makeBody();
+
 			changelist.addChange(context.what.fileName,
 				InsertText(functionDefinition + body, {fileName: context.what.fileName, start: extractData.newMethodOffset, end: extractData.newMethodOffset},
 					true),
 				null);
+
 			return changelist.execute();
 		});
 	}
@@ -83,6 +104,7 @@ class ExtractMethod {
 		if (file == null) {
 			return null;
 		}
+		// find corresponding tokens in tokentree, selection start/end in whitespace
 		final tokensStart:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posStart);
 		final tokensEnd:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posEnd);
 		if (tokensStart.after == null) {
@@ -101,6 +123,7 @@ class ExtractMethod {
 		if (tokenStart.index >= tokenEnd.index) {
 			return null;
 		}
+		// currently not supporting extracting an inner function
 		switch (tokenStart.tok) {
 			case Kwd(KwdFunction):
 				return null;
@@ -115,9 +138,12 @@ class ExtractMethod {
 			return null;
 		}
 
+		// extracting only works if parent of start token is also grand…parent of end token
 		if (!shareSameParent(tokenStart, tokenEnd)) {
 			return null;
 		}
+
+		// find top-level containing function
 		var parentFunction:Null<TokenTree> = findParentFunction(tokenStart);
 		if (parentFunction == null) {
 			return null;
@@ -135,6 +161,8 @@ class ExtractMethod {
 			return null;
 		}
 		final newMethodOffset = lastToken.pos.max + 1;
+
+		// suggest name + Extract for new method name
 		final nameToken:Null<TokenTree> = parentFunction.getFirstChild();
 		if (nameToken == null) {
 			return null;
@@ -155,35 +183,33 @@ class ExtractMethod {
 		};
 	}
 
-	static function findParameters(extractData:ExtractMethodData, context:RefactorContext) {
+	static function shareSameParent(tokenA:TokenTree, tokenB:TokenTree):Bool {
+		var parentA = tokenA.parent;
+		if (parentA == null) {
+			return false;
+		}
+		var parentB = tokenB.parent;
+		while (true) {
+			if (parentB == null) {
+				return false;
+			}
+			if (parentA.index == parentB.index) {
+				return true;
+			}
+			parentB = parentB.parent;
+		}
+	}
+
+	static function getFunctionIdentifier(extractData:ExtractMethodData, context:RefactorContext):Null<Identifier> {
 		final file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
-			return [];
+			return null;
 		}
-		final functionIdentifier = file.getIdentifier(extractData.functionToken.getFirstChild().pos.min);
-		if (functionIdentifier == null) {
-			return [];
-		}
-		final allIdentifiersBefore = functionIdentifier.findAllIdentifiers(identifier -> {
-			if ((identifier.pos.start < extractData.functionToken.pos.min) || (identifier.pos.start >= extractData.startToken.pos.min)) {
-				return false;
-			}
-			if (identifier.name.contains(".")) {
-				return false;
-			}
-			switch (identifier.type) {
-				case ScopedLocal(scopeStart, scopeEnd, _):
-					if (scopeEnd <= extractData.startToken.pos.min) {
-						return false;
-					}
-					if (scopeStart > extractData.endToken.pos.max) {
-						return false;
-					}
-					return true;
-				default:
-					return false;
-			}
-		});
+		return file.getIdentifier(extractData.functionToken.getFirstChild().pos.min);
+	}
+
+	static function findParameters(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier) {
+		final allIdentifiersBefore = getScopedBeforeSelected(extractData, context, functionIdentifier);
 
 		final scopedInside:Array<Identifier> = [];
 		final allUsesInside = functionIdentifier.findAllIdentifiers(identifier -> {
@@ -237,26 +263,53 @@ class ExtractMethod {
 		return neededIdentifiers;
 	}
 
-	static function shareSameParent(tokenA:TokenTree, tokenB:TokenTree):Bool {
-		var parentA = tokenA.parent;
-		if (parentA == null) {
-			return false;
-		}
-		var parentB = tokenB.parent;
-		while (true) {
-			if (parentB == null) {
+	static function getScopedBeforeSelected(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier):Array<Identifier> {
+		return functionIdentifier.findAllIdentifiers(identifier -> {
+			if ((identifier.pos.start < extractData.functionToken.pos.min) || (identifier.pos.start >= extractData.startToken.pos.min)) {
 				return false;
 			}
-			if (parentA.index == parentB.index) {
-				return true;
+			if (identifier.name.contains(".")) {
+				return false;
 			}
-			parentB = parentB.parent;
-		}
+			switch (identifier.type) {
+				case ScopedLocal(scopeStart, scopeEnd, _):
+					if (scopeEnd <= extractData.startToken.pos.min) {
+						return false;
+					}
+					if (scopeStart > extractData.endToken.pos.max) {
+						return false;
+					}
+					return true;
+				default:
+					return false;
+			}
+		});
+	}
+
+	static function getScopedInsideSelected(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier):Array<Identifier> {
+		return functionIdentifier.findAllIdentifiers(identifier -> {
+			if ((identifier.pos.start < extractData.startToken.pos.min) || (identifier.pos.start > extractData.endToken.pos.min)) {
+				return false;
+			}
+			switch (identifier.type) {
+				case ScopedLocal(_):
+					return true;
+				default:
+			}
+			return false;
+		});
 	}
 
 	static function isSingleExpression(tokenStart:TokenTree, tokenEnd:TokenTree):Bool {
 		var fullPos = tokenStart.getPos();
-		return (tokenEnd.pos.min >= fullPos.min) && (tokenEnd.pos.max <= fullPos.max);
+		if ((tokenEnd.pos.min >= fullPos.min) && (tokenEnd.pos.max <= fullPos.max)) {
+			return true;
+		}
+		if (tokenEnd.matches(Semicolon)) {
+			return (tokenEnd.pos.min == fullPos.max);
+		}
+
+		return false;
 	}
 
 	static function findParentFunction(token:TokenTree):Null<TokenTree> {
@@ -272,17 +325,20 @@ class ExtractMethod {
 		return null;
 	}
 
-	static function findReturnType(extractData:ExtractMethodData, context:RefactorContext, neededParams:Array<Identifier>):ReturnType {
+	static function findCodeGen(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier,
+			neededIdentifiers:Array<Identifier>):Null<ICodeGen> {
 		final assignedVars:Array<String> = [];
 		final parent = extractData.startToken.parent;
 
 		if (usedAsExpression(parent)) {
 			if (extractData.isSingleExpr) {
-				return ReturnAsExpression;
+				return new CodeGenAsExpression(extractData, context, neededIdentifiers);
 			} else {
-				return Invalid;
+				return null;
 			}
 		}
+
+		final leakingVars = findAdditionalScopedVars(extractData, context, functionIdentifier, neededIdentifiers);
 
 		final allReturns = parent.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			if (token.pos.max < extractData.startToken.pos.min) {
@@ -312,44 +368,108 @@ class ExtractMethod {
 		if (allReturns.length > 0) {
 			var lastReturn = allReturns[allReturns.length - 1];
 			if (isSingleExpression(lastReturn, extractData.endToken)) {
-				return ReturnIsLast(lastReturn);
+				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers, lastReturn);
 			}
 		}
 
 		final modifiedIdentifiers:Array<Identifier> = [];
-		for (identifier in neededParams) {
+		for (identifier in neededIdentifiers) {
 			if (assignedVars.contains(identifier.name)) {
 				modifiedIdentifiers.push(identifier);
-				trace(identifier.name + " modified");
 			}
 		}
 
 		if (allReturns.length == 0) {
-			return NoReturn(modifiedIdentifiers);
+			return new CodeGenNoReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);
 		}
 		for (ret in allReturns) {
 			var child = ret.getFirstChild();
 			if (child == null) {
-				return Invalid;
+				trace("xxx");
+				return null;
 			}
 			switch (child.tok) {
 				case Semicolon:
-					return EmptyReturn(modifiedIdentifiers);
+					return new CodeGenEmptyReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);
 				default:
 					if (modifiedIdentifiers.length > 0) {
-						return Invalid;
+						trace("xxx");
+						return null;
 					}
-					return OpenEndedReturn(allReturns);
+					return new CodeGenOpenEnded(extractData, context, neededIdentifiers, allReturns);
 			}
 		}
-		return Invalid;
+		trace("xxx");
+		return null;
+	}
+
+	static function findAdditionalScopedVars(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier,
+			neededParams:Array<Identifier>):Array<Identifier> {
+		// find all scoped identifiers that are valid beyond user's selection
+		final allVarsInsideSelection = getScopedInsideSelected(extractData, context, functionIdentifier);
+		final varsValidAfterSelection:Map<String, Identifier> = new Map<String, Identifier>();
+		for (identifier in allVarsInsideSelection) {
+			switch (identifier.type) {
+				case ScopedLocal(scopeStart, scopeEnd, _):
+					if (scopeEnd > context.what.posEnd) {
+						varsValidAfterSelection.set(identifier.name, identifier);
+					}
+				default:
+			}
+		}
+
+		// find all identifier uses after user's selection that share same name
+		final varShadows:Map<String, Identifier> = new Map<String, Identifier>();
+		final allIdentifierUses:Array<Identifier> = functionIdentifier.findAllIdentifiers(identifier -> {
+			if (identifier.pos.start < extractData.endToken.pos.max) {
+				return false;
+			}
+			final parts = identifier.name.split(".");
+			final part = parts.shift();
+			if (!varsValidAfterSelection.exists(part)) {
+				return false;
+			}
+			final scoped:Identifier = varsValidAfterSelection.get(part);
+			switch (scoped.type) {
+				case ScopedLocal(_, scopeEnd, _):
+					if (identifier.pos.start > scopeEnd) {
+						return false;
+					}
+				default:
+					return false;
+			}
+			switch (identifier.type) {
+				case ScopedLocal(_):
+					// new scoped identifier that shadows the one from selection
+					varShadows.set(identifier.name, identifier);
+					return false;
+				default:
+			}
+			return true;
+		});
+
+		// apply shadows
+		final scopedVarUses:Array<Identifier> = [];
+		for (use in allIdentifierUses) {
+			final parts = use.name.split(".");
+			final part = parts.shift();
+			if (varShadows.exists(part)) {
+				final shadow = varShadows.get(part);
+				if ((use.pos.start >= shadow.pos.start) && (use.pos.end <= shadow.pos.end)) {
+					continue;
+				}
+			}
+			scopedVarUses.push(varsValidAfterSelection.get(part));
+			trace("leaking " + varsValidAfterSelection.get(part));
+		}
+		return scopedVarUses;
 	}
 
 	static function makeParameterList(extractData:ExtractMethodData, context:RefactorContext, neededIdentifiers:Array<Identifier>):Array<Promise<String>> {
 		var promises:Array<Promise<String>> = [];
 		for (identifier in neededIdentifiers) {
 			final promise = findTypeOfIdentifier(context, identifier).then(function(typeHint):Promise<String> {
-				trace("typehint resolved: " + PrintHelper.typeHintToString(typeHint));
+				trace("typehint resolved: " + identifier + " " + PrintHelper.typeHintToString(typeHint));
 				return Promise.resolve(buildParameter(identifier, typeHint));
 			});
 
@@ -358,7 +478,7 @@ class ExtractMethod {
 		return promises;
 	}
 
-	static function findTypeOfIdentifier(context:RefactorContext, identifier:Identifier):Promise<TypeHintType> {
+	public static function findTypeOfIdentifier(context:RefactorContext, identifier:Identifier):Promise<TypeHintType> {
 		var hint = identifier.getTypeHint();
 		if (hint != null) {
 			return TypingHelper.typeFromTypeHint(context, hint);
@@ -368,195 +488,6 @@ class ExtractMethod {
 			pos: identifier.pos.end - 1,
 			defineType: identifier.defineType
 		});
-	}
-
-	static function makeCallSite(extractData:ExtractMethodData, context:RefactorContext, neededIdentifiers:Array<Identifier>, returnType:ReturnType):String {
-		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
-		return switch (returnType) {
-			case NoReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						'${extractData.newMethodName}($callParams);\n';
-					case 1:
-						'${assignments[0].name} = ${extractData.newMethodName}($callParams);\n';
-					default:
-						final assignData = assignments.map(a -> '${a.name} = data.${a.name};').join("\n");
-						'{\nfinal data = ${extractData.newMethodName}($callParams);\n' + assignData + "}\n";
-				}
-			case ReturnAsExpression:
-				'${extractData.newMethodName}($callParams)';
-			case ReturnIsLast(_):
-				'return ${extractData.newMethodName}($callParams);\n';
-			case EmptyReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						'if (!${extractData.newMethodName}($callParams)) {\nreturn;\n}\n';
-					case 1:
-						'switch (${extractData.newMethodName}($callParams)) {\n'
-						+ 'case None:\n'
-						+ 'return;\n'
-						+ 'case Some(data):\n'
-						+ '${assignments[0].name} = data;\n}\n';
-					default:
-						final assignData = assignments.map(a -> '${a.name} = data.${a.name};').join("\n");
-						'{\nfinal data =${extractData.newMethodName}($callParams);\n' + assignData + "}\n";
-						'switch (${extractData.newMethodName}($callParams)) {\n'
-						+ 'case None:\n'
-						+ 'return;\n'
-						+ 'case Some(data):\n'
-						+ '${assignData}}\n';
-				}
-			case OpenEndedReturn(_):
-				'switch (${extractData.newMethodName}($callParams)) {\n'
-				+ 'case None:\n'
-				+ 'case Some(data):\n'
-				+ 'return data;\n}\n';
-			case Invalid:
-				"";
-		}
-	}
-
-	static function makeReturnTypeHint(extractData:ExtractMethodData, context:RefactorContext, returnType:ReturnType):Promise<String> {
-		switch (returnType) {
-			case NoReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						return Promise.resolve(":Void");
-					case 1:
-						return findTypeOfIdentifier(context, assignments[0]).then(function(typeHint):Promise<String> {
-							if (typeHint == null) {
-								return Promise.resolve("");
-							}
-							return Promise.resolve(":" + typeHint.printTypeHint());
-						});
-					default:
-						var promises:Array<Promise<String>> = [];
-						for (assign in assignments) {
-							promises.push(findTypeOfIdentifier(context, assign).then(function(typeHint):Promise<String> {
-								if (typeHint == null) {
-									return Promise.resolve(assign.name + ":Any");
-								}
-								return Promise.resolve(":" + typeHint.printTypeHint());
-							}));
-						}
-						return Promise.all(promises).then(function(fields) {
-							return Promise.resolve(":{" + fields.join(", ") + "}");
-						});
-				}
-			case ReturnAsExpression:
-				return TypingHelper.findTypeWithTyper(context, context.what.fileName, extractData.endToken.pos.max - 1)
-					.then(function(typeHint):Promise<String> {
-						if (typeHint == null) {
-							return Promise.resolve("");
-						}
-						return Promise.resolve(":" + typeHint.printTypeHint());
-					});
-			case ReturnIsLast(lastReturnToken):
-				final pos = lastReturnToken.getPos();
-				return TypingHelper.findTypeWithTyper(context, context.what.fileName, pos.max - 2).then(function(typeHint):Promise<String> {
-					if (typeHint == null) {
-						return Promise.resolve("");
-					}
-					return Promise.resolve(":" + typeHint.printTypeHint());
-				});
-			case EmptyReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						return Promise.resolve(":Bool");
-					case 1:
-						return findTypeOfIdentifier(context, assignments[0]).then(function(typeHint):Promise<String> {
-							if (typeHint == null) {
-								return Promise.resolve("");
-							}
-							return Promise.resolve(":haxe.ds.Option<" + typeHint.printTypeHint() + ">");
-						});
-					default:
-						var promises:Array<Promise<String>> = [];
-						for (assign in assignments) {
-							promises.push(findTypeOfIdentifier(context, assign).then(function(typeHint):Promise<String> {
-								if (typeHint == null) {
-									return Promise.resolve(assign.name + ":Any");
-								}
-								return Promise.resolve(":" + typeHint.printTypeHint());
-							}));
-						}
-						return Promise.all(promises).then(function(fields) {
-							return Promise.resolve(":haxe.ds.Option<{" + fields.join(", ") + "}>");
-						});
-				}
-			case OpenEndedReturn(returnTokens):
-				var token = returnTokens.shift();
-				if (token == null) {
-					return Promise.resolve("");
-				}
-				final pos = token.getPos();
-				return TypingHelper.findTypeWithTyper(context, context.what.fileName, pos.max - 2).then(function(typeHint):Promise<String> {
-					if (typeHint == null) {
-						return Promise.resolve("");
-					}
-					return Promise.resolve(":haxe.ds.Option<" + typeHint.printTypeHint() + ">");
-				});
-			case Invalid:
-				return Promise.resolve("");
-		}
-		return Promise.resolve("");
-	}
-
-	static function makeBody(extractData:ExtractMethodData, context:RefactorContext, returnType:ReturnType):String {
-		final selectedSnippet = RefactorHelper.extractText(context.converter, extractData.content, extractData.startToken.pos.min,
-			extractData.endToken.pos.max);
-		return switch (returnType) {
-			case NoReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						" {\n" + selectedSnippet + "\n}\n";
-					case 1:
-						final returnAssigmentVar = '\nreturn ${assignments[0].name};';
-						" {\n" + selectedSnippet + returnAssigmentVar + "\n}\n";
-					default:
-						final returnAssigments = "\nreturn {\n" + assignments.map(a -> '${a.name}: ${a.name},\n') + "};";
-						" {\n" + selectedSnippet + returnAssigments + "\n}\n";
-				}
-			case ReturnAsExpression:
-				" {\n" + "return " + selectedSnippet + "\n}\n";
-			case ReturnIsLast(_):
-				" {\n" + selectedSnippet + "\n}\n";
-			case EmptyReturn(assignments):
-				switch (assignments.length) {
-					case 0:
-						final reg:EReg = ~/^([ \t]*)return[ \t]*;/gm;
-						final replacedSnippet = reg.map(selectedSnippet, f -> f.matched(1) + "return false;");
-						" {\n" + replacedSnippet + "\nreturn true;\n}\n";
-					case 1:
-						final reg:EReg = ~/^([ \t]*)return[ \t]*;/gm;
-						final replacedSnippet = reg.map(selectedSnippet, f -> f.matched(1) + "return None;");
-						final returnAssigmentVar = '\nreturn Some(${assignments[0].name});';
-						" {\n" + replacedSnippet + returnAssigmentVar + "\n}\n";
-					default:
-						final reg:EReg = ~/^([ \t]*)return[ \t]*;/gm;
-						final replacedSnippet = reg.map(selectedSnippet, f -> f.matched(1) + "return None;");
-						final returnAssigments = "\nreturn Some({\n" + assignments.map(a -> '${a.name}: ${a.name},\n') + "});";
-						" {\n" + replacedSnippet + returnAssigments + "\n}\n";
-				}
-			case OpenEndedReturn(returnTokens):
-				var startOffset = context.converter(extractData.content, extractData.startToken.pos.min);
-				var snippet = selectedSnippet;
-				returnTokens.reverse();
-				for (token in returnTokens) {
-					var pos = token.getPos();
-					var returnStart = context.converter(extractData.content, pos.min);
-					var returnEnd = context.converter(extractData.content, pos.max);
-					returnStart -= startOffset;
-					returnEnd -= startOffset;
-					var before = snippet.substring(0, returnStart);
-					var after = snippet.substring(returnEnd);
-					var retValue = snippet.substring(returnStart + 7, returnEnd - 1);
-					snippet = before + "return Some(" + retValue + ");" + after;
-				}
-				" {\n" + snippet + "\nreturn None;\n}\n";
-			case Invalid:
-				"";
-		}
 	}
 
 	static function buildParameter(identifier:Identifier, typeHint:TypeHintType):String {
@@ -598,13 +529,4 @@ typedef ExtractMethodData = {
 	var functionToken:TokenTree;
 	var isStatic:Bool;
 	var isSingleExpr:Bool;
-}
-
-enum ReturnType {
-	NoReturn(assignments:Array<Identifier>);
-	ReturnAsExpression;
-	ReturnIsLast(lastReturnToken:TokenTree);
-	EmptyReturn(assignments:Array<Identifier>);
-	OpenEndedReturn(returnTokens:Array<TokenTree>);
-	Invalid;
 }

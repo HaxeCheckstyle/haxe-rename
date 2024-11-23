@@ -136,9 +136,7 @@ class RenameHelper {
 						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
 					}
 				case LibType(_, _) | UnknownType(_):
-					trace("TODO");
 				case FunctionType(_, _) | StructType(_):
-					trace("TODO");
 			}
 		});
 	}

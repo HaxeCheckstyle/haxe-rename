@@ -4,6 +4,7 @@ import haxe.PosInfos;
 import js.lib.Promise;
 import refactor.RefactorResult;
 import refactor.TestEditableDocument;
+import refactor.TypingHelper.TypeHintType;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
@@ -14,8 +15,11 @@ import refactor.edits.FileEdit;
 
 class TestBase implements ITest {
 	var usageContext:UsageContext;
+	var typer:TestTyper;
 
-	public function new() {}
+	public function new() {
+		typer = new TestTyper();
+	}
 
 	function setupTestSources(srcFolders:Array<String>) {
 		usageContext = {
@@ -36,11 +40,16 @@ class TestBase implements ITest {
 
 	@:access(refactor.discover.NameMap)
 	function setup() {
+		typer.clear();
 		for (key => list in usageContext.nameMap.names) {
 			for (identifier in list) {
 				identifier.edited = false;
 			}
 		}
+	}
+
+	public function addTypeHint(fileName:String, pos:Int, typeHint:TypeHintType) {
+		typer.addTypeHint(fileName, pos, typeHint);
 	}
 
 	function fileEditToString(edit:FileEdit):String {

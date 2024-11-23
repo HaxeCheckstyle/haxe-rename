@@ -9,9 +9,9 @@ import refactor.Rename;
 import refactor.TestEditableDocument;
 
 class RenameTestBase extends TestBase {
-	function checkRename(what:RenameWhat, edits:Array<TestEdit>, async:Async, ?pos:PosInfos) {
+	function checkRename(what:RenameWhat, edits:Array<TestEdit>, async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
-			doCanRename(what, edits, pos).catchError(function(failure) {
+			doCanRename(what, edits, withTyper, pos).catchError(function(failure) {
 				Assert.fail('$failure', pos);
 			}).finally(function() {
 				async.done();
@@ -21,9 +21,9 @@ class RenameTestBase extends TestBase {
 		}
 	}
 
-	function failCanRename(what:RenameWhat, expected:String, async:Async, ?pos:PosInfos) {
+	function failCanRename(what:RenameWhat, expected:String, async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
-			doCanRename(what, [], pos).then(function(success:RefactorResult) {
+			doCanRename(what, [], withTyper, pos).then(function(success:RefactorResult) {
 				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
@@ -35,9 +35,9 @@ class RenameTestBase extends TestBase {
 		}
 	}
 
-	function failRename(what:RenameWhat, expected:String, async:Async, ?pos:PosInfos) {
+	function failRename(what:RenameWhat, expected:String, async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
-			doRename(what, [], pos).then(function(success:RefactorResult) {
+			doRename(what, [], withTyper, pos).then(function(success:RefactorResult) {
 				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
@@ -49,7 +49,7 @@ class RenameTestBase extends TestBase {
 		}
 	}
 
-	function doCanRename(what:RenameWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
+	function doCanRename(what:RenameWhat, edits:Array<TestEdit>, withTyper:Bool = false, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
 		return Rename.canRename({
 			nameMap: usageContext.nameMap,
@@ -59,13 +59,13 @@ class RenameTestBase extends TestBase {
 			verboseLog: function(text:String, ?pos:PosInfos) {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
-			typer: null
+			typer: withTyper ? typer : null,
 		}).then(function(success:CanRenameResult) {
-			return doRename(what, edits, pos);
+			return doRename(what, edits, withTyper, pos);
 		});
 	}
 
-	function doRename(what:RenameWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
+	function doRename(what:RenameWhat, edits:Array<TestEdit>, withTyper:Bool = false, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
 		return Rename.rename({
 			nameMap: usageContext.nameMap,
@@ -77,7 +77,7 @@ class RenameTestBase extends TestBase {
 			verboseLog: function(text:String, ?pos:PosInfos) {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
-			typer: null
+			typer: withTyper ? typer : null,
 		}).then(function(success:RefactorResult) {
 			return assertEdits(success, editList, edits, pos);
 		});
