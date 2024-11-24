@@ -60,6 +60,8 @@ class RenameTestBase extends TestBase {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
 			typer: withTyper ? typer : null,
+			converter: (string, byteOffset) -> byteOffset,
+			fileReader: fileReader,
 		}).then(function(success:CanRenameResult) {
 			return doRename(what, edits, withTyper, pos);
 		});
@@ -78,6 +80,8 @@ class RenameTestBase extends TestBase {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
 			typer: withTyper ? typer : null,
+			converter: (string, byteOffset) -> byteOffset,
+			fileReader: fileReader,
 		}).then(function(success:RefactorResult) {
 			return assertEdits(success, editList, edits, pos);
 		});

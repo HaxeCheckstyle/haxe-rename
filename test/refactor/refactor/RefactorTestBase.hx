@@ -3,15 +3,9 @@ package refactor.refactor;
 import haxe.Exception;
 import haxe.PosInfos;
 import js.lib.Promise;
-import byte.ByteData;
-import haxeparser.HaxeLexer;
-import hxparse.ParserError;
-import tokentree.TokenTree;
-import tokentree.TokenTreeBuilder;
 import utest.Async;
 import refactor.RefactorResult;
 import refactor.TestEditableDocument;
-import refactor.discover.FileContentType;
 
 class RefactorTestBase extends TestBase {
 	function checkRefactor(refactorType:RefactorType, what:RefactorWhat, edits:Array<TestEdit>, async:Async, ?pos:PosInfos) {
@@ -66,7 +60,7 @@ class RefactorTestBase extends TestBase {
 			},
 			typer: null,
 			converter: (string, byteOffset) -> byteOffset,
-			fileReader: testFileReader,
+			fileReader: fileReader,
 		});
 		return switch (result) {
 			case Unsupported:
@@ -90,33 +84,9 @@ class RefactorTestBase extends TestBase {
 			},
 			typer: typer,
 			converter: (string, byteOffset) -> byteOffset,
-			fileReader: testFileReader,
+			fileReader: fileReader,
 		}).then(function(success:RefactorResult) {
 			return assertEdits(success, editList, edits, pos);
 		});
-	}
-}
-
-function testFileReader(path:String):FileContentType {
-	final text = sys.io.File.getContent(path);
-	var root:Null<TokenTree> = null;
-	try {
-		final content = ByteData.ofString(text);
-		final lexer = new HaxeLexer(content, path);
-		var t:haxeparser.Data.Token = lexer.token(haxeparser.HaxeLexer.tok);
-
-		final tokens:Array<haxeparser.Data.Token> = [];
-		while (t.tok != Eof) {
-			tokens.push(t);
-			t = lexer.token(haxeparser.HaxeLexer.tok);
-		}
-		root = TokenTreeBuilder.buildTokenTree(tokens, content, TypeLevel);
-		return Token(root, text);
-	} catch (e:ParserError) {
-		throw 'failed to parse ${path} - ParserError: $e (${e.pos})';
-	} catch (e:LexerError) {
-		throw 'failed to parse ${path} - LexerError: ${e.msg} (${e.pos})';
-	} catch (e:Exception) {
-		throw 'failed to parse ${path} - ${e.details()}';
 	}
 }

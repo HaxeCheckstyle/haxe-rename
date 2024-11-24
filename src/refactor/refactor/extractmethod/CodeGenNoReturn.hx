@@ -27,9 +27,8 @@ class CodeGenNoReturn extends CodeGenBase {
 				'${assignments[0].name} = $call;\n';
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
-				final assignData = assignments.map(a -> '${a.name} = data.${a.name};').join("\n");
-				final assignVars = vars.map(v -> '${v.name} = data.${v.name};').join("\n");
-				'$dataVars\n{\nfinal data = $call;\n' + assignData + assignVars + "}\n";
+				final assignData = assignments.concat(vars).map(a -> '${a.name} = data.${a.name};').join("\n");
+				'$dataVars\n{\nfinal data = $call;\n' + assignData + "\n}\n";
 		}
 	}
 
@@ -88,9 +87,8 @@ class CodeGenNoReturn extends CodeGenBase {
 				final returnAssigmentVar = '\nreturn ${assignments[0].name};';
 				" {\n" + selectedSnippet + returnAssigmentVar + "\n}\n";
 			case [_, _]:
-				final assignData = assignments.map(a -> '${a.name}: ${a.name},').join("\n");
-				final assignVars = vars.map(v -> '${v.name}: ${v.name},').join("\n");
-				final returnAssigments = "\nreturn {\n" + assignData + assignVars + "};";
+				final assignData = assignments.concat(vars).map(a -> '${a.name}: ${a.name},').join("\n");
+				final returnAssigments = "\nreturn {\n" + assignData + "\n};";
 				" {\n" + selectedSnippet + returnAssigments + "\n}\n";
 		}
 	}

@@ -44,15 +44,14 @@ class CodeGenOpenEnded extends CodeGenBase {
 				+ "}\n";
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
-				final assignData = assignments.map(a -> '${a.name} = result.data.${a.name};').join("\n");
-				final varsData = vars.map(v -> '${v.name} = result.data.${v.name};').join("\n");
+				final assignData = assignments.concat(vars).map(a -> '${a.name} = result.data.${a.name};').join("\n");
 				'$dataVars'
 				+ '{\nfinal result = $call;\n'
 				+ "switch (result.ret) {\n"
 				+ "case Some(data):\n"
 				+ "return data;\n"
 				+ "case None:\n"
-				+ '${assignData}${varsData}'
+				+ '${assignData}\n'
 				+ "}\n"
 				+ "}\n";
 		}
@@ -134,46 +133,6 @@ class CodeGenOpenEnded extends CodeGenBase {
 		}
 	}
 
-	function parentTypeHint():Promise<TypeHintType> {
-		var func:Null<TokenTree> = findParentFunction();
-		if (func == null) {
-			return Promise.reject("failed to find return type of selected code");
-		}
-		return TypingHelper.findTypeWithTyper(context, context.what.fileName, func.pos.max - 1).then(function(typeHint) {
-			return switch (typeHint) {
-				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
-					Promise.resolve(typeHint);
-				case FunctionType(args, retVal):
-					Promise.resolve(retVal);
-			}
-		});
-	}
-
-	function findParentFunction():Null<TokenTree> {
-		var token = extractData.startToken.parent;
-		while (true) {
-			switch (token.tok) {
-				case Kwd(KwdFunction):
-					var child = token.getFirstChild();
-					if (child == null) {
-						return null;
-					}
-					switch (child.tok) {
-						case Const(_):
-							return child;
-						default:
-							return token;
-					}
-				case Arrow:
-					return token;
-				case Root:
-					return null;
-				default:
-					token = token.parent;
-			}
-		}
-	}
-
 	public function makeBody():String {
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
@@ -189,9 +148,8 @@ class CodeGenOpenEnded extends CodeGenBase {
 				return " {\n" + snippet + '\nreturn $returnData;\n}\n';
 			case [_, _]:
 				final snippet = replaceReturnValues(returnTokens, value -> '{ret: Some($value)}');
-				final assignData = assignments.map(a -> '${a.name}: ${a.name},\n');
-				final varsData = vars.map(v -> '${v.name}: ${v.name},\n');
-				final returnData = '{ret: None, data: {$assignData$varsData}}';
+				final assignData = assignments.concat(vars).map(a -> '${a.name}: ${a.name},\n');
+				final returnData = '{ret: None, data: {\n$assignData\n}}';
 				return " {\n" + snippet + '\nreturn $returnData;\n}\n';
 		}
 	}

@@ -138,6 +138,12 @@ class TypingHelper {
 		if (context.typer == null) {
 			return Promise.reject("no typer for " + fileName + "@" + pos);
 		}
+		switch (context.fileReader(fileName)) {
+			case Text(text):
+				pos = context.converter(text, pos);
+			case Token(root, text):
+				pos = context.converter(text, pos);
+		}
 		return context.typer.resolveType(fileName, pos);
 	}
 

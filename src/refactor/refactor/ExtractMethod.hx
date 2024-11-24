@@ -372,6 +372,8 @@ class ExtractMethod {
 						switch (child.tok) {
 							case Binop(OpAssign) | Binop(OpAssignOp(_)):
 								assignedVars.push(s);
+							case Unop(OpIncrement) | Unop(OpDecrement):
+								assignedVars.push(s);
 							default:
 						}
 					}
@@ -382,7 +384,7 @@ class ExtractMethod {
 		if (allReturns.length > 0) {
 			var lastReturn = allReturns[allReturns.length - 1];
 			if (isSingleExpression(lastReturn, extractData.endToken)) {
-				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers, lastReturn);
+				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers);
 			}
 		}
 
@@ -467,7 +469,11 @@ class ExtractMethod {
 					continue;
 				}
 			}
-			scopedVarUses.push(varsValidAfterSelection.get(part));
+			final scopedVar = varsValidAfterSelection.get(part);
+			if (scopedVarUses.contains(scopedVar)) {
+				continue;
+			}
+			scopedVarUses.push(scopedVar);
 			trace("leaking " + varsValidAfterSelection.get(part));
 		}
 		return scopedVarUses;

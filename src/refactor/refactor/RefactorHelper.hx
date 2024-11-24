@@ -1,7 +1,7 @@
 package refactor.refactor;
 
+import refactor.CacheAndTyperContext.ByteToCharConverterFunc;
 import refactor.discover.File;
-import refactor.refactor.CanRefactorContext.ByteToCharConverterFunc;
 
 class RefactorHelper {
 	public static function findTokensAtPos(root:TokenTree, searchPos:Int):TokensAtPos {

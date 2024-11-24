@@ -67,6 +67,33 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 568, posEnd: 720}, edits, async);
 	}
 
+	function testCalculateTotalJustVars(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx",
+				"var price;\n"
+				+ "var quantity;\n"
+				+ "{\nfinal data = calculateTotalExtract(item);\n"
+				+ "price = data.price;\n"
+				+ "quantity = data.quantity;\n"
+				+ "}\n",
+				630, 686, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function calculateTotalExtract(item:Item):{price:Float, quantity:Float} {\n"
+				+ "var price = item.price;\n"
+				+ "			var quantity = item.quantity;\n"
+				+ "return {\n"
+				+ "price: price,\n"
+				+ "quantity: quantity,\n"
+				+ "};\n"
+				+ "}\n",
+				741, true),
+		];
+		addTypeHint("testcases/methods/Main.hx", 613, LibType("Item", "Item", []));
+		addTypeHint("testcases/methods/Main.hx", 638, LibType("Float", "Float", []));
+		addTypeHint("testcases/methods/Main.hx", 668, LibType("Float", "Float", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 629, posEnd: 686}, edits, async);
+	}
+
 	function testCalculateTotalWithLastReturn(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotalExtract(items, total);\n", 569, 737, true),
@@ -83,6 +110,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				741, true),
 		];
+		addTypeHint("testcases/methods/Main.hx", 514, LibType("Float", "Float", []));
 		addTypeHint("testcases/methods/Main.hx", 735, LibType("Float", "Float", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 568, posEnd: 737}, edits, async);
 	}
@@ -285,6 +313,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				357, true),
 		];
+		addTypeHint("testcases/methods/MacroTools.hx", 133, LibType("Array", "Array", [LibType("Field", "Field", [])]));
 		addTypeHint("testcases/methods/MacroTools.hx", 163, LibType("Array", "Array", [LibType("Field", "Field", [])]));
 		addTypeHint("testcases/methods/MacroTools.hx", 351, LibType("Array", "Array", [LibType("Field", "Field", [])]));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MacroTools.hx", posStart: 195, posEnd: 353}, edits, async);

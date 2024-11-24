@@ -118,7 +118,9 @@ class Cli {
 			forRealExecute: execute && forReal,
 			docFactory: EditableDocument.new,
 			verboseLog: verboseLog,
-			typer: null
+			typer: null,
+			fileReader: null,
+			converter: null,
 		});
 		result.then(function(result:RefactorResult) {
 			switch (result) {

@@ -37,6 +37,49 @@ abstract class CodeGenBase implements ICodeGen {
 		}
 		return snippet;
 	}
+
+	function parentTypeHint():Promise<TypeHintType> {
+		var func:Null<TokenTree> = findParentFunction();
+		if (func == null) {
+			return Promise.reject("failed to find return type of selected code");
+		}
+		return TypingHelper.findTypeWithTyper(context, context.what.fileName, func.pos.max - 1).then(function(typeHint) {
+			return switch (typeHint) {
+				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
+					Promise.resolve(typeHint);
+				case FunctionType(args, retVal):
+					Promise.resolve(retVal);
+			}
+		});
+	}
+
+	function findParentFunction():Null<TokenTree> {
+		var token = extractData.startToken.parent;
+		while (true) {
+			if (token == null) {
+				return null;
+			}
+			switch (token.tok) {
+				case Kwd(KwdFunction):
+					var child = token.getFirstChild();
+					if (child == null) {
+						return null;
+					}
+					switch (child.tok) {
+						case Const(_):
+							return child;
+						default:
+							return token;
+					}
+				case Arrow:
+					return token;
+				case Root:
+					return null;
+				default:
+					token = token.parent;
+			}
+		}
+	}
 }
 
 typedef ReturnValueCallback = (value:String) -> String;

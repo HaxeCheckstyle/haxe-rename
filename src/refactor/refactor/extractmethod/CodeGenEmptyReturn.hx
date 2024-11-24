@@ -39,15 +39,8 @@ class CodeGenEmptyReturn extends CodeGenBase {
 				+ '${vars[0].name} = data;\n}\n';
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
-				final assignData = assignments.map(a -> '${a.name} = data.${a.name};').join("\n");
-				final varsData = vars.map(v -> '${v.name} = data.${v.name};').join("\n");
-				dataVars
-				+ 'switch ($call) {\n'
-				+ "case None:\n"
-				+ "return;\n"
-				+ "case Some(data):\n"
-				+ '${assignData}${varsData}'
-				+ "}\n";
+				final assignData = assignments.concat(vars).map(a -> '${a.name} = data.${a.name};').join("\n");
+				dataVars + 'switch ($call) {\n' + "case None:\n" + "return;\n" + "case Some(data):\n" + '${assignData}\n' + "}\n";
 		}
 	}
 
@@ -111,9 +104,8 @@ class CodeGenEmptyReturn extends CodeGenBase {
 				" {\n" + snippet + returnLocalVar + "\n}\n";
 			case [_, _]:
 				final snippet = replaceReturnValues(returnTokens, value -> 'None');
-				final assignData = assignments.map(a -> '${a.name}: ${a.name},\n');
-				final varsData = vars.map(v -> '${v.name}: ${v.name},\n');
-				final returnAssigments = "\nreturn Some({\n" + assignData + varsData + "});";
+				final assignData = assignments.concat(vars).map(a -> '${a.name}: ${a.name},\n');
+				final returnAssigments = "\nreturn Some({\n" + assignData + "\n});";
 				" {\n" + snippet + returnAssigments + "\n}\n";
 		}
 	}
