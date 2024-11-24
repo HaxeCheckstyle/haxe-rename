@@ -103,6 +103,14 @@ class RenameClassTest extends RenameTestBase {
 		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "ChildList", pos: 872}, edits, async);
 	}
 
+	public function testRenameScopeStart(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "scopeStartRenamed", 255, 265),
+			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "scopeStartRenamed", 404, 414),
+		];
+		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "scopeStartRenamed", pos: 259}, edits, async);
+	}
+
 	public function testRenameStaticExtentionSum(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/ChildHelper.hx", "sumChilds", 62, 65),

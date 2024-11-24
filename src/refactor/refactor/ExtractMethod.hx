@@ -285,7 +285,7 @@ class ExtractMethod {
 			if (identifier.name.contains(".")) {
 				return false;
 			}
-			switch (identifier.type) {
+			return switch (identifier.type) {
 				case ScopedLocal(scopeStart, scopeEnd, _):
 					if (scopeEnd <= extractData.startToken.pos.min) {
 						return false;
@@ -293,9 +293,9 @@ class ExtractMethod {
 					if (scopeStart > extractData.endToken.pos.max) {
 						return false;
 					}
-					return true;
+					true;
 				default:
-					return false;
+					false;
 			}
 		});
 	}
@@ -388,12 +388,13 @@ class ExtractMethod {
 			}
 		}
 
-		final modifiedIdentifiers:Array<Identifier> = [];
+		var modifiedCandidates:Map<String, Identifier> = new Map<String, Identifier>();
 		for (identifier in neededIdentifiers) {
 			if (assignedVars.contains(identifier.name)) {
-				modifiedIdentifiers.push(identifier);
+				modifiedCandidates.set(identifier.name, identifier);
 			}
 		}
+		final modifiedIdentifiers = findIdentifiersUsedAfterSelection(extractData, functionIdentifier, modifiedCandidates);
 
 		if (allReturns.length == 0) {
 			return new CodeGenNoReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);
@@ -428,6 +429,11 @@ class ExtractMethod {
 			}
 		}
 
+		return findIdentifiersUsedAfterSelection(extractData, functionIdentifier, varsValidAfterSelection);
+	}
+
+	static function findIdentifiersUsedAfterSelection(extractData:ExtractMethodData, functionIdentifier:Identifier,
+			varsValidAfterSelection:Map<String, Identifier>):Array<Identifier> {
 		// find all identifier uses after user's selection that share same name
 		final varShadows:Map<String, Identifier> = new Map<String, Identifier>();
 		final allIdentifierUses:Array<Identifier> = functionIdentifier.findAllIdentifiers(identifier -> {

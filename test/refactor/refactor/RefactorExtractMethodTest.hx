@@ -168,6 +168,47 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1080, posEnd: 1278}, edits, async);
 	}
 
+	function testCalcConditionalLevel(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "count = calcConditionalLevelExtract(token, count);\n", 1388, 1543, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function calcConditionalLevelExtract(token:tokentree.TokenTree, count:Int):Int {\n"
+				+ "while ((token != null) && (token.tok != Root)) {\n"
+				+ "			switch (token.tok) {\n"
+				+ "				case Sharp(\"if\"):\n"
+				+ "					count++;\n"
+				+ "				default:\n"
+				+ "			}\n"
+				+ "			token = token.parent;\n"
+				+ "		}\n"
+				+ "return count;\n"
+				+ "}\n",
+				1600, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1387, posEnd: 1543}, edits, async);
+	}
+
+	function testCalcConditionalLevelWithVar(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "var count = calcConditionalLevelExtract(token);\n", 1366, 1543, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function calcConditionalLevelExtract(token:tokentree.TokenTree):Int {\n"
+				+ "var count:Int = -1;\n"
+				+ "		while ((token != null) && (token.tok != Root)) {\n"
+				+ "			switch (token.tok) {\n"
+				+ "				case Sharp(\"if\"):\n"
+				+ "					count++;\n"
+				+ "				default:\n"
+				+ "			}\n"
+				+ "			token = token.parent;\n"
+				+ "		}\n"
+				+ "return count;\n"
+				+ "}\n",
+				1600, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1365, posEnd: 1543}, edits, async);
+	}
+
 	function testCalculateMath(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Math.hx", "calculateExtract(a, b);\n", 106, 122, true),

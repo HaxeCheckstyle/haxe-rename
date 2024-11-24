@@ -70,6 +70,22 @@ class Main {
 
 		return total;
 	}
+
+	function calcConditionalLevel(token:tokentree.TokenTree):Int {
+		var count:Int = -1;
+		while ((token != null) && (token.tok != Root)) {
+			switch (token.tok) {
+				case Sharp("if"):
+					count++;
+				default:
+			}
+			token = token.parent;
+		}
+		if (count <= 0) {
+			return 0;
+		}
+		return count;
+	}
 }
 
 typedef Item = {

@@ -932,6 +932,8 @@ class UsageCollector {
 					case Binop(OpLt):
 						if (TokenTreeCheckUtils.isTypeParameter(child)) {
 							typeParamLt = child;
+						} else {
+							pOpenToken.push(child);
 						}
 					case Arrow:
 						var scopePos = child.getPos();
