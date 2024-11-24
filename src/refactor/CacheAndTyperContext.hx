@@ -1,10 +1,10 @@
 package refactor;
 
-import refactor.ITyper;
 import refactor.VerboseLogger;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TypeList;
+import refactor.typing.ITyper;
 
 typedef CacheAndTyperContext = {
 	var nameMap:NameMap;

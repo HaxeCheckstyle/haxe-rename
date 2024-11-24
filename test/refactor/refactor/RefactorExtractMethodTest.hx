@@ -1,7 +1,5 @@
 package refactor.refactor;
 
-import refactor.TypingHelper.TypeHintType;
-
 class RefactorExtractMethodTest extends RefactorTestBase {
 	function setupClass() {
 		setupTestSources(["testcases/methods"]);
@@ -10,11 +8,11 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 	function testSimpleNoReturns(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsExtract();\n", 94, 131, true),
-			makeInsertTestEdit("testcases/methods/Main.hx",
-				"function noReturnsExtract():Void {\n"
+			makeInsertTestEdit("testcases/methods/Main.hx", "function noReturnsExtract() {\n"
 				+ "trace(\"hello 2\");\n"
 				+ "		trace(\"hello 3\");\n"
-				+ "}\n", 155, true),
+				+ "}\n",
+				155, true),
 		];
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 93, posEnd: 131}, edits, async);
 	}
@@ -23,7 +21,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsStaticExtract();\n", 222, 259, true),
 			makeInsertTestEdit("testcases/methods/Main.hx",
-				"static function noReturnsStaticExtract():Void {\n"
+				"static function noReturnsStaticExtract() {\n"
 				+ "trace(\"hello 2\");\n"
 				+ "		trace(\"hello 3\");\n"
 				+ "}\n", 283, true),
@@ -89,7 +87,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 568, posEnd: 737}, edits, async);
 	}
 
-	function testProcessUser2(async:Async) {
+	function testProcessUserWithLastReturn(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotal2Extract(items, total);\n", 1081, 1295, true),
 			makeInsertTestEdit("testcases/methods/Main.hx",
@@ -110,26 +108,37 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1080, posEnd: 1295}, edits, async);
 	}
 
-	// function testProcessUser3(async:Async) {
-	// 	var edits:Array<TestEdit> = [
-	// 		makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotal2Extract(items, total);\n", 1081, 1295, true),
-	// 		makeInsertTestEdit("testcases/methods/Main.hx",
-	// 			"function calculateTotal2Extract(items:Array<Item>, total:Float) {\n"
-	// 			+ "// Selected code block to extract\n"
-	// 			+ "		for (item in items) {\n"
-	// 			+ "			var price = item.price;\n"
-	// 			+ "			var quantity = item.quantity;\n"
-	// 			+ "			if (quantity < 0) {\n"
-	// 			+ "				return total;\n"
-	// 			+ "			}\n"
-	// 			+ "			total += price * quantity;\n"
-	// 			+ "		}\n\n"
-	// 			+ "		return total;\n"
-	// 			+ "}\n",
-	// 			1299, true),
-	// 	];
-	// 	checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1080, posEnd: 1278}, edits, async);
-	// }
+	function testProcessUserWithUseAfterSelection(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx",
+				"{\n"
+				+ "final result = calculateTotal2Extract(items, total);\n"
+				+ "switch (result.ret) {\n"
+				+ "case Some(data):\n"
+				+ "return data;\n"
+				+ "case None:\n"
+				+ "total = result.data;\n"
+				+ "}\n"
+				+ "}\n",
+				1081, 1278, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function calculateTotal2Extract(items:Array<Item>, total:Float):{ret:haxe.ds.Option<Float>, ?data:Float} {\n"
+				+ "// Selected code block to extract\n"
+				+ "		for (item in items) {\n"
+				+ "			var price = item.price;\n"
+				+ "			var quantity = item.quantity;\n"
+				+ "			if (quantity < 0) {\n"
+				+ "				return {ret: Some(total)};\n"
+				+ "			}\n"
+				+ "			total += price * quantity;\n"
+				+ "		}\n"
+				+ "return {ret: None, data: total};\n"
+				+ "}\n",
+				1299, true),
+		];
+		addTypeHint("testcases/methods/Main.hx", 1026, FunctionType([LibType("Array", "Array", [LibType("Item", "Item", [])])], LibType("Float", "Float", [])));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1080, posEnd: 1278}, edits, async);
+	}
 
 	function testCalculateMath(async:Async) {
 		var edits:Array<TestEdit> = [
@@ -238,5 +247,80 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		addTypeHint("testcases/methods/PersonHandler.hx", 75, LibType("Int", "Int", []));
 		addTypeHint("testcases/methods/PersonHandler.hx", 95, LibType("String", "String", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/PersonHandler.hx", posStart: 101, posEnd: 161}, edits, async);
+	}
+
+	function testContainer(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Container.hx", "var result = processExtract(items, converter);\n", 108, 239, true),
+			makeInsertTestEdit("testcases/methods/Container.hx",
+				"function processExtract(items:Array<T>, converter:T -> String):Array<String> {\n"
+				+ "var result = new Array<String>();\n"
+				+ "		for (item in items) {\n"
+				+ "			var converted = converter(item);\n"
+				+ "			result.push('[${converted}]');\n"
+				+ "		}\n"
+				+ "return result;\n"
+				+ "}\n",
+				260, true),
+		];
+		addTypeHint("testcases/methods/Container.hx", 91, FunctionType([LibType("T", "T", [])], LibType("String", "String", [])));
+		addTypeHint("testcases/methods/Container.hx", 117, LibType("Array", "Array", [LibType("String", "String", [])]));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Container.hx", posStart: 107, posEnd: 239}, edits, async);
+	}
+
+	function testMacroTools(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/MacroTools.hx", "return buildExtract(fields);\n", 195, 353, true),
+			makeInsertTestEdit("testcases/methods/MacroTools.hx",
+				"static function buildExtract(fields:Array<Field>):Array<Field> {\n"
+				+ "for (field in fields) {\n"
+				+ "			switch field.kind {\n"
+				+ "				case FFun(f):\n"
+				+ "					var expr = f.expr;\n"
+				+ "				// Complex manipulation...\n"
+				+ "				default:\n"
+				+ "			}\n"
+				+ "		}\n"
+				+ "		return fields;\n"
+				+ "}\n",
+				357, true),
+		];
+		addTypeHint("testcases/methods/MacroTools.hx", 163, LibType("Array", "Array", [LibType("Field", "Field", [])]));
+		addTypeHint("testcases/methods/MacroTools.hx", 351, LibType("Array", "Array", [LibType("Field", "Field", [])]));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MacroTools.hx", posStart: 195, posEnd: 353}, edits, async);
+	}
+
+	function testMatcherOnlySwitch(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Matcher.hx", "processExtract(value);\n", 84, 284, true),
+			makeInsertTestEdit("testcases/methods/Matcher.hx",
+				"function processExtract(value:Any) {\n"
+				+ "return switch value {\n"
+				+ "			case Int(i) if (i > 0): 'Positive: $i';\n"
+				+ "			case String(s) if (s.length > 0): 'NonEmpty: $s';\n"
+				+ "			case Array(a) if (a.length > 0): 'HasElements: ${a.length}';\n"
+				+ "			case _: 'Unknown';\n"
+				+ "		}\n"
+				+ "}\n",
+				288, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Matcher.hx", posStart: 84, posEnd: 284}, edits, async);
+	}
+
+	function testMatcherWithReturn(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Matcher.hx", "return processExtract(value);\n", 77, 284, true),
+			makeInsertTestEdit("testcases/methods/Matcher.hx",
+				"function processExtract(value:Any) {\n"
+				+ "return switch value {\n"
+				+ "			case Int(i) if (i > 0): 'Positive: $i';\n"
+				+ "			case String(s) if (s.length > 0): 'NonEmpty: $s';\n"
+				+ "			case Array(a) if (a.length > 0): 'HasElements: ${a.length}';\n"
+				+ "			case _: 'Unknown';\n"
+				+ "		}\n"
+				+ "}\n",
+				288, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Matcher.hx", posStart: 76, posEnd: 284}, edits, async);
 	}
 }

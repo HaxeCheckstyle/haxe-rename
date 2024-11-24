@@ -21,7 +21,7 @@ class RefactorHelper {
 				}
 			}
 
-			if (token.pos.max >= searchPos) {
+			if (token.pos.max > searchPos) {
 				var distance = token.pos.min - searchPos;
 				if (distanceAfter > distance) {
 					tokens.after = token;

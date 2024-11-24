@@ -1,11 +1,12 @@
 package refactor.rename;
 
-import refactor.TypingHelper;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.discover.TypeList;
 import refactor.edits.Changelist;
+import refactor.typing.TypeHintType;
+import refactor.typing.TypingHelper;
 
 class RenameHelper {
 	public static function replaceTextWithPrefix(use:Identifier, prefix:String, to:String, changelist:Changelist) {
@@ -67,10 +68,8 @@ class RenameHelper {
 												continue;
 											}
 										case StructType(fields):
-											trace("TODO");
 											continue;
 										case FunctionType(args, retVal):
-											trace("TODO");
 											continue;
 										case UnknownType(name):
 											continue;

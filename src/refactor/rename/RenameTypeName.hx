@@ -2,12 +2,13 @@ package refactor.rename;
 
 import haxe.io.Path;
 import refactor.RefactorResult;
-import refactor.TypingHelper;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
 import refactor.rename.RenameContext;
+import refactor.typing.TypeHintType;
+import refactor.typing.TypingHelper;
 
 class RenameTypeName {
 	public static function refactorTypeName(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {

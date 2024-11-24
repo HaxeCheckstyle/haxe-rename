@@ -1,7 +1,6 @@
-package refactor.refactor.refactormethod;
+package refactor.refactor.extractmethod;
 
 import refactor.discover.Identifier;
-import refactor.refactor.ExtractMethod.ExtractMethodData;
 
 class CodeGenReturnIsLast extends CodeGenBase {
 	final lastReturnToken:Null<TokenTree>;
@@ -14,7 +13,9 @@ class CodeGenReturnIsLast extends CodeGenBase {
 
 	public function makeCallSite():String {
 		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
-		return 'return ${extractData.newMethodName}($callParams);\n';
+		final call = '${extractData.newMethodName}($callParams)';
+
+		return 'return $call;\n';
 	}
 
 	public function makeReturnTypeHint():Promise<String> {

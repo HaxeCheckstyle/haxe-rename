@@ -1,7 +1,6 @@
-package refactor.refactor.refactormethod;
+package refactor.refactor.extractmethod;
 
 import refactor.discover.Identifier;
-import refactor.refactor.ExtractMethod.ExtractMethodData;
 
 class CodeGenNoReturn extends CodeGenBase {
 	final assignments:Array<Identifier>;
@@ -17,25 +16,27 @@ class CodeGenNoReturn extends CodeGenBase {
 
 	public function makeCallSite():String {
 		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
+		final call = '${extractData.newMethodName}($callParams)';
+
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
-				'${extractData.newMethodName}($callParams);\n';
+				'$call;\n';
 			case [0, 1]:
-				'var ${vars[0].name} = ${extractData.newMethodName}($callParams);\n';
+				'var ${vars[0].name} = $call;\n';
 			case [1, 0]:
-				'${assignments[0].name} = ${extractData.newMethodName}($callParams);\n';
+				'${assignments[0].name} = $call;\n';
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
 				final assignData = assignments.map(a -> '${a.name} = data.${a.name};').join("\n");
 				final assignVars = vars.map(v -> '${v.name} = data.${v.name};').join("\n");
-				'$dataVars\n{\nfinal data = ${extractData.newMethodName}($callParams);\n' + assignData + assignVars + "}\n";
+				'$dataVars\n{\nfinal data = $call;\n' + assignData + assignVars + "}\n";
 		}
 	}
 
 	public function makeReturnTypeHint():Promise<String> {
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
-				return Promise.resolve(":Void");
+				return Promise.resolve("");
 			case [0, 1]:
 				return findTypeOfIdentifier(vars[0]).then(function(typeHint):Promise<String> {
 					if (typeHint == null) {

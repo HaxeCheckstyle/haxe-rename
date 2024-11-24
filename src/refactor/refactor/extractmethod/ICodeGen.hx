@@ -1,4 +1,4 @@
-package refactor.refactor.refactormethod;
+package refactor.refactor.extractmethod;
 
 interface ICodeGen {
 	function makeCallSite():String;

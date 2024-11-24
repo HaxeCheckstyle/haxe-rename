@@ -1,10 +1,8 @@
-package refactor;
+package refactor.typing;
 
 import refactor.discover.Identifier;
-import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.discover.TypeList;
-import refactor.edits.Changelist;
 
 class TypingHelper {
 	public static function findDescendantTypes(context:CacheAndTyperContext, packName:String, baseType:Type):Array<Type> {
@@ -231,9 +229,7 @@ class TypingHelper {
 											}
 											return Promise.resolve(typeParams[index]);
 										case UnknownType(_):
-											trace("unknown type!!");
 										case StructType(_) | FunctionType(_):
-											trace("TODO");
 									}
 									return Promise.reject("not found");
 								}));
@@ -374,10 +370,8 @@ class TypingHelper {
 					case TypedParameter:
 						var allTypes:Array<Type> = context.typeList.findTypeName(use.name);
 						if (allTypes.length <= 0) {
-							if (use.defineType != null) {
-								typeParams.push(ClasspathType(use.defineType, []));
-								continue;
-							}
+							typeParams.push(LibType(use.name, use.name, []));
+							continue;
 						}
 						for (type in allTypes) {
 							switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
@@ -421,14 +415,6 @@ typedef SearchTypeOf = {
 	var name:String;
 	var pos:Int;
 	var defineType:Type;
-}
-
-enum TypeHintType {
-	ClasspathType(type:Type, typeParams:Array<TypeHintType>);
-	LibType(name:String, fullName:String, typeParams:Array<TypeHintType>);
-	FunctionType(args:Array<TypeHintType>, retVal:Null<TypeHintType>);
-	StructType(fields:Array<TypeHintType>);
-	UnknownType(name:String);
 }
 
 typedef TypeParameterList = Array<Identifier>;

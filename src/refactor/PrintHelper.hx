@@ -1,8 +1,8 @@
 package refactor;
 
-import refactor.TypingHelper.TypeHintType;
-import refactor.TypingHelper.TypeParameterList;
 import refactor.discover.IdentifierType;
+import refactor.typing.TypeHintType;
+import refactor.typing.TypingHelper.TypeParameterList;
 
 class PrintHelper {
 	public static function typeToString(identType:IdentifierType):String {
@@ -94,6 +94,9 @@ class PrintHelper {
 				final args = argTypes.map(f -> printTypeHint(f));
 				if (argTypes == null) {
 					return '(${args.join(", ")}) -> Void';
+				}
+				if (argTypes.length == 1) {
+					return '${args.join(", ")} -> ${printTypeHint(retVal)}';
 				}
 				return '(${args.join(", ")}) -> ${printTypeHint(retVal)}';
 			case StructType(fieldTypes):

@@ -1,4 +1,4 @@
-package refactor;
+package refactor.typing;
 
 import refactor.discover.Type;
 

@@ -1,7 +1,8 @@
 package refactor;
 
 import js.lib.Promise;
-import refactor.TypingHelper.TypeHintType;
+import refactor.typing.ITyper;
+import refactor.typing.TypeHintType;
 
 using refactor.PrintHelper;
 

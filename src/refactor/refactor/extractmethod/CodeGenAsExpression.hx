@@ -1,7 +1,6 @@
-package refactor.refactor.refactormethod;
+package refactor.refactor.extractmethod;
 
 import refactor.discover.Identifier;
-import refactor.refactor.ExtractMethod.ExtractMethodData;
 
 class CodeGenAsExpression extends CodeGenBase {
 	public function new(extractData:ExtractMethodData, context:RefactorContext, neededIdentifiers:Array<Identifier>) {
@@ -10,10 +9,14 @@ class CodeGenAsExpression extends CodeGenBase {
 
 	public function makeCallSite():String {
 		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
-		if (extractData.endToken.matches(Semicolon)) {
-			return '${extractData.newMethodName}($callParams);\n';
+		final call = '${extractData.newMethodName}($callParams)';
+
+		return switch (extractData.endToken.tok) {
+			case Semicolon | BrClose:
+				'$call;\n';
+			default:
+				'$call';
 		}
-		return '${extractData.newMethodName}($callParams)';
 	}
 
 	public function makeReturnTypeHint():Promise<String> {

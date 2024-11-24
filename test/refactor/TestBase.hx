@@ -4,7 +4,6 @@ import haxe.PosInfos;
 import js.lib.Promise;
 import refactor.RefactorResult;
 import refactor.TestEditableDocument;
-import refactor.TypingHelper.TypeHintType;
 import refactor.discover.FileList;
 import refactor.discover.NameMap;
 import refactor.discover.TraverseSources;
@@ -12,6 +11,7 @@ import refactor.discover.TypeList;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.FileEdit;
+import refactor.typing.TypeHintType;
 
 class TestBase implements ITest {
 	var usageContext:UsageContext;

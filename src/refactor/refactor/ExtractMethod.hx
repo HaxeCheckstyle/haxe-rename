@@ -1,16 +1,17 @@
 package refactor.refactor;
 
-import refactor.TypingHelper.TypeHintType;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
-import refactor.refactor.refactormethod.CodeGenAsExpression;
-import refactor.refactor.refactormethod.CodeGenEmptyReturn;
-import refactor.refactor.refactormethod.CodeGenNoReturn;
-import refactor.refactor.refactormethod.CodeGenOpenEnded;
-import refactor.refactor.refactormethod.CodeGenReturnIsLast;
-import refactor.refactor.refactormethod.ICodeGen;
+import refactor.refactor.extractmethod.CodeGenAsExpression;
+import refactor.refactor.extractmethod.CodeGenEmptyReturn;
+import refactor.refactor.extractmethod.CodeGenNoReturn;
+import refactor.refactor.extractmethod.CodeGenOpenEnded;
+import refactor.refactor.extractmethod.CodeGenReturnIsLast;
+import refactor.refactor.extractmethod.ExtractMethodData;
+import refactor.refactor.extractmethod.ICodeGen;
+import refactor.typing.TypeHintType;
 
 class ExtractMethod {
 	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
@@ -127,6 +128,19 @@ class ExtractMethod {
 		switch (tokenStart.tok) {
 			case Kwd(KwdFunction):
 				return null;
+			case Const(_):
+				if (tokenStart.hasChildren()) {
+					final child = tokenStart.getFirstChild();
+					if (child.matches(Arrow)) {
+						return null;
+					}
+				}
+			case POpen:
+				switch (TokenTreeCheckUtils.getPOpenType(tokenStart)) {
+					case Parameter:
+						return null;
+					default:
+				}
 			default:
 		}
 
@@ -385,21 +399,15 @@ class ExtractMethod {
 		for (ret in allReturns) {
 			var child = ret.getFirstChild();
 			if (child == null) {
-				trace("xxx");
 				return null;
 			}
 			switch (child.tok) {
 				case Semicolon:
-					return new CodeGenEmptyReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);
+					return new CodeGenEmptyReturn(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
 				default:
-					if (modifiedIdentifiers.length > 0) {
-						trace("xxx");
-						return null;
-					}
-					return new CodeGenOpenEnded(extractData, context, neededIdentifiers, allReturns);
+					return new CodeGenOpenEnded(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
 			}
 		}
-		trace("xxx");
 		return null;
 	}
 
@@ -517,16 +525,4 @@ class ExtractMethod {
 private typedef NewFunctionParameter = {
 	final call:String;
 	final param:String;
-}
-
-typedef ExtractMethodData = {
-	var content:String;
-	var root:TokenTree;
-	var startToken:TokenTree;
-	var endToken:TokenTree;
-	var newMethodName:String;
-	var newMethodOffset:Int;
-	var functionToken:TokenTree;
-	var isStatic:Bool;
-	var isSingleExpr:Bool;
 }
