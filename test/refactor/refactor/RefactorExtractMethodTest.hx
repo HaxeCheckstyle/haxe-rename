@@ -521,4 +521,22 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		];
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/TypeProcessor.hx", posStart: 113, posEnd: 221}, edits, async);
 	}
+
+	function testFunctionProcessor(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/FunctionProcessor.hx", "processExtract(callback, value, text);\n", 143, 211, true),
+			makeInsertTestEdit("testcases/methods/FunctionProcessor.hx",
+				"function processExtract(callback:(Int, String) -> Bool, value:Int, text:String) {\n"
+				+ "if (callback(value, text)) {\n"
+				+ "			trace('Success: $value, $text');\n"
+				+ "		}\n"
+				+ "}\n",
+				215, true),
+		];
+		addTypeHint("testcases/methods/FunctionProcessor.hx", 79,
+			FunctionType([LibType("Int", "Int", []), LibType("String", "String", [])], LibType("Bool", "Bool", [])));
+		addTypeHint("testcases/methods/FunctionProcessor.hx", 112, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/FunctionProcessor.hx", 129, LibType("String", "String", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/FunctionProcessor.hx", posStart: 142, posEnd: 211}, edits, async);
+	}
 }
