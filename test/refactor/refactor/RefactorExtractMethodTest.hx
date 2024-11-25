@@ -435,7 +435,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Container.hx", "var result = processExtract(items, converter);\n", 108, 239, true),
 			makeInsertTestEdit("testcases/methods/Container.hx",
-				"function processExtract(items:Array<T>, converter:T -> String):Array<String> {\n"
+				"function processExtract<T>(items:Array<T>, converter:T -> String):Array<String> {\n"
 				+ "var result = new Array<String>();\n"
 				+ "		for (item in items) {\n"
 				+ "			var converted = converter(item);\n"
@@ -505,5 +505,20 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				288, true),
 		];
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Matcher.hx", posStart: 76, posEnd: 284}, edits, async);
+	}
+
+	function testTypeProcessor(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/TypeProcessor.hx", "processExtract(item, compare);\n", 114, 221, true),
+			makeInsertTestEdit("testcases/methods/TypeProcessor.hx",
+				"function processExtract<T:Base, U:IComparable>(item:T, compare:U) {\n"
+				+ "var result = item.process();\n"
+				+ "		if (compare.compareTo(result) > 0) {\n"
+				+ "			item.update(compare.getValue());\n"
+				+ "		}\n"
+				+ "}\n",
+				225, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/TypeProcessor.hx", posStart: 113, posEnd: 221}, edits, async);
 	}
 }

@@ -71,7 +71,8 @@ class ExtractMethod {
 
 			// insert new method with function signature and body after current function
 			final staticModifier = extractData.isStatic ? "static " : "";
-			final functionDefinition:String = '${staticModifier}function ${extractData.newMethodName}($parameterList)$returnTypeHint';
+			final functionName = makeFunctionName(extractData, context);
+			final functionDefinition:String = '${staticModifier}function $functionName($parameterList)$returnTypeHint';
 			final body:String = codeGen.makeBody();
 
 			changelist.addChange(context.what.fileName,
@@ -81,6 +82,19 @@ class ExtractMethod {
 
 			return changelist.execute();
 		});
+	}
+
+	static function makeFunctionName(extractData:ExtractMethodData, context:RefactorContext):String {
+		final functionName = extractData.functionToken.access().firstChild().token;
+		if (functionName == null) {
+			return extractData.newMethodName;
+		}
+		final functionTypeParameter = functionName.access().firstOf(Binop(OpLt)).token;
+		if (functionTypeParameter == null) {
+			return extractData.newMethodName;
+		}
+		final pos = functionTypeParameter.getPos();
+		return extractData.newMethodName + RefactorHelper.extractText(context.converter, extractData.content, pos.min, pos.max);
 	}
 
 	static function makeExtractMethodData(context:CanRefactorContext):Null<ExtractMethodData> {
