@@ -30,6 +30,13 @@ class CodeGenAsExpression extends CodeGenBase {
 					}
 					return Promise.resolve(":" + typeHint.printTypeHint());
 				});
+			case Kwd(KwdReturn):
+				return parentTypeHint().then(function(typeHint):Promise<String> {
+					if (typeHint == null) {
+						return Promise.resolve("");
+					}
+					return Promise.resolve(":" + typeHint.printTypeHint());
+				});
 			default:
 		}
 		return TypingHelper.findTypeWithTyper(context, context.what.fileName, extractData.endToken.pos.max - 1).then(function(typeHint):Promise<String> {
