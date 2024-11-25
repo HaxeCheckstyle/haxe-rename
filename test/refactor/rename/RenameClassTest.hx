@@ -212,40 +212,40 @@ class RenameClassTest extends RenameTestBase {
 
 	public function testRenameBaseClassParamterWithShadowLocalVar(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists');
 		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 298}, 'local var "data" exists', async);
 	}
 
 	public function testRenameBaseClassCaseLabel(async:Async) {
 		var edits:Array<TestEdit> = [];
 		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
-			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))", async);
+			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))");
 		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 516},
 			"renaming not supported for Case1 testcases/classes/BaseClass.hx@514-519 (CaseLabel(val))", async);
 	}
 
 	public function testRenameUseChildClassParentSubPart(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename");
 		failRename({fileName: "testcases/classes/UseChild.hx", toName: "data", pos: 222}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameBaseClassDataToData(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename");
 		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 43}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameBaseClassNoIdentifier(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename");
 		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 103}, "could not find identifier to rename", async);
 	}
 
 	public function testRenameStaticUsingConstructorCall(async:Async) {
 		var edits:Array<TestEdit> = [];
 		failCanRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
-			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
+			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))");
 		failRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
 			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
 	}
@@ -260,14 +260,14 @@ class RenameClassTest extends RenameTestBase {
 
 	public function testRenameBaseClassParamterWithShadowCase(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
+		failCanRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists');
 		failRename({fileName: "testcases/classes/BaseClass.hx", toName: "data", pos: 470}, 'local var "data" exists', async);
 	}
 
 	public function testRenameChildClassExtendsBaseClass(async:Async) {
 		var edits:Array<TestEdit> = [];
 		failCanRename({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
-			"renaming not supported for BaseClass testcases/classes/ChildClass.hx@43-52 (Extends)", async);
+			"renaming not supported for BaseClass testcases/classes/ChildClass.hx@43-52 (Extends)");
 		failRename({fileName: "testcases/classes/ChildClass.hx", toName: "parentBase", pos: 47},
 			"renaming not supported for BaseClass testcases/classes/ChildClass.hx@43-52 (Extends)", async);
 	}
@@ -275,7 +275,7 @@ class RenameClassTest extends RenameTestBase {
 	public function testRenameImport(async:Async) {
 		var edits:Array<TestEdit> = [];
 		failCanRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
-			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)", async);
+			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)");
 		failRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "refactor.Foo", pos: 44},
 			"renaming not supported for refactor.discover.File testcases/classes/MyIdentifier.hx@25-47 (ImportModul)", async);
 	}

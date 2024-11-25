@@ -267,6 +267,57 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 254, posEnd: 463}, edits, async);
 	}
 
+	function testDemoCodeAndSwitch(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 161, 463, true),
+			makeInsertTestEdit("testcases/methods/Demo.hx",
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				+ "doNothing();\n"
+				+ "		trace(\"I'm here\");\n"
+				+ "		doNothing();\n"
+				+ "		trace(\"yep, still here\");\n"
+				+ "		doNothing();\n"
+				+ "		return switch [cond, val] {\n"
+				+ "			case [true, 0]:\n"
+				+ "				std.Math.random() * val;\n"
+				+ "			case [true, _]:\n"
+				+ "				val + val;\n"
+				+ "			case [false, 10]:\n"
+				+ "				Std.parseFloat(text);\n"
+				+ "			case [_, _]:\n"
+				+ "				std.Math.NEGATIVE_INFINITY;\n"
+				+ "		}\n"
+				+ "}\n",
+				467, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 160, posEnd: 463}, edits, async);
+	}
+
+	function testDemoConditionAndCode(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Demo.hx",
+				"switch (doSomethingExtract(cond, text)) {\n"
+				+ "case Some(data):\n"
+				+ "return data;\n"
+				+ "case None:\n"
+				+ "}\n", 112, 252, true),
+			makeInsertTestEdit("testcases/methods/Demo.hx",
+				"function doSomethingExtract(cond:Bool, text:Null<String>) {\n"
+				+ "if (cond && text == null) {\n"
+				+ "			return Some(0.0);\n"
+				+ "		}\n"
+				+ "		doNothing();\n"
+				+ "		trace(\"I'm here\");\n"
+				+ "		doNothing();\n"
+				+ "		trace(\"yep, still here\");\n"
+				+ "		doNothing();\n"
+				+ "return None;\n"
+				+ "}\n",
+				467, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 111, posEnd: 252}, edits, async);
+	}
+
 	function testCalculateMath(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Math.hx", "calculateExtract(a, b);\n", 106, 122, true),

@@ -20,14 +20,16 @@ class RefactorTestBase extends TestBase {
 		}
 	}
 
-	function failCanRefactor(refactorType:RefactorType, what:RefactorWhat, expected:String, async:Async, ?pos:PosInfos) {
+	function failCanRefactor(refactorType:RefactorType, what:RefactorWhat, expected:String, ?async:Async, ?pos:PosInfos) {
 		try {
 			doCanRefactor(refactorType, what, [], pos).then(function(success:RefactorResult) {
 				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
 			}).finally(function() {
-				async.done();
+				if (async != null) {
+					async.done();
+				}
 			});
 		} catch (e:Exception) {
 			Assert.fail(e.toString(), pos);

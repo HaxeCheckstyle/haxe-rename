@@ -21,14 +21,16 @@ class RenameTestBase extends TestBase {
 		}
 	}
 
-	function failCanRename(what:RenameWhat, expected:String, async:Async, withTyper:Bool = false, ?pos:PosInfos) {
+	function failCanRename(what:RenameWhat, expected:String, ?async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
 			doCanRename(what, [], withTyper, pos).then(function(success:RefactorResult) {
 				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
 			}).finally(function() {
-				async.done();
+				if (async != null) {
+					async.done();
+				}
 			});
 		} catch (e:Exception) {
 			Assert.fail(e.toString(), pos);

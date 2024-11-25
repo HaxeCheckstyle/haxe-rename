@@ -73,7 +73,7 @@ class RenameTypedefTest extends RenameTestBase {
 	public function testRenameTypedefBase(async:Async) {
 		var edits:Array<TestEdit> = [];
 		failCanRename({fileName: "testcases/typedefs/Types.hx", toName: "Position", pos: 172},
-			"renaming not supported for IdentifierPos testcases/typedefs/Types.hx@166-179 (TypedefBase)", async);
+			"renaming not supported for IdentifierPos testcases/typedefs/Types.hx@166-179 (TypedefBase)");
 		failRename({fileName: "testcases/typedefs/Types.hx", toName: "Position", pos: 172},
 			"renaming not supported for IdentifierPos testcases/typedefs/Types.hx@166-179 (TypedefBase)", async);
 	}
