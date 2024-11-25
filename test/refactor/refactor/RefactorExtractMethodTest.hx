@@ -229,7 +229,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract(cond, val, text);\n", 262, 463, true),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
-				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "return switch [cond, val] {\n"
 				+ "			case [true, 0]:\n"
 				+ "				std.Math.random() * val;\n"
@@ -243,6 +243,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				467, true),
 		];
+		addTypeHint("testcases/methods/Demo.hx", 61, LibType("Float", "Float", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 262, posEnd: 463}, edits, async);
 	}
 
@@ -250,7 +251,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 255, 463, true),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
-				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "return switch [cond, val] {\n"
 				+ "			case [true, 0]:\n"
 				+ "				std.Math.random() * val;\n"
@@ -264,6 +265,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				467, true),
 		];
+		addTypeHint("testcases/methods/Demo.hx", 61, LibType("Float", "Float", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 254, posEnd: 463}, edits, async);
 	}
 
@@ -271,7 +273,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 161, 463, true),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
-				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "doNothing();\n"
 				+ "		trace(\"I'm here\");\n"
 				+ "		doNothing();\n"
@@ -290,6 +292,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				467, true),
 		];
+		addTypeHint("testcases/methods/Demo.hx", 61, LibType("Float", "Float", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 160, posEnd: 463}, edits, async);
 	}
 
@@ -302,7 +305,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "case None:\n"
 				+ "}\n", 112, 252, true),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
-				"function doSomethingExtract(cond:Bool, text:Null<String>) {\n"
+				"function doSomethingExtract(cond:Bool, text:Null<String>):haxe.ds.Option<Float> {\n"
 				+ "if (cond && text == null) {\n"
 				+ "			return Some(0.0);\n"
 				+ "		}\n"
@@ -315,6 +318,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "}\n",
 				467, true),
 		];
+		addTypeHint("testcases/methods/Demo.hx", 61, LibType("Float", "Float", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 111, posEnd: 252}, edits, async);
 	}
 
