@@ -113,6 +113,18 @@ class RenameHelper {
 		}
 		name = name.substr(0, index);
 
+		function addMatchToChangelist(type:Type) {
+			if (!types.contains(type)) {
+				return;
+			}
+			var pos:IdentifierPos = {
+				fileName: use.pos.fileName,
+				start: use.pos.start + name.length + 1,
+				end: use.pos.end
+			};
+			pos.end = pos.start + fromName.length;
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
+		}
 		var search:SearchTypeOf = {
 			name: name,
 			pos: use.pos.start,
@@ -122,20 +134,21 @@ class RenameHelper {
 			switch (typeHint) {
 				case null:
 				case ClasspathType(type, _):
-					for (t in types) {
-						if (t != type) {
-							continue;
-						}
-						var pos:IdentifierPos = {
-							fileName: use.pos.fileName,
-							start: use.pos.start + name.length + 1,
-							end: use.pos.end
-						};
-						pos.end = pos.start + fromName.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
+					addMatchToChangelist(type);
+				case LibType(name, fullName, params):
+					if (name != "Null") {
+						return;
 					}
-				case LibType(_, _) | UnknownType(_):
-				case FunctionType(_, _) | StructType(_):
+					if (params == null || params.length != 1) {
+						return;
+					}
+					switch (params[0]) {
+						case ClasspathType(type, _):
+							addMatchToChangelist(type);
+						case LibType(_) | FunctionType(_) | StructType(_) | UnknownType(_):
+					}
+
+				case UnknownType(_) | FunctionType(_, _) | StructType(_):
 			}
 		});
 	}

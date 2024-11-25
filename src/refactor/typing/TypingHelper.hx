@@ -164,7 +164,18 @@ class TypingHelper {
 					case ClasspathType(t, params):
 						return findField(context, t, part).then(findFieldForPart);
 					case LibType(t, fullPath, params):
-						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+						if (t != "Null") {
+							return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+						}
+						if (params == null || params.length != 1) {
+							return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+						}
+						switch (params[0]) {
+							case ClasspathType(t, typeParams):
+								return findField(context, t, part).then(findFieldForPart);
+							case LibType(_) | FunctionType(_) | StructType(_) | UnknownType(_):
+								return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+						}
 					case StructType(fields):
 						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
 					case FunctionType(args, retVal):
@@ -363,7 +374,9 @@ class TypingHelper {
 			if ((hint.uses == null) || (hint.uses.length <= 0)) {
 				return Promise.reject();
 			}
-			return typeFromTypeHint(context, hint.uses[0]);
+			return typeFromTypeHint(context, hint.uses[0]).then(function(typeHint) {
+				return Promise.resolve(LibType("Null", "Null", [typeHint]));
+			});
 		}
 
 		var parts:Array<String> = hint.name.split(".");

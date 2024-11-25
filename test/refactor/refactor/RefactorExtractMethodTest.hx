@@ -209,6 +209,64 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1365, posEnd: 1543}, edits, async);
 	}
 
+	function testDemoSimple(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract();\n", 161, 252, true),
+			makeInsertTestEdit("testcases/methods/Demo.hx",
+				"function doSomethingExtract() {\n"
+				+ "doNothing();\n"
+				+ "		trace(\"I'm here\");\n"
+				+ "		doNothing();\n"
+				+ "		trace(\"yep, still here\");\n"
+				+ "		doNothing();\n"
+				+ "}\n",
+				467, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 160, posEnd: 252}, edits, async);
+	}
+
+	function testDemoSwitch(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract(cond, val, text);\n", 262, 463, true),
+			makeInsertTestEdit("testcases/methods/Demo.hx",
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				+ "return switch [cond, val] {\n"
+				+ "			case [true, 0]:\n"
+				+ "				std.Math.random() * val;\n"
+				+ "			case [true, _]:\n"
+				+ "				val + val;\n"
+				+ "			case [false, 10]:\n"
+				+ "				Std.parseFloat(text);\n"
+				+ "			case [_, _]:\n"
+				+ "				std.Math.NEGATIVE_INFINITY;\n"
+				+ "		}\n"
+				+ "}\n",
+				467, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 262, posEnd: 463}, edits, async);
+	}
+
+	function testDemoReturnSwitch(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 255, 463, true),
+			makeInsertTestEdit("testcases/methods/Demo.hx",
+				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>) {\n"
+				+ "return switch [cond, val] {\n"
+				+ "			case [true, 0]:\n"
+				+ "				std.Math.random() * val;\n"
+				+ "			case [true, _]:\n"
+				+ "				val + val;\n"
+				+ "			case [false, 10]:\n"
+				+ "				Std.parseFloat(text);\n"
+				+ "			case [_, _]:\n"
+				+ "				std.Math.NEGATIVE_INFINITY;\n"
+				+ "		}\n"
+				+ "}\n",
+				467, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Demo.hx", posStart: 254, posEnd: 463}, edits, async);
+	}
+
 	function testCalculateMath(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Math.hx", "calculateExtract(a, b);\n", 106, 122, true),

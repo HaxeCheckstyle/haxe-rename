@@ -291,7 +291,33 @@ class ExtractInterface {
 		for (field in fields) {
 			buf.add("\t");
 			var text:String = RefactorHelper.extractText(context.converter, extractData.content, field.pos.min, field.pos.max);
-			text = text.replace(" public ", " ");
+			var index = text.lastIndexOf("function ");
+			if (index < 0) {
+				index = text.lastIndexOf("var ");
+			}
+			if (index < 0) {
+				index = text.lastIndexOf("final ");
+			}
+			if (index > 0) {
+				var commentIndex:Int = text.lastIndexOf("*/", index);
+				var comment = "";
+				if (commentIndex < 0) {
+					commentIndex = 0;
+				}
+				if (commentIndex > 0) {
+					comment = text.substr(0, commentIndex);
+				}
+				var modifier = text.substring(commentIndex, index);
+				final funcSignature = text.substr(index);
+				modifier = modifier.replace("public", "");
+				modifier = modifier.replace("inline", "");
+				modifier = modifier.replace("override", "");
+				modifier = modifier.replace("abstract", "");
+				text = comment + modifier + funcSignature;
+				if (!funcSignature.endsWith(";")) {
+					text += ";";
+				}
+			}
 			buf.add(text);
 			if (field.isSharp) {
 				buf.add("\n");
