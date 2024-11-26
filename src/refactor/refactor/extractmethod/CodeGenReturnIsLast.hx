@@ -3,18 +3,27 @@ package refactor.refactor.extractmethod;
 import refactor.discover.Identifier;
 
 class CodeGenReturnIsLast extends CodeGenBase {
-	public function new(extractData:ExtractMethodData, context:RefactorContext, neededIdentifiers:Array<Identifier>) {
+	final returnEmpty:Bool;
+
+	public function new(extractData:ExtractMethodData, context:RefactorContext, neededIdentifiers:Array<Identifier>, returnEmpty:Bool) {
 		super(extractData, context, neededIdentifiers);
+		this.returnEmpty = returnEmpty;
 	}
 
 	public function makeCallSite():String {
 		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
 		final call = '${extractData.newMethodName}($callParams)';
-
-		return 'return $call;\n';
+		if (returnEmpty) {
+			return '$call;\n';
+		} else {
+			return 'return $call;\n';
+		}
 	}
 
 	public function makeReturnTypeHint():Promise<String> {
+		if (returnEmpty) {
+			return Promise.resolve(":Void");
+		}
 		return parentTypeHint().then(function(typeHint):Promise<String> {
 			if (typeHint == null) {
 				return Promise.resolve("");

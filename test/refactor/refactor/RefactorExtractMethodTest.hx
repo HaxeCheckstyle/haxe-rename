@@ -8,11 +8,11 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 	function testSimpleNoReturns(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsExtract();\n", 94, 131, true),
-			makeInsertTestEdit("testcases/methods/Main.hx", "function noReturnsExtract() {\n"
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function noReturnsExtract():Void {\n"
 				+ "trace(\"hello 2\");\n"
 				+ "		trace(\"hello 3\");\n"
-				+ "}\n",
-				155, true),
+				+ "}\n", 155, true),
 		];
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 93, posEnd: 131}, edits, async);
 	}
@@ -21,7 +21,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsStaticExtract();\n", 222, 259, true),
 			makeInsertTestEdit("testcases/methods/Main.hx",
-				"static function noReturnsStaticExtract() {\n"
+				"static function noReturnsStaticExtract():Void {\n"
 				+ "trace(\"hello 2\");\n"
 				+ "		trace(\"hello 3\");\n"
 				+ "}\n", 283, true),
@@ -209,11 +209,27 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1365, posEnd: 1543}, edits, async);
 	}
 
+	function testAllEmptyReturns(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "allEmptyReturnsExtract();\n", 1722, 1809, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"function allEmptyReturnsExtract():Void {\n"
+				+ "trace(\"hello 1\");\n"
+				+ "		trace(\"hello 2\");\n"
+				+ "		trace(\"hello 3\");\n"
+				+ "		trace(\"hello 4\");\n"
+				+ "		return;\n"
+				+ "}\n",
+				1813, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1721, posEnd: 1809}, edits, async);
+	}
+
 	function testDemoSimple(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract();\n", 161, 252, true),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
-				"function doSomethingExtract() {\n"
+				"function doSomethingExtract():Void {\n"
 				+ "doNothing();\n"
 				+ "		trace(\"I'm here\");\n"
 				+ "		doNothing();\n"
@@ -511,7 +527,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/TypeProcessor.hx", "processExtract(item, compare);\n", 114, 221, true),
 			makeInsertTestEdit("testcases/methods/TypeProcessor.hx",
-				"function processExtract<T:Base, U:IComparable>(item:T, compare:U) {\n"
+				"function processExtract<T:Base, U:IComparable>(item:T, compare:U):Void {\n"
 				+ "var result = item.process();\n"
 				+ "		if (compare.compareTo(result) > 0) {\n"
 				+ "			item.update(compare.getValue());\n"
@@ -526,7 +542,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/FunctionProcessor.hx", "processExtract(callback, value, text);\n", 143, 211, true),
 			makeInsertTestEdit("testcases/methods/FunctionProcessor.hx",
-				"function processExtract(callback:(Int, String) -> Bool, value:Int, text:String) {\n"
+				"function processExtract(callback:(Int, String) -> Bool, value:Int, text:String):Void {\n"
 				+ "if (callback(value, text)) {\n"
 				+ "			trace('Success: $value, $text');\n"
 				+ "		}\n"
@@ -563,11 +579,11 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 86, 152, true),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
-				"function processExtract() {\n"
+				"function processExtract():Void {\n"
 				+ "var data = getData();\n"
 				+ "			validateData(data);\n"
 				+ "			processData(data);\n"
-				+ "}\n", 258, true),
+				+ "}\n", 795, true),
 		];
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 85, posEnd: 152}, edits, async);
 	}
@@ -576,19 +592,54 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 193, 250, true),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
-				"function processExtract() {\n"
+				"function processExtract():Void {\n"
 				+ "logError(e);\n"
 				+ "			throw new ProcessingException(e.message);\n"
-				+ "}\n", 258, true),
+				+ "}\n", 795, true),
 		];
+		addTypeHint("testcases/methods/ExceptionHandler.hx", 69, LibType("Void", "Void", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 192, posEnd: 250}, edits, async);
+	}
+
+	function testExceptionHandlerTryWithThrow(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 266, 404, true),
+			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
+				"function processExtract():Void {\n"
+				+ "var data = getData();\n"
+				+ "			if (data.value > 10) {\n"
+				+ "				return;\n"
+				+ "			}\n"
+				+ "			throw new InvalidDataException(\"value should not be smaller than 11\");\n"
+				+ "}\n",
+				795, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 265, posEnd: 404}, edits, async);
+	}
+
+	function testExceptionHandlerTryWithThrowNotLast(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 518, 689, true),
+			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
+				"function processExtract():Void {\n"
+				+ "var data = getData();\n"
+				+ "			if (data.value > 10) {\n"
+				+ "				throw new InvalidDataException(\"value should not be larger than 10\");\n"
+				+ "			}\n"
+				+ "			validateData(data);\n"
+				+ "			processData(data);\n"
+				+ "}\n",
+				795, true),
+		];
+		addTypeHint("testcases/methods/ExceptionHandler.hx", 69, LibType("Void", "Void", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 517, posEnd: 689}, edits, async);
 	}
 
 	function testMetadataProcessor(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(meta, results);\n", 220, 575, true),
 			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
-				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>, results:Map<String, Array<String>>) {\n"
+				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>, results:Map<String, Array<String>>):Void {\n"
 				+ "for (field in Reflect.fields(meta)) {\n"
 				+ "			var fieldMeta = Reflect.field(meta, field);\n"
 				+ "			if (Reflect.hasField(fieldMeta, \"meta\")) {\n"
@@ -646,7 +697,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(results);\n", 579, 672, true),
 			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
-				"function processExtract(results:Map<String, Array<String>>) {\n"
+				"function processExtract(results:Map<String, Array<String>>):Void {\n"
 				+ "for (field => values in results) {\n"
 				+ "			trace('Field: $field, Meta: ${values.join(\", \")}');\n"
 				+ "		}\n"

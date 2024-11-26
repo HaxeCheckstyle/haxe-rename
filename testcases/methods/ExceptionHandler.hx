@@ -10,6 +10,27 @@ class ExceptionHandler {
 			logError(e);
 			throw new ProcessingException(e.message);
 		}
+		try {
+			var data = getData();
+			if (data.value > 10) {
+				return;
+			}
+			throw new InvalidDataException("value should not be smaller than 11");
+		} catch (e:InvalidDataException) {
+			logError(e);
+			throw new ProcessingException(e.message);
+		}
+		try {
+			var data = getData();
+			if (data.value > 10) {
+				throw new InvalidDataException("value should not be larger than 10");
+			}
+			validateData(data);
+			processData(data);
+		} catch (e:InvalidDataException) {
+			logError(e);
+			throw new ProcessingException(e.message);
+		}
 	}
 
 	function getData():DataType {

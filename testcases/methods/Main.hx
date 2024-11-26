@@ -86,6 +86,20 @@ class Main {
 		}
 		return count;
 	}
+
+	public function allEmptyReturns(cond1:Bool, cond2:Bool) {
+		if (cond1) {
+			return;
+		}
+		if (cond2) {
+			return;
+		}
+		trace("hello 1");
+		trace("hello 2");
+		trace("hello 3");
+		trace("hello 4");
+		return;
+	}
 }
 
 typedef Item = {

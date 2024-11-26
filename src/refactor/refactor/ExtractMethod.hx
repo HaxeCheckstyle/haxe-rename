@@ -368,6 +368,7 @@ class ExtractMethod {
 
 		final leakingVars = findAdditionalScopedVars(extractData, context, functionIdentifier, neededIdentifiers);
 
+		final allThrows:Array<TokenTree> = [];
 		final allReturns = parent.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			if (token.pos.max < extractData.startToken.pos.min) {
 				return GoDeeper;
@@ -380,6 +381,8 @@ class ExtractMethod {
 					return SkipSubtree;
 				case Kwd(KwdReturn):
 					return FoundSkipSubtree;
+				case Kwd(KwdThrow):
+					allThrows.push(token);
 				case Const(CIdent(s)):
 					var child = token.getFirstChild();
 					if (child != null) {
@@ -395,10 +398,18 @@ class ExtractMethod {
 			}
 			return GoDeeper;
 		});
+		var returnIsEmpty:Bool = allReturns.length == 0;
 		if (allReturns.length > 0) {
 			var lastReturn = allReturns[allReturns.length - 1];
+			returnIsEmpty = isReturnEmpty(lastReturn);
 			if (isSingleExpression(lastReturn, extractData.endToken)) {
-				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers);
+				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers, returnIsEmpty);
+			}
+		}
+		if (allThrows.length > 0) {
+			var lastThrow = allThrows[allThrows.length - 1];
+			if (isSingleExpression(lastThrow, extractData.endToken)) {
+				return new CodeGenReturnIsLast(extractData, context, neededIdentifiers, returnIsEmpty);
 			}
 		}
 
@@ -413,19 +424,27 @@ class ExtractMethod {
 		if (allReturns.length == 0) {
 			return new CodeGenNoReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);
 		}
-		for (ret in allReturns) {
-			var child = ret.getFirstChild();
-			if (child == null) {
-				return null;
-			}
-			switch (child.tok) {
-				case Semicolon:
-					return new CodeGenEmptyReturn(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
-				default:
-					return new CodeGenOpenEnded(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
-			}
+		if (returnIsEmpty) {
+			return new CodeGenEmptyReturn(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
+		} else {
+			return new CodeGenOpenEnded(extractData, context, neededIdentifiers, allReturns, modifiedIdentifiers, leakingVars);
 		}
-		return null;
+	}
+
+	static function isReturnEmpty(token:TokenTree):Bool {
+		if (!token.matches(Kwd(KwdReturn))) {
+			return false;
+		}
+		var child = token.getFirstChild();
+		if (child == null) {
+			return false;
+		}
+		return switch (child.tok) {
+			case Semicolon:
+				true;
+			default:
+				false;
+		}
 	}
 
 	static function findAdditionalScopedVars(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier,

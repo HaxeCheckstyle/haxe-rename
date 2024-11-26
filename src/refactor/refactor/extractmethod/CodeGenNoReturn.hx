@@ -35,7 +35,7 @@ class CodeGenNoReturn extends CodeGenBase {
 	public function makeReturnTypeHint():Promise<String> {
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
-				return Promise.resolve("");
+				return Promise.resolve(":Void");
 			case [0, 1]:
 				return findTypeOfIdentifier(vars[0]).then(function(typeHint):Promise<String> {
 					if (typeHint == null) {
