@@ -539,4 +539,124 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		addTypeHint("testcases/methods/FunctionProcessor.hx", 129, LibType("String", "String", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/FunctionProcessor.hx", posStart: 142, posEnd: 211}, edits, async);
 	}
+
+	function testArrayTools(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/ArrayTools.hx", "return processItemsExtract(arr, fn);\n", 117, 231, true),
+			makeInsertTestEdit("testcases/methods/ArrayTools.hx",
+				"static function processItemsExtract<T>(arr:Array<T>, fn:T -> Bool):Array<T> {\n"
+				+ "var results = new Array<T>();\n"
+				+ "		for (item in arr) {\n"
+				+ "			if (fn(item))\n"
+				+ "				results.push(item);\n"
+				+ "		}\n"
+				+ "		return results;\n"
+				+ "}\n",
+				235, true),
+		];
+		addTypeHint("testcases/methods/ArrayTools.hx", 82, LibType("Array", "Array", [LibType("T", "T", [])]));
+		addTypeHint("testcases/methods/ArrayTools.hx", 102, FunctionType([LibType("T", "T", [])], LibType("Bool", "Bool", [])));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ArrayTools.hx", posStart: 115, posEnd: 231}, edits, async);
+	}
+
+	function testExceptionHandlerTry(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 86, 152, true),
+			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
+				"function processExtract() {\n"
+				+ "var data = getData();\n"
+				+ "			validateData(data);\n"
+				+ "			processData(data);\n"
+				+ "}\n", 258, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 85, posEnd: 152}, edits, async);
+	}
+
+	function testExceptionHandlerCatch(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 193, 250, true),
+			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
+				"function processExtract() {\n"
+				+ "logError(e);\n"
+				+ "			throw new ProcessingException(e.message);\n"
+				+ "}\n", 258, true),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/ExceptionHandler.hx", posStart: 192, posEnd: 250}, edits, async);
+	}
+
+	function testMetadataProcessor(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(meta, results);\n", 220, 575, true),
+			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
+				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>, results:Map<String, Array<String>>) {\n"
+				+ "for (field in Reflect.fields(meta)) {\n"
+				+ "			var fieldMeta = Reflect.field(meta, field);\n"
+				+ "			if (Reflect.hasField(fieldMeta, \"meta\")) {\n"
+				+ "				var metaValues = Reflect.field(fieldMeta, \"meta\");\n"
+				+ "				if (Std.isOfType(metaValues, Array)) {\n"
+				+ "					var values = cast(metaValues, Array<Dynamic>);\n"
+				+ "					results.set(field, [for (v in values) Std.string(v)]);\n"
+				+ "				}\n"
+				+ "			}\n"
+				+ "		}\n"
+				+ "}\n",
+				676, true),
+		];
+		addTypeHint("testcases/methods/MetadataProcessor.hx", 132, LibType("Dynamic", "Dynamic", [
+			LibType("Dynamic", "Dynamic", [LibType("Array", "Array", [LibType("Dynamic", "Dynamic", [])])])
+		]));
+		addTypeHint("testcases/methods/MetadataProcessor.hx", 179, LibType("Map", "Map", [
+			LibType("String", "String", []),
+			LibType("Array", "Array", [LibType("String", "String", [])])
+		]));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MetadataProcessor.hx", posStart: 219, posEnd: 575}, edits, async);
+	}
+
+	function testMetadataProcessorWithResults(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "var results = processExtract(meta);\n", 169, 575, true),
+			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
+				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>):Map<String, Array<String>> {\n"
+				+ "var results = new Map<String, Array<String>>();\n\n"
+				+ "		for (field in Reflect.fields(meta)) {\n"
+				+ "			var fieldMeta = Reflect.field(meta, field);\n"
+				+ "			if (Reflect.hasField(fieldMeta, \"meta\")) {\n"
+				+ "				var metaValues = Reflect.field(fieldMeta, \"meta\");\n"
+				+ "				if (Std.isOfType(metaValues, Array)) {\n"
+				+ "					var values = cast(metaValues, Array<Dynamic>);\n"
+				+ "					results.set(field, [for (v in values) Std.string(v)]);\n"
+				+ "				}\n"
+				+ "			}\n"
+				+ "		}\n"
+				+ "return results;\n"
+				+ "}\n",
+				676, true),
+		];
+		addTypeHint("testcases/methods/MetadataProcessor.hx", 132, LibType("Dynamic", "Dynamic", [
+			LibType("Dynamic", "Dynamic", [LibType("Array", "Array", [LibType("Dynamic", "Dynamic", [])])])
+		]));
+		addTypeHint("testcases/methods/MetadataProcessor.hx", 179, LibType("Map", "Map", [
+			LibType("String", "String", []),
+			LibType("Array", "Array", [LibType("String", "String", [])])
+		]));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MetadataProcessor.hx", posStart: 168, posEnd: 575}, edits, async);
+	}
+
+	function testMetadataProcessorPrint(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(results);\n", 579, 672, true),
+			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
+				"function processExtract(results:Map<String, Array<String>>) {\n"
+				+ "for (field => values in results) {\n"
+				+ "			trace('Field: $field, Meta: ${values.join(\", \")}');\n"
+				+ "		}\n"
+				+ "}\n",
+				676, true),
+		];
+		addTypeHint("testcases/methods/MetadataProcessor.hx", 179, LibType("Map", "Map", [
+			LibType("String", "String", []),
+			LibType("Array", "Array", [LibType("String", "String", [])])
+		]));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MetadataProcessor.hx", posStart: 578, posEnd: 672}, edits, async);
+	}
 }
