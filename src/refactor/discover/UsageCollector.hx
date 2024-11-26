@@ -283,11 +283,20 @@ class UsageCollector {
 							start: token.pos.min + 1,
 							end: token.pos.max - 1
 						};
-						identifier.addUse(new Identifier(StringConst, s, pos, context.nameMap, context.file, context.type));
+						final newIdentifier = new Identifier(StringConst, s, pos, context.nameMap, context.file, context.type);
+						final parentIdentifier = findParentIdentifier(context, token);
+						if (parentIdentifier != null) {
+							parentIdentifier.addUse(newIdentifier);
+						}
+						identifier.addUse(newIdentifier);
 					}
 					SkipSubtree;
 				case Const(CString(s, SingleQuotes)):
-					readStringInterpolation(context, identifier, token, s);
+					var parentIdentifier = findParentIdentifier(context, token);
+					if (parentIdentifier == null) {
+						parentIdentifier = identifier;
+					}
+					readStringInterpolation(context, parentIdentifier, token, s);
 					SkipSubtree;
 				default:
 					GoDeeper;
@@ -329,6 +338,24 @@ class UsageCollector {
 				identifier.addUse(new Identifier(Access, matchedText, pos, context.nameMap, context.file, context.type));
 			}
 		}
+	}
+
+	function findParentIdentifier(context:UsageContext, stringToken:TokenTree):Null<Identifier> {
+		var parent = stringToken.parent;
+		while (true) {
+			switch (parent.tok) {
+				case Kwd(KwdFunction) | Kwd(KwdVar) | Kwd(KwdFinal) | Kwd(KwdAbstract) | Kwd(KwdClass) | Kwd(KwdEnum) | Kwd(KwdInterface) | Kwd(KwdTypedef):
+					var child = parent.getFirstChild();
+					if (child != null) {
+						return context.type.findIdentifier(child.pos.min);
+					}
+				case Root | null:
+					break;
+				default:
+			}
+			parent = parent.parent;
+		}
+		return null;
 	}
 
 	function isDollarEscaped(text:String, index:Int):Bool {

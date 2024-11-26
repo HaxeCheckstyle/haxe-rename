@@ -225,6 +225,17 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1721, posEnd: 1809}, edits, async);
 	}
 
+	function testStringInterpolation(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "return interpolationExtract(data);\n", 1884, 1937, true),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"static function interpolationExtract(data:Dynamic):String {\n" + "return cast '${data.a}_${data.b}_${data.c}_${false}';\n" + "}\n", 1941,
+				true),
+		];
+		addTypeHint("testcases/methods/Main.hx", 1857, LibType("String", "String", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1887, posEnd: 1937}, edits, async);
+	}
+
 	function testDemoSimple(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract();\n", 161, 252, true),

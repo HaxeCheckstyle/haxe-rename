@@ -216,14 +216,47 @@ class ExtractMethod {
 		if (parentA == null) {
 			return false;
 		}
+		switch (parentA.tok) {
+			case POpen:
+				final closeToken = parentA.access().firstOf(PClose).token;
+				if (closeToken == null) {
+					return false;
+				}
+				if (closeToken.index < tokenB.index) {
+					return false;
+				}
+			case BrOpen:
+				final closeToken = parentA.access().firstOf(BrClose).token;
+				if (closeToken == null) {
+					return false;
+				}
+				if (closeToken.index < tokenB.index) {
+					return false;
+				}
+			case BkOpen:
+				final closeToken = parentA.access().firstOf(BkClose).token;
+				if (closeToken == null) {
+					return false;
+				}
+				if (closeToken.index < tokenB.index) {
+					return false;
+				}
+			default:
+		}
 		var parentB = tokenB.parent;
+		var oldParentB = tokenB;
 		while (true) {
 			if (parentB == null) {
 				return false;
 			}
 			if (parentA.index == parentB.index) {
-				return true;
+				final lastToken = TokenTreeCheckUtils.getLastToken(oldParentB);
+				if (lastToken == null) {
+					return false;
+				}
+				return (lastToken.index <= tokenB.index);
 			}
+			oldParentB = parentB;
 			parentB = parentB.parent;
 		}
 	}
