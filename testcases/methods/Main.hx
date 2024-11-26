@@ -100,6 +100,10 @@ class Main {
 		trace("hello 4");
 		return;
 	}
+
+	public static inline function interpolation(data:Dynamic):String {
+		return cast '${data.a}_${data.b}_${data.c}_${false}';
+	}
 }
 
 typedef Item = {
