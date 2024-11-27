@@ -6,6 +6,7 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 import refactor.refactor.extractmethod.CodeGenAsExpression;
 import refactor.refactor.extractmethod.CodeGenEmptyReturn;
+import refactor.refactor.extractmethod.CodeGenLocalFunction;
 import refactor.refactor.extractmethod.CodeGenNoReturn;
 import refactor.refactor.extractmethod.CodeGenOpenEnded;
 import refactor.refactor.extractmethod.CodeGenReturnIsLast;
@@ -37,10 +38,12 @@ class ExtractMethod {
 
 		// find all parameters for extracted method
 		// e.g. all scoped vars used inside selected code
-		var neededIdentifiers:Array<Identifier> = findParameters(extractData, context, functionIdentifier);
+		final neededIdentifiers:Array<Identifier> = findParameters(extractData, context, functionIdentifier);
+
+		final localFunctionParameters:Array<Identifier> = findLocalParameters(extractData, context, functionIdentifier);
 
 		// determine type of selected code
-		var codeGen:Null<ICodeGen> = findCodeGen(extractData, context, functionIdentifier, neededIdentifiers);
+		final codeGen:Null<ICodeGen> = findCodeGen(extractData, context, functionIdentifier, neededIdentifiers, localFunctionParameters);
 		if (codeGen == null) {
 			return Promise.resolve(RefactorResult.Unsupported("could not extract method from selected code - no codegen"));
 		}
@@ -49,12 +52,13 @@ class ExtractMethod {
 		var returnTypeHint:String = "";
 
 		// resolve all parameter types either from typehint or using a hover request with Haxe server
-		var parameterPromise = Promise.all(makeParameterList(extractData, context, neededIdentifiers)).then(function(params):Promise<Bool> {
-			parameterList = params.join(", ");
-			return Promise.resolve(true);
-		});
-		// resolve function return typehint
+		var parameterPromise = Promise.all(makeParameterList(extractData, context, localFunctionParameters.concat(neededIdentifiers)))
+			.then(function(params):Promise<Bool> {
+				parameterList = params.join(", ");
+				return Promise.resolve(true);
+			});
 
+		// resolve function return typehint
 		var returnHintPromise = codeGen.makeReturnTypeHint().then(function(typeHint) {
 			returnTypeHint = typeHint;
 			return Promise.resolve(true);
@@ -64,7 +68,6 @@ class ExtractMethod {
 		return Promise.all([parameterPromise, returnHintPromise]).then(function(_) {
 			// replace selected code with call to newly extracted method
 			final extractedCall:String = codeGen.makeCallSite();
-
 			changelist.addChange(context.what.fileName,
 				ReplaceText(extractedCall, {fileName: context.what.fileName, start: extractData.startToken.pos.min, end: extractData.endToken.pos.max}, true),
 				null);
@@ -138,21 +141,34 @@ class ExtractMethod {
 		if (tokenStart.index >= tokenEnd.index) {
 			return null;
 		}
-		// currently not supporting extracting an inner function
+
+		// inner function detection
+		var functionType:LocalFunctionType = NoFunction;
 		switch (tokenStart.tok) {
 			case Kwd(KwdFunction):
-				return null;
+				final child = tokenStart.getFirstChild();
+				if (child == null) {
+					return null;
+				}
+				switch (child.tok) {
+					case Const(_):
+						functionType = Named;
+					case POpen:
+						functionType = Unnamed;
+					default:
+						return null;
+				}
 			case Const(_):
 				if (tokenStart.hasChildren()) {
 					final child = tokenStart.getFirstChild();
 					if (child.matches(Arrow)) {
-						return null;
+						functionType = Unnamed;
 					}
 				}
 			case POpen:
 				switch (TokenTreeCheckUtils.getPOpenType(tokenStart)) {
 					case Parameter:
-						return null;
+						functionType = Unnamed;
 					default:
 				}
 			default:
@@ -168,6 +184,7 @@ class ExtractMethod {
 
 		// extracting only works if parent of start token is also grand…parent of end token
 		if (!shareSameParent(tokenStart, tokenEnd)) {
+			trace("xxx");
 			return null;
 		}
 
@@ -208,6 +225,7 @@ class ExtractMethod {
 			functionToken: parentFunction,
 			isStatic: isStatic,
 			isSingleExpr: isSingleExpr,
+			functionType: functionType,
 		};
 	}
 
@@ -267,6 +285,60 @@ class ExtractMethod {
 			return null;
 		}
 		return file.getIdentifier(extractData.functionToken.getFirstChild().pos.min);
+	}
+
+	static function findLocalParameters(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier):Array<Identifier> {
+		if (extractData.functionType == NoFunction) {
+			return [];
+		}
+		final localFunctionParameters:Array<Identifier> = [];
+		switch (extractData.startToken.tok) {
+			case Kwd(KwdFunction):
+				var pOpenToken = extractData.startToken.getFirstChild();
+				if (pOpenToken == null) {
+					return [];
+				}
+				switch (pOpenToken.tok) {
+					case Const(CIdent(_)):
+						pOpenToken = pOpenToken.getFirstChild();
+					case POpen:
+					default:
+						return [];
+				}
+				for (child in pOpenToken.children) {
+					switch (child.tok) {
+						case Const(CIdent(_)):
+							final param = functionIdentifier.findIdentifier(child.pos.min);
+							if (param != null) {
+								localFunctionParameters.push(param);
+							}
+						case PClose:
+							break;
+						default:
+					}
+				}
+			case Const(_):
+				final singleParam = functionIdentifier.findIdentifier(extractData.startToken.pos.min);
+				if (singleParam == null) {
+					return [];
+				}
+				localFunctionParameters.push(singleParam);
+			case POpen:
+				for (child in extractData.startToken.children) {
+					switch (child.tok) {
+						case Const(CIdent(_)):
+							final param = functionIdentifier.findIdentifier(child.pos.min);
+							if (param != null) {
+								localFunctionParameters.push(param);
+							}
+						case PClose:
+							break;
+						default:
+					}
+				}
+			default:
+		}
+		return localFunctionParameters;
 	}
 
 	static function findParameters(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier) {
@@ -386,12 +458,12 @@ class ExtractMethod {
 		return null;
 	}
 
-	static function findCodeGen(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier,
-			neededIdentifiers:Array<Identifier>):Null<ICodeGen> {
+	static function findCodeGen(extractData:ExtractMethodData, context:RefactorContext, functionIdentifier:Identifier, neededIdentifiers:Array<Identifier>,
+			localFunctionIdentifiers:Array<Identifier>):Null<ICodeGen> {
 		final assignedVars:Array<String> = [];
 		final parent = extractData.startToken.parent;
 
-		if (usedAsExpression(parent)) {
+		if (extractData.functionType == NoFunction && usedAsExpression(parent)) {
 			if (extractData.isSingleExpr) {
 				return new CodeGenAsExpression(extractData, context, neededIdentifiers);
 			} else {
@@ -453,6 +525,13 @@ class ExtractMethod {
 			}
 		}
 		final modifiedIdentifiers = findIdentifiersUsedAfterSelection(extractData, functionIdentifier, modifiedCandidates);
+		if (extractData.functionType != NoFunction) {
+			if (modifiedIdentifiers.length > 0) {
+				// assigments to closures are not supported
+				return null;
+			}
+			return new CodeGenLocalFunction(extractData, context, neededIdentifiers, localFunctionIdentifiers, returnIsEmpty);
+		}
 
 		if (allReturns.length == 0) {
 			return new CodeGenNoReturn(extractData, context, neededIdentifiers, modifiedIdentifiers, leakingVars);

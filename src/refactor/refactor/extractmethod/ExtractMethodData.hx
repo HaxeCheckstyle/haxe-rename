@@ -10,4 +10,11 @@ typedef ExtractMethodData = {
 	var functionToken:TokenTree;
 	var isStatic:Bool;
 	var isSingleExpr:Bool;
+	var functionType:LocalFunctionType;
+}
+
+enum LocalFunctionType {
+	NoFunction;
+	Named;
+	Unnamed;
 }

@@ -13,7 +13,7 @@ class RefactorHelper {
 		var distanceAfter:Int = 10000;
 
 		root.filterCallback(function(token:TokenTree, index:Int):FilterResult {
-			if (token.pos.min <= searchPos) {
+			if (token.pos.min < searchPos) {
 				var distance = searchPos - token.pos.max;
 				if (distanceBefore > distance) {
 					tokens.before = token;

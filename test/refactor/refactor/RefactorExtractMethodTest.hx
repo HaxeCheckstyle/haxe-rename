@@ -721,4 +721,48 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		]));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/MetadataProcessor.hx", posStart: 578, posEnd: 672}, edits, async);
 	}
+
+	function testLambdaExample(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/LambdaExample.hx", "processExtract", 156, 230, true),
+			makeInsertTestEdit("testcases/methods/LambdaExample.hx",
+				"function processExtract(n:Int):Int {\n"
+				+ "var temp = n * multiplier;\n"
+				+ "			return temp + this.multiplier;\n"
+				+ "}\n", 236, true),
+		];
+		addTypeHint("testcases/methods/LambdaExample.hx", 156, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/LambdaExample.hx", 159, LibType("Int", "Int", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 156, posEnd: 230}, edits, async);
+	}
+
+	function testLambdaExampleCallback(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/LambdaExample.hx", "processCallbackExtract", 281, 337, true),
+			makeInsertTestEdit("testcases/methods/LambdaExample.hx",
+				"function processCallbackExtract(n:Int, m:Int):Int {\n"
+				+ "var temp = n * m;\n"
+				+ "			return temp + m;\n"
+				+ "}\n", 343, true),
+		];
+		addTypeHint("testcases/methods/LambdaExample.hx", 282, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/LambdaExample.hx", 285, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/LambdaExample.hx", 289, LibType("Int", "Int", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 281, posEnd: 337}, edits, async);
+	}
+
+	function testLambdaExampleCallbackFunc(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/LambdaExample.hx", "processCallbackFuncExtract", 392, 453, true),
+			makeInsertTestEdit("testcases/methods/LambdaExample.hx",
+				"function processCallbackFuncExtract(n:Int, m:Int):Int {\n"
+				+ "var temp = n * m;\n"
+				+ "			return temp + m;\n"
+				+ "}\n", 459, true),
+		];
+		addTypeHint("testcases/methods/LambdaExample.hx", 401, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/LambdaExample.hx", 404, LibType("Int", "Int", []));
+		addTypeHint("testcases/methods/LambdaExample.hx", 399, LibType("Int", "Int", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 392, posEnd: 453}, edits, async);
+	}
 }
