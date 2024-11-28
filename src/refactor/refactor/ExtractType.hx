@@ -24,7 +24,7 @@ class ExtractType {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractTypeData(context);
 		if (extractData == null) {
-			return Promise.resolve(RefactorResult.NotFound);
+			return Promise.reject("failed to collect extract type data");
 		}
 		// copy header + imports
 		final fileHeader = makeHeader(extractData, context);

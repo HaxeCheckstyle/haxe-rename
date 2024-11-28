@@ -107,7 +107,7 @@ class PrintHelper {
 		}
 	}
 
-	public static function printRefactorResult(result:RefactorResult):String {
+	public static function printRenameResult(result:RefactorResult):String {
 		return switch (result) {
 			case NoChange:
 				"nothing to do";
@@ -119,6 +119,21 @@ class PrintHelper {
 				"dry run - no changes were made";
 			case Done:
 				"rename successful";
+		}
+	}
+
+	public static function printRefactorResult(result:RefactorResult):String {
+		return switch (result) {
+			case NoChange:
+				"nothing to do";
+			case NotFound:
+				"could not find identifier to refactor";
+			case Unsupported(name):
+				"refactor not supported for " + name;
+			case DryRun:
+				"dry run - no changes were made";
+			case Done:
+				"refactor successful";
 		}
 	}
 }

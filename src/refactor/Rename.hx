@@ -19,11 +19,11 @@ class Rename {
 	public static function canRename(context:CanRenameContext):Promise<CanRenameResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
-			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+			return Promise.reject(RefactorResult.NotFound.printRenameResult());
 		}
 		var identifier:Identifier = file.getIdentifier(context.what.pos);
 		if (identifier == null) {
-			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+			return Promise.reject(RefactorResult.NotFound.printRenameResult());
 		}
 		return switch (identifier.type) {
 			case PackageName | ImportAlias | Abstract | Class | Enum | Interface | Typedef | ModuleLevelStaticVar | ModuleLevelStaticMethod | Property |
@@ -32,11 +32,11 @@ class Rename {
 				Promise.resolve({name: identifier.name, pos: identifier.pos});
 			case ImportModul | UsingModul | Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst | TypedParameter |
 				TypedefBase | Call(true) | CaseLabel(_):
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case Call(false) | Access | ArrayAccess(_) | ForIterator:
 				var candidate:Null<Identifier> = findActualWhat(context, file, identifier);
 				if (candidate == null) {
-					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 				}
 				if (identifier.name.startsWith(candidate.name)) {
 					var pos:IdentifierPos = {
@@ -54,28 +54,28 @@ class Rename {
 					}
 					return Promise.resolve({name: candidate.name, pos: pos});
 				}
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 		}
 	}
 
 	public static function rename(context:RenameContext):Promise<RefactorResult> {
 		var file:Null<File> = context.fileList.getFile(context.what.fileName);
 		if (file == null) {
-			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+			return Promise.reject(RefactorResult.NotFound.printRenameResult());
 		}
 		var identifier:Identifier = file.getIdentifier(context.what.pos);
 		if (identifier == null) {
-			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+			return Promise.reject(RefactorResult.NotFound.printRenameResult());
 		}
 		if (identifier.name == context.what.toName) {
-			return Promise.reject(RefactorResult.NotFound.printRefactorResult());
+			return Promise.reject(RefactorResult.NotFound.printRenameResult());
 		}
 		return switch (identifier.type) {
 			case PackageName:
 				context.verboseLog('rename package name "${identifier.name}" to "${context.what.toName}"');
 				RenamePackage.refactorPackageName(context, file, identifier);
 			case ImportModul | UsingModul:
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case ImportAlias:
 				context.verboseLog('rename import alias "${identifier.name}" to "${context.what.toName}"');
 				RenameImportAlias.refactorImportAlias(context, file, identifier);
@@ -86,7 +86,7 @@ class Rename {
 				context.verboseLog('rename module level static "${identifier.name}" to "${context.what.toName}"');
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
 			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case Property:
 				context.verboseLog('rename property "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, false);
@@ -97,9 +97,9 @@ class Rename {
 				context.verboseLog('rename class method "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case TypedefBase:
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case TypedefField(fields):
 				RenameAnonStructField.refactorAnonStructField(context, file, identifier, fields);
 			case StructureField(fields):
@@ -111,17 +111,17 @@ class Rename {
 				context.verboseLog('rename enum field "${identifier.name}" to "${context.what.toName}"');
 				RenameEnumField.refactorEnumField(context, file, identifier);
 			case Call(true):
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case Call(false) | Access | ArrayAccess(_) | ForIterator:
 				context.verboseLog('rename "${identifier.name}" at call/access location - trying to find definition');
 				var candidate:Null<Identifier> = findActualWhat(context, file, identifier);
 				if (candidate == null) {
-					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+					return Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 				}
 				context.what.pos = candidate.pos.start;
 				rename(context);
 			case CaseLabel(_):
-				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRefactorResult());
+				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case ScopedLocal(scopeStart, scopeEnd, type):
 				context.verboseLog('rename scoped local "${identifier.name}" (${type.scopeTypeToString()}) to "${context.what.toName}"');
 				RenameScopedLocal.refactorScopedLocal(context, file, identifier, scopeStart, scopeEnd);

@@ -30,6 +30,6 @@ class Refactoring {
 			case RefactorExtractType:
 				return ExtractType.doRefactor(context);
 		}
-		return Promise.resolve(RefactorResult.Unsupported("no refactor type selected"));
+		return Promise.reject("no refactor type selected");
 	}
 }

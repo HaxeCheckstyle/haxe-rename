@@ -5,6 +5,18 @@ class RefactorClassTest extends RefactorTestBase {
 		setupTestSources(["testcases/classes"]);
 	}
 
+	function testFailExtractTypChildClass(async:Async) {
+		failCanRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "unsupported");
+		failRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "failed to collect extract type data",
+			async);
+	}
+
+	function testFailExtractInterfaceNoClass(async:Async) {
+		failCanRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875}, "unsupported");
+		failRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875},
+			"failed to collect extract interface data", async);
+	}
+
 	function testExtractTypeListOfChilds(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeRemoveTestEdit("testcases/classes/ChildClass.hx", 860, 901),
@@ -32,6 +44,25 @@ class RefactorClassTest extends RefactorTestBase {
 			makeInsertTestEdit("testcases/classes/pack/UsePrinter.hx", "import classes.TextLoader;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/Printer.hx", posStart: 1273, posEnd: 1283}, edits, async);
+	}
+
+	function testExtractTypeContextWithDocComment(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeCreateTestEdit("testcases/classes/Context.hx"),
+			makeInsertTestEdit("testcases/classes/Context.hx",
+				"package classes;\n\n"
+				+ "using classes.ChildHelper;\n"
+				+ "using classes.pack.SecondChildHelper;\n\n"
+				+ "/**\n"
+				+ " * Context class\n"
+				+ " */\n"
+				+ "class Context {\n"
+				+ "	public static var printFunc:PrintFunc;\n"
+				+ "}",
+				0, true),
+			makeRemoveTestEdit("testcases/classes/StaticUsing.hx", 484, 566),
+		];
+		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/StaticUsing.hx", posStart: 518, posEnd: 518}, edits, async);
 	}
 
 	function testExtractInterfaceBaseClass(async:Async) {

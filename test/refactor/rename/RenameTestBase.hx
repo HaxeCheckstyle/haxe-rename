@@ -24,7 +24,7 @@ class RenameTestBase extends TestBase {
 	function failCanRename(what:RenameWhat, expected:String, ?async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
 			doCanRename(what, [], withTyper, pos).then(function(success:RefactorResult) {
-				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
+				Assert.equals(expected, PrintHelper.printRenameResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
 			}).finally(function() {
@@ -40,7 +40,7 @@ class RenameTestBase extends TestBase {
 	function failRename(what:RenameWhat, expected:String, async:Async, withTyper:Bool = false, ?pos:PosInfos) {
 		try {
 			doRename(what, [], withTyper, pos).then(function(success:RefactorResult) {
-				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);
+				Assert.equals(expected, PrintHelper.printRenameResult(success), pos);
 			}).catchError(function(failure) {
 				Assert.equals(expected, '$failure', pos);
 			}).finally(function() {

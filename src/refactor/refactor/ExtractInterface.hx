@@ -20,7 +20,7 @@ class ExtractInterface {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractInterfaceData(context);
 		if (extractData == null) {
-			return Promise.resolve(RefactorResult.NotFound);
+			return Promise.reject("failed to collect extract interface data");
 		}
 
 		final changelist:Changelist = new Changelist(context);

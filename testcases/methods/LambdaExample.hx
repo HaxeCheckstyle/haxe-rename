@@ -29,6 +29,11 @@ class LambdaExample {
 		var numbers = [1, 2, 3];
 		var result = numbers.map(n -> cb(n, multiplier));
 	}
+
+	function processSimple() {
+		var numbers = [1, 2, 3];
+		var result = numbers.map(n -> n * n);
+	}
 }
 
 typedef ProcessCallback = (n:Int, m:Int) -> Int;

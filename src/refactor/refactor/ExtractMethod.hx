@@ -26,14 +26,14 @@ class ExtractMethod {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractMethodData(context);
 		if (extractData == null) {
-			return Promise.resolve(RefactorResult.Unsupported("failed to collect extract method data"));
+			return Promise.reject("failed to collect extract method data");
 		}
 		final changelist:Changelist = new Changelist(context);
 
 		// identifier of top-level containing function
 		final functionIdentifier = getFunctionIdentifier(extractData, context);
 		if (functionIdentifier == null) {
-			return Promise.resolve(RefactorResult.Unsupported("failed to find identifier of containing function"));
+			return Promise.reject("failed to find identifier of containing function");
 		}
 
 		// find all parameters for extracted method
@@ -45,7 +45,7 @@ class ExtractMethod {
 		// determine type of selected code
 		final codeGen:Null<ICodeGen> = findCodeGen(extractData, context, functionIdentifier, neededIdentifiers, localFunctionParameters);
 		if (codeGen == null) {
-			return Promise.resolve(RefactorResult.Unsupported("could not extract method from selected code - no codegen"));
+			return Promise.reject("could not extract method from selected code - no codegen");
 		}
 
 		var parameterList:String = "";
@@ -125,10 +125,7 @@ class ExtractMethod {
 		// find corresponding tokens in tokentree, selection start/end in whitespace
 		final tokensStart:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posStart);
 		final tokensEnd:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posEnd);
-		if (tokensStart.after == null) {
-			return null;
-		}
-		if (tokensEnd.before == null) {
+		if (tokensStart.after == null || tokensEnd.before == null) {
 			return null;
 		}
 
@@ -184,7 +181,6 @@ class ExtractMethod {
 
 		// extracting only works if parent of start token is also grand…parent of end token
 		if (!shareSameParent(tokenStart, tokenEnd)) {
-			trace("xxx");
 			return null;
 		}
 

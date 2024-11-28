@@ -36,7 +36,7 @@ class RefactorTestBase extends TestBase {
 		}
 	}
 
-	function failRename(refactorType:RefactorType, what:RefactorWhat, expected:String, async:Async, ?pos:PosInfos) {
+	function failRefactor(refactorType:RefactorType, what:RefactorWhat, expected:String, async:Async, ?pos:PosInfos) {
 		try {
 			doRefactor(refactorType, what, [], pos).then(function(success:RefactorResult) {
 				Assert.equals(expected, PrintHelper.printRefactorResult(success), pos);

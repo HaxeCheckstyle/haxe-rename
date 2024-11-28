@@ -26,6 +26,9 @@ class StaticUsing {
 	}
 }
 
+/**
+ * Context class
+ */
 class Context {
 	public static var printFunc:PrintFunc;
 }
