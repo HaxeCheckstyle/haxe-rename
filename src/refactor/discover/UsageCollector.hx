@@ -100,6 +100,8 @@ class UsageCollector {
 					pos = child.getPos().max + 1;
 				case Kwd(KwdImport) | Kwd(KwdUsing):
 					return child.pos.min;
+				case Comment(_) | CommentLine(_):
+					pos = child.pos.max + 1;
 				default:
 					return child.pos.min;
 			}

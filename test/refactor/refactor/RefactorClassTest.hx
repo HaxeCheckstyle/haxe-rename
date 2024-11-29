@@ -65,6 +65,24 @@ class RefactorClassTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/StaticUsing.hx", posStart: 518, posEnd: 518}, edits, async);
 	}
 
+	function testExtractTypeNotDocModule(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeRemoveTestEdit("testcases/classes/DocModule.hx", 62, 110),
+			makeReplaceTestEdit("testcases/classes/ForceRenameCrash.hx", "classes.NotDocModule", 86, 116),
+			makeCreateTestEdit("testcases/classes/NotDocModule.hx"),
+			makeInsertTestEdit("testcases/classes/NotDocModule.hx",
+				"/**\n"
+				+ " * file header\n"
+				+ " */\n\n"
+				+ "package classes;\n\n"
+				+ "class NotDocModule {\n"
+				+ "	public function new() {}\n"
+				+ "}", 0, true),
+			makeInsertTestEdit("testcases/classes/pack/UseDocModule.hx", "import classes.NotDocModule;\n", 23),
+		];
+		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/DocModule.hx", posStart: 73, posEnd: 73}, edits, async);
+	}
+
 	function testExtractInterfaceBaseClass(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeInsertTestEdit("testcases/classes/BaseClass.hx", " implements IBaseClass", 33),
