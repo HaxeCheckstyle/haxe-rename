@@ -88,4 +88,12 @@ class RenameTypedefTest extends RenameTestBase {
 		];
 		checkRename({fileName: "testcases/typedefs/Types.hx", toName: "sourceFolders", pos: 784}, edits, async);
 	}
+
+	public function testRenameIndentOffset(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/typedefs/TestFormatter.hx", "indentationOffset", 496, 508),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "indentationOffset", 456, 468),
+		];
+		checkRename({fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", toName: "indentationOffset", pos: 462}, edits, async, true);
+	}
 }

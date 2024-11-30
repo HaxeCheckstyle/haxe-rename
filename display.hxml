@@ -1,10 +1,12 @@
 -cp src
 -cp test
+-cp testcases
 
 -lib haxeparser
 -lib tokentree
 -lib hxnodejs
 -lib hxargs
+-lib formatter
 -lib utest
 -lib test-adapter
 

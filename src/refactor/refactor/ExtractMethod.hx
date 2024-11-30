@@ -69,7 +69,8 @@ class ExtractMethod {
 			// replace selected code with call to newly extracted method
 			final extractedCall:String = codeGen.makeCallSite();
 			changelist.addChange(context.what.fileName,
-				ReplaceText(extractedCall, {fileName: context.what.fileName, start: extractData.startToken.pos.min, end: extractData.endToken.pos.max}, true),
+				ReplaceText(extractedCall, {fileName: context.what.fileName, start: extractData.startToken.pos.min, end: extractData.endToken.pos.max},
+					Format(extractData.snippetIndent)),
 				null);
 
 			// insert new method with function signature and body after current function
@@ -80,7 +81,7 @@ class ExtractMethod {
 
 			changelist.addChange(context.what.fileName,
 				InsertText(functionDefinition + body, {fileName: context.what.fileName, start: extractData.newMethodOffset, end: extractData.newMethodOffset},
-					true),
+					Format(extractData.functionIndent)),
 				null);
 
 			return changelist.execute();
@@ -211,6 +212,9 @@ class ExtractMethod {
 		final name:String = nameToken.toString();
 		final newMethodName = '${name}Extract';
 
+		final functionIndent:Int = RefactorHelper.calcIndentation(context, content, context.what.fileName, parentFunction.pos.min);
+		final snippetIndent:Int = RefactorHelper.calcIndentation(context, content, context.what.fileName, tokenStart.pos.min);
+
 		return {
 			content: content,
 			root: root,
@@ -222,6 +226,8 @@ class ExtractMethod {
 			isStatic: isStatic,
 			isSingleExpr: isSingleExpr,
 			functionType: functionType,
+			functionIndent: functionIndent,
+			snippetIndent: snippetIndent,
 		};
 	}
 

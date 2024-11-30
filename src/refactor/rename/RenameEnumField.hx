@@ -9,7 +9,7 @@ import refactor.rename.RenameContext;
 class RenameEnumField {
 	public static function refactorEnumField(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, false), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, NoFormat), identifier);
 
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();

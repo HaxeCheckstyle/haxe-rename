@@ -32,7 +32,7 @@ class RenameModuleLevelStatic {
 			if ((use.pos.fileName != file.name) && (!filesWithStaticImport.contains(use.pos.fileName))) {
 				continue;
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 		}
 
 		// all uses in files importing with package.mainmodul
@@ -45,7 +45,7 @@ class RenameModuleLevelStatic {
 					for (u in uses) {
 						switch (u.type) {
 							case Call(false) | Access:
-								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos, false), u);
+								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos, NoFormat), u);
 							case ScopedLocal(_):
 							default:
 						}
@@ -65,7 +65,7 @@ class RenameModuleLevelStatic {
 			if (use.type.match(ImportModul)) {
 				filesWithStaticImport.push(use.pos.fileName);
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(replaceName, use.pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(replaceName, use.pos, NoFormat), use);
 		}
 		var searchNameDot:String = '$searchName.';
 		var replaceNameDot:String = '$replaceName.';
@@ -76,7 +76,7 @@ class RenameModuleLevelStatic {
 				start: use.pos.start,
 				end: use.pos.start + searchNameDot.length
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(replaceNameDot, pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(replaceNameDot, pos, NoFormat), use);
 		}
 	}
 }

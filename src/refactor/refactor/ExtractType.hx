@@ -48,7 +48,8 @@ class ExtractType {
 		changelist.addChange(extractData.newFileName, CreateFile(extractData.newFileName), null);
 
 		// copy file header, type and doc comment into new file
-		changelist.addChange(extractData.newFileName, InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}, true), null);
+		changelist.addChange(extractData.newFileName, InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)),
+			null);
 
 		// find all places using type and update their imports
 		findImportLocations(context, extractData, changelist);
@@ -191,7 +192,7 @@ class ExtractType {
 		final newFullName = oldPackageName + "." + extractData.name;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(oldFullName);
 		for (use in allUses) {
-			changelist.addChange(use.file.name, ReplaceText(newFullName, use.pos, false), use);
+			changelist.addChange(use.file.name, ReplaceText(newFullName, use.pos, NoFormat), use);
 		}
 		allUses = context.nameMap.getIdentifiers(extractData.name);
 		var needsImport:Array<File> = [];
@@ -209,7 +210,7 @@ class ExtractType {
 		final importNewModule = "import " + newFullName + ";\n";
 		for (file in needsImport) {
 			var pos:IdentifierPos = {fileName: file.name, start: file.importInsertPos, end: file.importInsertPos};
-			changelist.addChange(file.name, InsertText(importNewModule, pos, false), null);
+			changelist.addChange(file.name, InsertText(importNewModule, pos, NoFormat), null);
 		}
 	}
 }

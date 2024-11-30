@@ -18,6 +18,7 @@ import refactor.discover.TypeList;
 import refactor.discover.UsageCollector;
 import refactor.discover.UsageContext;
 import refactor.edits.FileEdit;
+import refactor.edits.FormatType;
 import refactor.typing.TypeHintType;
 
 class TestBase implements ITest {
@@ -67,12 +68,25 @@ class TestBase implements ITest {
 				'Delete $fileName';
 			case Move(newFileName):
 				'Move $newFileName';
-			case ReplaceText(text, pos, format):
-				'ReplaceText "$text" ${pos.fileName}@${pos.start}-${pos.end}${format ? " with format" : ""}';
-			case InsertText(text, pos, format):
-				'InsertText "$text" ${pos.fileName}@${pos.start}-${pos.end}${format ? " with format" : ""}';
+			case ReplaceText(text, pos, f):
+				final formatText = formatTypeToString(f);
+				'ReplaceText "$text" ${pos.fileName}@${pos.start}-${pos.end}$formatText';
+			case InsertText(text, pos, f):
+				final formatText = formatTypeToString(f);
+				'InsertText "$text" ${pos.fileName}@${pos.start}-${pos.end}$formatText';
 			case RemoveText(pos):
 				'RemoveText ${pos.fileName}@${pos.start}-${pos.end}';
+		}
+	}
+
+	function formatTypeToString(format:FormatType):String {
+		return switch (format) {
+			case NoFormat:
+				"";
+			case Format(0):
+				" with format";
+			case Format(indentOffset):
+				' with format +indent=$indentOffset';
 		}
 	}
 
@@ -100,7 +114,7 @@ class TestBase implements ITest {
 		}
 	}
 
-	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int, format:Bool = false, ?pos:PosInfos):TestEdit {
+	function makeReplaceTestEdit(fileName:String, text:String, start:Int, end:Int, format:FormatType = NoFormat, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
 			edit: ReplaceText(text, {fileName: fileName, start: start, end: end}, format),
@@ -108,7 +122,7 @@ class TestBase implements ITest {
 		}
 	}
 
-	function makeInsertTestEdit(fileName:String, text:String, insertPos:Int, format:Bool = false, ?pos:PosInfos):TestEdit {
+	function makeInsertTestEdit(fileName:String, text:String, insertPos:Int, format:FormatType = NoFormat, ?pos:PosInfos):TestEdit {
 		return {
 			fileName: fileName,
 			edit: InsertText(text, {fileName: fileName, start: insertPos, end: insertPos}, format),

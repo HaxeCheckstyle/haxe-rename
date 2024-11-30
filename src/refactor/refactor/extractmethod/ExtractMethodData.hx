@@ -11,6 +11,8 @@ typedef ExtractMethodData = {
 	var isStatic:Bool;
 	var isSingleExpr:Bool;
 	var functionType:LocalFunctionType;
+	var functionIndent:Int;
+	var snippetIndent:Int;
 }
 
 enum LocalFunctionType {

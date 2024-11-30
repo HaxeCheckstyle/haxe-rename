@@ -63,11 +63,11 @@ class Changelist {
 						Sys.println('* delete file "$fileName"');
 					case Move(newFileName):
 						Sys.println('* rename to file "$newFileName"');
-					case InsertText(text, pos, format):
-						Sys.println('* insert text "$text" @${pos.start}-${pos.end}${format ? " with format" : ""}');
+					case InsertText(text, pos, f):
+						Sys.println('* insert text "$text" @${pos.start}-${pos.end}${formatTypeToString(f)}');
 						Sys.println('+++ $text');
-					case ReplaceText(text, pos, format):
-						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}${format ? " with format" : ""}');
+					case ReplaceText(text, pos, f):
+						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}${formatTypeToString(f)}');
 						printDiffLines(pos, text);
 					case RemoveText(pos):
 						Sys.println('* remove text @${pos.start}-${pos.end}');
@@ -76,6 +76,17 @@ class Changelist {
 			}
 		}
 		return (hasChanges ? DryRun : NoChange);
+	}
+
+	function formatTypeToString(format:FormatType):String {
+		return switch (format) {
+			case NoFormat:
+				"";
+			case Format(0):
+				" with format";
+			case Format(indentOffset):
+				' with format +indent=$indentOffset';
+		}
 	}
 
 	function sortFileEdits(a:FileEdit, b:FileEdit):Int {

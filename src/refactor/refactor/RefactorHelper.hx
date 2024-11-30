@@ -1,5 +1,6 @@
 package refactor.refactor;
 
+import formatter.Formatter;
 import refactor.CacheAndTyperContext.ByteToCharConverterFunc;
 import refactor.discover.File;
 
@@ -134,6 +135,43 @@ class RefactorHelper {
 			return GoDeeper;
 		});
 		return headers.shift();
+	}
+
+	public static function calcIndentation(context:CacheAndTyperContext, content:String, fileName:String, pos:Int):Int {
+		final config = Formatter.loadConfig(fileName);
+		var startPos = pos - 200;
+		if (startPos < 0) {
+			startPos = 0;
+		}
+
+		var text = extractText(context.converter, content, startPos, pos);
+		var indexLF = text.lastIndexOf("\n");
+		var indexCR = text.lastIndexOf("\r");
+		if (indexCR < 0) {
+			indexCR = indexLF;
+		}
+		if (indexLF < 0) {
+			indexLF = indexCR;
+		}
+		if (indexLF < 0) {
+			return 0;
+		}
+		final index = if (indexLF > indexCR) indexLF else indexCR;
+		final line = text.substr(index);
+		final regex = ~/([\t ]+).*/;
+		if (!regex.match(line)) {
+			return 0;
+		}
+		var match = regex.matched(1);
+		var character = config.indentation.character;
+		if (character.toLowerCase() == "tab") {
+			character = "\t";
+		}
+		var parts = match.split(character);
+		if (parts.length <= 0) {
+			return 0;
+		}
+		return parts.length - 1;
 	}
 }
 

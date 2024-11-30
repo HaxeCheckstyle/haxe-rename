@@ -5,6 +5,7 @@
 -lib haxeparser
 -lib tokentree
 -lib hxargs
+-lib formatter
 -lib utest
 -lib hxnodejs
 -lib instrument

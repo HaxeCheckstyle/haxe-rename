@@ -11,14 +11,14 @@ import refactor.typing.TypingHelper;
 class RenameHelper {
 	public static function replaceTextWithPrefix(use:Identifier, prefix:String, to:String, changelist:Changelist) {
 		if (prefix.length <= 0) {
-			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(to, use.pos, NoFormat), use);
 		} else {
 			var pos:IdentifierPos = {
 				fileName: use.pos.fileName,
 				start: use.pos.start + prefix.length,
 				end: use.pos.end
 			};
-			changelist.addChange(use.pos.fileName, ReplaceText(to, pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(to, pos, NoFormat), use);
 		}
 	}
 
@@ -59,12 +59,12 @@ class RenameHelper {
 										case null:
 										case ClasspathType(type, _):
 											if (use.parent.name == type.name.name) {
-												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
+												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 												continue;
 											}
 										case LibType(name, _):
 											if (use.parent.name == name) {
-												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, false), use);
+												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 												continue;
 											}
 										case StructType(fields):
@@ -123,7 +123,7 @@ class RenameHelper {
 				end: use.pos.end
 			};
 			pos.end = pos.start + fromName.length;
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);
 		}
 		var search:SearchTypeOf = {
 			name: name,
@@ -176,7 +176,7 @@ class RenameHelper {
 							end: use.pos.end
 						};
 						pos.end = pos.start + fromName.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, false), use);
+						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);
 					}
 				case LibType(_, _) | UnknownType(_):
 					trace("TODO " + typeHint.typeHintToString());

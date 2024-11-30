@@ -29,7 +29,7 @@ class RefactorTypedefTest extends RefactorTestBase {
 				+ "	var maxCompletionItems:Int;\n"
 				+ "	var renameSourceFolders:Array<String>;\n"
 				+ "}",
-				0, true),
+				0, Format(0)),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/typedefs/Types.hx", posStart: 260, posEnd: 260}, edits, async);
 	}

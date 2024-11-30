@@ -37,13 +37,13 @@ class ExtractInterface {
 		final fieldDefinition:String = makeFields(extractData, context, fields);
 		final interfaceText:String = 'interface ${extractData.newTypeName} {\n' + fieldDefinition + "}";
 
-		changelist.addChange(extractData.newFileName, InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, true),
-			null);
+		changelist.addChange(extractData.newFileName,
+			InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)), null);
 
 		final implementsText:String = ' implements ${extractData.newTypeName}';
 		final pos:Position = findImplementsPos(extractData);
-		changelist.addChange(extractData.srcFile.name, InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}, false),
-			null);
+		changelist.addChange(extractData.srcFile.name,
+			InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}, NoFormat), null);
 
 		return Promise.resolve(changelist.execute());
 	}
