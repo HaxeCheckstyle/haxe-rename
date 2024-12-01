@@ -740,7 +740,6 @@ class UsageCollector {
 						switch (child.children[index].tok) {
 							case Sharp(_):
 							case Kwd(KwdCase):
-								trace('$child');
 								readCase(context, switchIdent, child.children[index]);
 							case Kwd(KwdDefault):
 								if (child.hasChildren()) {
