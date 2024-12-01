@@ -26,12 +26,12 @@ class RenameEnumField {
 					}
 				case Global | SamePackage | Imported | StarImported:
 			}
-			RenameHelper.replaceTextWithPrefix(use, typeName, context.what.toName, changelist);
+			RenameHelper.replaceTextWithPrefix(use, typeName + ".", context.what.toName, changelist);
 		}
 
 		allUses = context.nameMap.getIdentifiers('$fullModuleTypeName.${identifier.name}');
 		for (use in allUses) {
-			RenameHelper.replaceTextWithPrefix(use, fullModuleTypeName, context.what.toName, changelist);
+			RenameHelper.replaceTextWithPrefix(use, fullModuleTypeName + ".", context.what.toName, changelist);
 		}
 
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);

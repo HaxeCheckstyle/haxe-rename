@@ -13,6 +13,14 @@ class RenameEnumTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 90, 104),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 480, 494),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2012, 2026),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2202, 2216),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2239, 2253),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2269, 2283),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2301, 2315),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2380, 2394),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2428, 2442),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2481, 2495),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "IdentType", 2531, 2545),
 		];
 		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "IdentType", pos: 30}, edits, async);
 	}
@@ -25,6 +33,8 @@ class RenameEnumTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 1427, 1438),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 1734, 1745),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 1869, 1880),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 2316, 2327),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "LocalScopeVar", 2496, 2507),
 		];
 		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "LocalScopeVar", pos: 77}, edits, async);
 	}
@@ -37,6 +47,7 @@ class RenameEnumTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1101, 1105),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1395, 1399),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 1702, 1706),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "FunctionCall", 2254, 2258),
 		];
 		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "FunctionCall", pos: 55}, edits, async);
 	}
@@ -49,7 +60,19 @@ class RenameEnumTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 1491, 1503),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 1798, 1810),
 			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 1904, 1916),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 2395, 2407),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "GlobalScopeVar", 2546, 2558),
 		];
 		checkRename({fileName: "testcases/enums/IdentifierType.hx", toName: "GlobalScopeVar", pos: 103}, edits, async);
+	}
+
+	public function testRenameBedroom1(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/enums/Main.hx", "MasterBedroom", 2740, 2748),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "MasterBedroom", 3137, 3145),
+			makeReplaceTestEdit("testcases/enums/Main.hx", "MasterBedroom", 3408, 3416),
+			makeReplaceTestEdit("testcases/enums/SmokeDetector.hx", "MasterBedroom", 127, 135),
+		];
+		checkRename({fileName: "testcases/enums/SmokeDetector.hx", toName: "MasterBedroom", pos: 132}, edits, async);
 	}
 }

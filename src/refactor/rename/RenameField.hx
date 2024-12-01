@@ -38,7 +38,7 @@ class RenameField {
 			}
 
 			if (isStatic) {
-				replaceStaticUse(context, changelist, type, identifier.name);
+				changes.push(replaceStaticUse(context, changelist, type, identifier.name));
 				switch (identifier.type) {
 					case Method(true):
 						changes.push(RenameHelper.replaceStaticExtension(context, changelist, identifier));
@@ -116,7 +116,7 @@ class RenameField {
 		}
 	}
 
-	static function replaceStaticUse(context:RenameContext, changelist:Changelist, type:Type, fromName:String) {
+	static function replaceStaticUse(context:RenameContext, changelist:Changelist, type:Type, fromName:String):Promise<Void> {
 		var packName:String = type.file.getPackage();
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('${type.name.name}.$fromName');
 		for (use in allUses) {
@@ -131,9 +131,31 @@ class RenameField {
 		}
 
 		var fullModuleName:String = type.fullModuleName;
-		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
+		allUses = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
 		for (use in allUses) {
 			RenameHelper.replaceTextWithPrefix(use, '$fullModuleName.', context.what.toName, changelist);
 		}
+		var changes:Array<Promise<Void>> = [];
+		switch (type.name.type) {
+			case Abstract:
+				allUses = context.nameMap.matchIdentifierPart(fromName, true);
+				for (use in allUses) {
+					switch (use.type) {
+						case CaseLabel(switchIdentifier):
+							changes.push(TypingHelper.matchesType(context, {
+								name: switchIdentifier.name,
+								pos: switchIdentifier.pos.start,
+								defineType: switchIdentifier.defineType
+							}, ClasspathType(type, [])).then(function(matched:Bool) {
+								if (matched) {
+									RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
+								}
+							}));
+						default:
+					}
+				}
+			default:
+		}
+		return Promise.all(changes).then(null);
 	}
 }

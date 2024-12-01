@@ -39,7 +39,6 @@ class RenameTypeName {
 			}
 		}
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
-		var type = context.typeList.findTypeName("Index");
 
 		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {

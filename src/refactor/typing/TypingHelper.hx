@@ -221,7 +221,18 @@ class TypingHelper {
 				candidate = fieldCandidate;
 			}
 			if (candidate == null) {
-				return Promise.resolve(null);
+				var typeCandidates = context.typeList.findTypeName(name);
+				for (candidateType in typeCandidates) {
+					switch (containerType.file.importsModule(candidateType.file.getPackage(), candidateType.file.getMainModulName(), candidateType.name.name)) {
+						case None:
+						case ImportedWithAlias(_):
+						case Global | SamePackage | Imported | StarImported:
+							return Promise.resolve(ClasspathType(candidateType, []));
+					}
+				}
+				if (candidate == null) {
+					return Promise.resolve(null);
+				}
 			}
 			var typeHint:Null<Identifier> = candidate.getTypeHint();
 			switch (candidate.type) {
