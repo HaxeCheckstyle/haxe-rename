@@ -10,6 +10,7 @@ class TestFormatter {
 		}
 		var inputData:TestFormatterInputData;
 		switch (input) {
+			#if sys
 			case Code(code, origin):
 				inputData = {
 					fileName: origin,
@@ -20,6 +21,7 @@ class TestFormatter {
 					indentOffset: indentOffset
 				};
 				return true;
+			#end
 			default:
 				return false;
 		}

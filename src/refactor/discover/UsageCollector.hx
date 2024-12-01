@@ -734,6 +734,21 @@ class UsageCollector {
 					if (child.hasChildren()) {
 						readBlock(context, switchIdent, child.getFirstChild());
 					}
+				case Sharp(_):
+					readExpression(context, identifier, child.getFirstChild());
+					for (index in 1...child.children.length - 1) {
+						switch (child.children[index].tok) {
+							case Sharp(_):
+							case Kwd(KwdCase):
+								trace('$child');
+								readCase(context, switchIdent, child.children[index]);
+							case Kwd(KwdDefault):
+								if (child.hasChildren()) {
+									readBlock(context, switchIdent, child.children[index].getFirstChild());
+								}
+							default:
+						}
+					}
 				default:
 					break;
 			}
