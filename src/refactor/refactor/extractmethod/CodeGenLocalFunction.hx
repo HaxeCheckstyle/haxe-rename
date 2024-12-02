@@ -17,7 +17,7 @@ class CodeGenLocalFunction extends CodeGenBase {
 		return switch (extractData.functionType) {
 			case NoFunction:
 				"";
-			case Named:
+			case Named(_):
 				"";
 			case Unnamed if (neededIdentifiers.length == 0):
 				extractData.newMethodName;
@@ -45,7 +45,7 @@ class CodeGenLocalFunction extends CodeGenBase {
 		var func:Null<TokenTree> = switch (extractData.functionType) {
 			case NoFunction:
 				null;
-			case Named:
+			case Named(_):
 				extractData.startToken.access().firstChild().token;
 			case Unnamed:
 				switch (extractData.startToken.tok) {
@@ -74,7 +74,7 @@ class CodeGenLocalFunction extends CodeGenBase {
 		var body:Null<TokenTree> = switch (extractData.functionType) {
 			case NoFunction:
 				null;
-			case Named:
+			case Named(_):
 				extractData.startToken.access().firstChild().firstOf(BrOpen).token;
 			case Unnamed:
 				switch (extractData.startToken.tok) {

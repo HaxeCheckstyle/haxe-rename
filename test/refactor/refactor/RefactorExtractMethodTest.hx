@@ -809,6 +809,19 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 669, posEnd: 679}, edits, async);
 	}
 
+	function testLambdaExampleNamedCallbackFunc(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/LambdaExample.hx", "", 727, 806, Format(2)),
+			makeInsertTestEdit("testcases/methods/LambdaExample.hx",
+				"function processCB(n:Int, m:Int):Int {\n"
+				+ "var temp = n * m;\n"
+				+ "			return temp + m;\n"
+				+ "}\n", 836, Format(1)),
+		];
+		addTypeHint("testcases/methods/LambdaExample.hx", 744, LibType("Int", "Int", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 726, posEnd: 806}, edits, async);
+	}
+
 	function testEditDocInner(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "text = addChangeExtract(range, text);\n", 388, 485, Format(4)),

@@ -34,6 +34,14 @@ class LambdaExample {
 		var numbers = [1, 2, 3];
 		var result = numbers.map(n -> n * n);
 	}
+
+	function processNamedCallbackFunc() {
+		function processCB(n:Int, m:Int) {
+			var temp = n * m;
+			return temp + m;
+		}
+		processItem(processCB);
+	}
 }
 
 typedef ProcessCallback = (n:Int, m:Int) -> Int;

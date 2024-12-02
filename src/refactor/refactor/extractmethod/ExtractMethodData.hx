@@ -17,6 +17,6 @@ typedef ExtractMethodData = {
 
 enum LocalFunctionType {
 	NoFunction;
-	Named;
+	Named(name:String);
 	Unnamed;
 }

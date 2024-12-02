@@ -149,8 +149,8 @@ class ExtractMethod {
 					return null;
 				}
 				switch (child.tok) {
-					case Const(_):
-						functionType = Named;
+					case Const(CIdent(s)):
+						functionType = Named(s);
 					case POpen:
 						functionType = Unnamed;
 					default:
@@ -210,7 +210,13 @@ class ExtractMethod {
 			return null;
 		}
 		final name:String = nameToken.toString();
-		final newMethodName = '${name}Extract';
+		var newMethodName = '${name}Extract';
+		switch (functionType) {
+			case NoFunction:
+			case Named(name):
+				newMethodName = name;
+			case Unnamed:
+		}
 
 		final functionIndent:Int = RefactorHelper.calcIndentation(context, content, context.what.fileName, parentFunction.pos.min);
 		final snippetIndent:Int = RefactorHelper.calcIndentation(context, content, context.what.fileName, tokenStart.pos.min);

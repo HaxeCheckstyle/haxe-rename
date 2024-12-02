@@ -18,7 +18,7 @@ class ExtractType {
 		if (extractData == null) {
 			return Unsupported;
 		}
-		return Supported('Extract "${extractData.name}" to ${Path.withoutDirectory(extractData.newFileName)}');
+		return Supported('Extract Type "${extractData.name}" to ${Path.withoutDirectory(extractData.newFileName)}');
 	}
 
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
