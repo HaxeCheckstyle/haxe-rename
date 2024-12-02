@@ -133,6 +133,9 @@ class ExtractConstructorParams {
 	static function findParametersWithNoFields(context:CanRefactorContext, identifierNew:Identifier):Array<Identifier> {
 		final params:Array<Identifier> = [];
 		var paramCandidates:Array<Identifier> = [];
+		if (identifierNew.uses == null) {
+			return [];
+		}
 
 		for (use in identifierNew.uses) {
 			switch (use.type) {
