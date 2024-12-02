@@ -34,18 +34,19 @@ class ExtractInterface {
 		// copy header + imports
 		final fileHeader:String = makeHeader(extractData, context, findImportCandidates(extractData, context, fields));
 		// create interface + fields
-		final fieldDefinition:String = makeFields(extractData, context, fields);
-		final interfaceText:String = 'interface ${extractData.newTypeName} {\n' + fieldDefinition + "}";
+		return makeFields(extractData, context, fields).then(function(fieldDefinitions:String) {
+			final interfaceText:String = 'interface ${extractData.newTypeName} {\n' + fieldDefinitions + "}";
 
-		changelist.addChange(extractData.newFileName,
-			InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)), null);
+			changelist.addChange(extractData.newFileName,
+				InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)), null);
 
-		final implementsText:String = ' implements ${extractData.newTypeName}';
-		final pos:Position = findImplementsPos(extractData);
-		changelist.addChange(extractData.srcFile.name,
-			InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}, NoFormat), null);
+			final implementsText:String = ' implements ${extractData.newTypeName}';
+			final pos:Position = findImplementsPos(extractData);
+			changelist.addChange(extractData.srcFile.name,
+				InsertText(implementsText, {fileName: extractData.srcFile.name, start: pos.max, end: pos.max}, NoFormat), null);
 
-		return Promise.resolve(changelist.execute());
+			return Promise.resolve(changelist.execute());
+		});
 	}
 
 	static function makeExtractInterfaceData(context:CanRefactorContext):Null<ExtractInterfaceData> {
@@ -284,55 +285,87 @@ class ExtractInterface {
 		return names;
 	}
 
-	static function makeFields(extractData:ExtractInterfaceData, context:RefactorContext, fields:Array<FieldData>):String {
-		final buf:StringBuf = new StringBuf();
-		final defaultHint:String = ":Void";
-
+	static function makeFields(extractData:ExtractInterfaceData, context:RefactorContext, fields:Array<FieldData>):Promise<String> {
+		var changes:Array<Promise<String>> = [];
 		for (field in fields) {
-			buf.add("\t");
-			var text:String = RefactorHelper.extractText(context.converter, extractData.content, field.pos.min, field.pos.max);
-			var index = text.lastIndexOf("function ");
-			if (index < 0) {
-				index = text.lastIndexOf("var ");
-			}
-			if (index < 0) {
-				index = text.lastIndexOf("final ");
-			}
-			if (index > 0) {
-				var commentIndex:Int = text.lastIndexOf("*/", index);
-				var comment = "";
-				if (commentIndex < 0) {
-					commentIndex = 0;
-				}
-				if (commentIndex > 0) {
-					comment = text.substr(0, commentIndex);
-				}
-				var modifier = text.substring(commentIndex, index);
-				final funcSignature = text.substr(index);
-				modifier = modifier.replace("public", "");
-				modifier = modifier.replace("inline", "");
-				modifier = modifier.replace("override", "");
-				modifier = modifier.replace("abstract", "");
-				text = comment + modifier + funcSignature;
-				if (!funcSignature.endsWith(";")) {
-					text += ";";
-				}
-			}
-			buf.add(text);
-			if (field.isSharp) {
-				buf.add("\n");
-				continue;
-			}
-			if (!field.hasHint) {
-				buf.add(defaultHint);
-			}
-			if (!text.endsWith(";")) {
-				buf.add(";");
-			}
-			buf.add("\n");
+			changes.push(makeField(context, extractData, field));
 		}
 
-		return buf.toString();
+		return Promise.all(changes).then(function(fields) {
+			return Promise.resolve(fields.join(""));
+		});
+	}
+
+	static function makeField(context:RefactorContext, extractData:ExtractInterfaceData, field:FieldData):Promise<String> {
+		final defaultHint:String = ":Void";
+		final buf:StringBuf = new StringBuf();
+
+		var text:String = RefactorHelper.extractText(context.converter, extractData.content, field.pos.min, field.pos.max);
+		var index = text.lastIndexOf("function ");
+		if (index < 0) {
+			index = text.lastIndexOf("var ");
+		}
+		if (index < 0) {
+			index = text.lastIndexOf("final ");
+		}
+		if (index > 0) {
+			var commentIndex:Int = text.lastIndexOf("*/", index);
+			var comment = "";
+			if (commentIndex < 0) {
+				commentIndex = 0;
+			}
+			if (commentIndex > 0) {
+				comment = text.substr(0, commentIndex);
+			}
+			var modifier = text.substring(commentIndex, index);
+			final funcSignature = text.substr(index);
+			modifier = modifier.replace("public", "");
+			modifier = modifier.replace("inline", "");
+			modifier = modifier.replace("override", "");
+			modifier = modifier.replace("abstract", "");
+			text = comment + modifier + funcSignature;
+			if (!funcSignature.endsWith(";")) {
+				text += ";";
+			}
+		}
+		buf.add(text);
+		if (field.isSharp) {
+			buf.add("\n");
+			return Promise.resolve(buf.toString());
+		}
+		if (!field.hasHint) {
+			return typeHint(context, field.pos).then(function(typeHint):Promise<String> {
+				if (typeHint == null) {
+					return Promise.resolve("");
+				}
+				buf.add(":");
+				buf.add(typeHint.printTypeHint());
+				if (!text.endsWith(";")) {
+					buf.add(";");
+				}
+				buf.add("\n");
+				return Promise.resolve(buf.toString());
+			});
+		}
+		if (!text.endsWith(";")) {
+			buf.add(";");
+		}
+		buf.add("\n");
+		return Promise.resolve(buf.toString());
+	}
+
+	static function typeHint(context:RefactorContext, pos:Position):Promise<TypeHintType> {
+		if (pos == null) {
+			return Promise.reject("failed to find return type of selected code");
+		}
+		return TypingHelper.findTypeWithTyper(context, pos.file, pos.min).then(function(typeHint) {
+			return switch (typeHint) {
+				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
+					Promise.resolve(typeHint);
+				case FunctionType(args, retVal):
+					Promise.resolve(retVal);
+			}
+		});
 	}
 }
 

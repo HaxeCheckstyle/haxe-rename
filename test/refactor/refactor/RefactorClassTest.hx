@@ -77,7 +77,8 @@ class RefactorClassTest extends RefactorTestBase {
 				+ "package classes;\n\n"
 				+ "class NotDocModule {\n"
 				+ "	public function new() {}\n"
-				+ "}", 0, Format(0)),
+				+ "}", 0,
+				Format(0)),
 			makeInsertTestEdit("testcases/classes/pack/UseDocModule.hx", "import classes.NotDocModule;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/DocModule.hx", posStart: 73, posEnd: 73}, edits, async);
@@ -90,14 +91,19 @@ class RefactorClassTest extends RefactorTestBase {
 			makeInsertTestEdit("testcases/classes/IBaseClass.hx",
 				"package classes;\n\n"
 				+ "interface IBaseClass {\n"
-				+ "	function doSomething(data:Array<String>):Void;\n"
-				+ "	function doSomething3(d:Array<String>):Void;\n"
-				+ "	function doSomething4(d:Array<String>):Void;\n"
-				+ "	function doSomething5(d:Array<String>):Void;\n"
-				+ "	function doSomething6(d:Array<String>):Void;\n"
+				+ "function doSomething(data:Array<String>):Void;\n"
+				+ "function doSomething3(d:Array<String>):Void;\n"
+				+ "function doSomething4(d:Array<String>):Void;\n"
+				+ "function doSomething5(d:Array<String>):Void;\n"
+				+ "function doSomething6(d:Array<String>):Bool;\n"
 				+ "}",
 				0, Format(0)),
 		];
+		addTypeHint("testcases/classes/BaseClass.hx", 112, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 205, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 276, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 364, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 448, LibType("Bool", "Bool", []));
 		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/BaseClass.hx", posStart: 27, posEnd: 27}, edits, async);
 	}
 }

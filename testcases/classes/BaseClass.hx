@@ -30,5 +30,6 @@ class BaseClass {
 			case Case1(data):
 			default:
 		}
+		return true;
 	}
 }
