@@ -198,6 +198,7 @@ class ExtractInterface {
 			return;
 		}
 		var data:FieldData = {
+			nameToken: nameToken,
 			pos: pos,
 			hasHint: hasHint,
 			isSharp: false
@@ -223,6 +224,7 @@ class ExtractInterface {
 					var pos:Position = {file: child.pos.file, min: child.pos.min, max: child.pos.max};
 					expandPos(pos, child.getFirstChild().getPos());
 					fields.push({
+						nameToken: child,
 						pos: pos,
 						hasHint: true,
 						isSharp: true
@@ -231,6 +233,7 @@ class ExtractInterface {
 				case Sharp("else"):
 					var pos:Position = {file: child.pos.file, min: child.pos.min, max: child.pos.max};
 					fields.push({
+						nameToken: child,
 						pos: pos,
 						hasHint: true,
 						isSharp: true
@@ -239,6 +242,7 @@ class ExtractInterface {
 				case Sharp("end"):
 					var pos:Position = {file: child.pos.file, min: child.pos.min, max: child.pos.max};
 					fields.push({
+						nameToken: child,
 						pos: pos,
 						hasHint: true,
 						isSharp: true
@@ -334,7 +338,7 @@ class ExtractInterface {
 			return Promise.resolve(buf.toString());
 		}
 		if (!field.hasHint) {
-			return typeHint(context, field.pos).then(function(typeHint):Promise<String> {
+			return typeHint(context, field.nameToken.pos).then(function(typeHint):Promise<String> {
 				if (typeHint == null) {
 					return Promise.resolve("");
 				}
@@ -358,7 +362,7 @@ class ExtractInterface {
 		if (pos == null) {
 			return Promise.reject("failed to find return type of selected code");
 		}
-		return TypingHelper.findTypeWithTyper(context, pos.file, pos.min).then(function(typeHint) {
+		return TypingHelper.findTypeWithTyper(context, context.what.fileName, pos.max - 1).then(function(typeHint) {
 			return switch (typeHint) {
 				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
 					Promise.resolve(typeHint);
@@ -381,6 +385,7 @@ typedef ExtractInterfaceData = {
 }
 
 typedef FieldData = {
+	var nameToken:TokenTree;
 	var pos:Position;
 	var hasHint:Bool;
 	var isSharp:Bool;

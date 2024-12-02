@@ -99,11 +99,11 @@ class RefactorClassTest extends RefactorTestBase {
 				+ "}",
 				0, Format(0)),
 		];
-		addTypeHint("testcases/classes/BaseClass.hx", 112, LibType("Void", "Void", []));
-		addTypeHint("testcases/classes/BaseClass.hx", 205, LibType("Void", "Void", []));
-		addTypeHint("testcases/classes/BaseClass.hx", 276, LibType("Void", "Void", []));
-		addTypeHint("testcases/classes/BaseClass.hx", 364, LibType("Void", "Void", []));
-		addTypeHint("testcases/classes/BaseClass.hx", 448, LibType("Bool", "Bool", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 131, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 225, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 296, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 384, LibType("Void", "Void", []));
+		addTypeHint("testcases/classes/BaseClass.hx", 468, LibType("Bool", "Bool", []));
 		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/BaseClass.hx", posStart: 27, posEnd: 27}, edits, async);
 	}
 }
