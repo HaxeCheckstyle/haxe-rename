@@ -177,7 +177,7 @@ class ExtractInterface {
 
 		for (child in nameToken.children) {
 			switch (child.tok) {
-				case Kwd(KwdPrivate) | Kwd(KwdStatic):
+				case Kwd(KwdPrivate) | Kwd(KwdStatic) | Kwd(KwdMacro):
 					return;
 				case Kwd(KwdPublic):
 					isPublic = true;

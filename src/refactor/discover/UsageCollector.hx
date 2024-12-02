@@ -926,7 +926,7 @@ class UsageCollector {
 			return null;
 		}
 		switch (nameToken.tok) {
-			case Kwd(KwdThis) | Kwd(KwdNull) | Const(CIdent(_)):
+			case Kwd(KwdNew) | Kwd(KwdThis) | Kwd(KwdNull) | Const(CIdent(_)):
 			default:
 				return null;
 		}
@@ -946,7 +946,7 @@ class UsageCollector {
 			}
 			for (child in parentPart.children) {
 				switch (child.tok) {
-					case Kwd(KwdThis) | Kwd(KwdNull) | Const(_):
+					case Kwd(KwdNew) | Kwd(KwdThis) | Kwd(KwdNull) | Const(_):
 						pack.push(child.toString());
 					case Dot:
 					case POpen:

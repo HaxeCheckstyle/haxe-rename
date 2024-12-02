@@ -187,9 +187,9 @@ class ExtractType {
 
 	static function findImportLocations(context:CanRefactorContext, extractData:ExtractTypeData, changelist:Changelist) {
 		final oldFullName = extractData.oldType.fullModuleName;
-		final oldPackageName = extractData.oldFile.packageIdentifier.name;
-		final oldModulName = oldPackageName + "." + extractData.oldFile.getMainModulName();
-		final newFullName = oldPackageName + "." + extractData.name;
+		final oldPackageName = extractData.oldFile.packageIdentifier?.name + "." ?? "";
+		final oldModulName = oldPackageName + extractData.oldFile.getMainModulName();
+		final newFullName = oldPackageName + extractData.name;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(oldFullName);
 		for (use in allUses) {
 			changelist.addChange(use.file.name, ReplaceText(newFullName, use.pos, NoFormat), use);
