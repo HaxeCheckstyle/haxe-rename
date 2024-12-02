@@ -4,4 +4,5 @@ enum RefactorType {
 	RefactorExtractInterface;
 	RefactorExtractMethod;
 	RefactorExtractType;
+	RefactorExtractConstructorParams;
 }

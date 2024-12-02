@@ -2,6 +2,7 @@ package refactor;
 
 import refactor.refactor.CanRefactorContext;
 import refactor.refactor.CanRefactorResult;
+import refactor.refactor.ExtractConstructorParams;
 import refactor.refactor.ExtractInterface;
 import refactor.refactor.ExtractMethod;
 import refactor.refactor.ExtractType;
@@ -17,6 +18,8 @@ class Refactoring {
 				return ExtractMethod.canRefactor(context);
 			case RefactorExtractType:
 				return ExtractType.canRefactor(context);
+			case RefactorExtractConstructorParams:
+				return ExtractConstructorParams.canRefactor(context);
 		}
 		return null;
 	}
@@ -29,6 +32,8 @@ class Refactoring {
 				return ExtractMethod.doRefactor(context);
 			case RefactorExtractType:
 				return ExtractType.doRefactor(context);
+			case RefactorExtractConstructorParams:
+				return ExtractConstructorParams.doRefactor(context);
 		}
 		return Promise.reject("no refactor type selected");
 	}
