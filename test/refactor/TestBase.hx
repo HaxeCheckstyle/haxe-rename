@@ -83,9 +83,13 @@ class TestBase implements ITest {
 		return switch (format) {
 			case NoFormat:
 				"";
-			case Format(0):
+			case Format(0, true):
+				" with format and rtrim";
+			case Format(0, _):
 				" with format";
-			case Format(indentOffset):
+			case Format(indentOffset, true):
+				' with format +indent=$indentOffset and rtrim';
+			case Format(indentOffset, _):
 				' with format +indent=$indentOffset';
 		}
 	}

@@ -8,6 +8,7 @@ import refactor.refactor.ExtractMethod;
 import refactor.refactor.ExtractType;
 import refactor.refactor.RefactorContext;
 import refactor.refactor.RefactorType;
+import refactor.refactor.RewriteVarsToFinals;
 
 class Refactoring {
 	public static function canRefactor(refactorType:RefactorType, context:CanRefactorContext):CanRefactorResult {
@@ -18,8 +19,10 @@ class Refactoring {
 				return ExtractMethod.canRefactor(context);
 			case RefactorExtractType:
 				return ExtractType.canRefactor(context);
-			case RefactorExtractConstructorParams:
-				return ExtractConstructorParams.canRefactor(context);
+			case RefactorExtractConstructorParams(asFinal):
+				return ExtractConstructorParams.canRefactor(context, asFinal);
+			case RefactorRewriteVarsToFinals(toFinals):
+				return RewriteVarsToFinals.canRefactor(context, toFinals);
 		}
 		return null;
 	}
@@ -32,8 +35,10 @@ class Refactoring {
 				return ExtractMethod.doRefactor(context);
 			case RefactorExtractType:
 				return ExtractType.doRefactor(context);
-			case RefactorExtractConstructorParams:
-				return ExtractConstructorParams.doRefactor(context);
+			case RefactorExtractConstructorParams(asFinal):
+				return ExtractConstructorParams.doRefactor(context, asFinal);
+			case RefactorRewriteVarsToFinals(toFinals):
+				return RewriteVarsToFinals.doRefactor(context, toFinals);
 		}
 		return Promise.reject("no refactor type selected");
 	}

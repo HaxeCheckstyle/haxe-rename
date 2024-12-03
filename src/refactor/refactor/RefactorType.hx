@@ -4,5 +4,6 @@ enum RefactorType {
 	RefactorExtractInterface;
 	RefactorExtractMethod;
 	RefactorExtractType;
-	RefactorExtractConstructorParams;
+	RefactorExtractConstructorParams(asFinal:Bool);
+	RefactorRewriteVarsToFinals(toFinals:Bool);
 }

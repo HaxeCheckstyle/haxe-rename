@@ -6,15 +6,19 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractConstructorParams {
-	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, asFinal:Bool):CanRefactorResult {
 		final extractData = makeExtractConstructorParamsData(context);
 		if (extractData == null) {
 			return Unsupported;
 		}
-		return Supported('Extract Constructor Params');
+		if (asFinal) {
+			return Supported('Extract Constructor Params as final');
+		} else {
+			return Supported('Extract Constructor Params as var');
+		}
 	}
 
-	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
+	public static function doRefactor(context:RefactorContext, asFinal:Bool):Promise<RefactorResult> {
 		final extractData = makeExtractConstructorParamsData(context);
 		if (extractData == null) {
 			return Promise.reject("failed to collect extract method data");
@@ -24,7 +28,7 @@ class ExtractConstructorParams {
 		final newFields:StringBuf = new StringBuf();
 		final newAssigns:StringBuf = new StringBuf();
 		for (param in extractData.parameters) {
-			newFields.add(makeField(context, extractData, param));
+			newFields.add(makeField(context, extractData, param, asFinal));
 			newAssigns.add(makeAssignment(extractData, param));
 		}
 
@@ -35,10 +39,10 @@ class ExtractConstructorParams {
 		}
 
 		changelist.addChange(context.what.fileName,
-			InsertText(newFields.toString(), {fileName: context.what.fileName, start: fieldInsertPos, end: fieldInsertPos}, Format(1)), null);
+			InsertText(newFields.toString(), {fileName: context.what.fileName, start: fieldInsertPos, end: fieldInsertPos}, Format(1, false)), null);
 
 		changelist.addChange(context.what.fileName,
-			InsertText(newAssigns.toString(), {fileName: context.what.fileName, start: assignmentInsertPos, end: assignmentInsertPos}, Format(2)), null);
+			InsertText(newAssigns.toString(), {fileName: context.what.fileName, start: assignmentInsertPos, end: assignmentInsertPos}, Format(2, false)), null);
 
 		return Promise.resolve(changelist.execute());
 	}
@@ -166,7 +170,7 @@ class ExtractConstructorParams {
 		return params;
 	}
 
-	static function makeField(context:RefactorContext, extractData:ExtractConstructorParamsData, param:Identifier):String {
+	static function makeField(context:RefactorContext, extractData:ExtractConstructorParamsData, param:Identifier, asFinal:Bool):String {
 		final tokensParam:TokensAtPos = RefactorHelper.findTokensAtPos(extractData.root, param.pos.start);
 		if (tokensParam.after == null) {
 			return "";
@@ -177,7 +181,11 @@ class ExtractConstructorParams {
 			fullPos.max = lastToken.pos.min;
 		}
 		final name = RefactorHelper.extractText(context.converter, extractData.content, fullPos.min, fullPos.max);
-		return 'final $name;\n';
+		if (asFinal) {
+			return 'final $name;\n';
+		} else {
+			return 'var $name;\n';
+		}
 	}
 
 	static function makeAssignment(extractData:ExtractConstructorParamsData, param:Identifier):String {

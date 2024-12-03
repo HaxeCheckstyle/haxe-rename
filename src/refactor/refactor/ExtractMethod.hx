@@ -70,7 +70,7 @@ class ExtractMethod {
 			final extractedCall:String = codeGen.makeCallSite();
 			changelist.addChange(context.what.fileName,
 				ReplaceText(extractedCall, {fileName: context.what.fileName, start: extractData.startToken.pos.min, end: extractData.endToken.pos.max},
-					Format(extractData.snippetIndent)),
+					Format(extractData.snippetIndent, true)),
 				null);
 
 			// insert new method with function signature and body after current function
@@ -81,7 +81,7 @@ class ExtractMethod {
 
 			changelist.addChange(context.what.fileName,
 				InsertText(functionDefinition + body, {fileName: context.what.fileName, start: extractData.newMethodOffset, end: extractData.newMethodOffset},
-					Format(extractData.functionIndent)),
+					Format(extractData.functionIndent, false)),
 				null);
 
 			return changelist.execute();

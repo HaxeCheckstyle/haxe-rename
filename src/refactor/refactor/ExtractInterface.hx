@@ -38,7 +38,7 @@ class ExtractInterface {
 			final interfaceText:String = 'interface ${extractData.newTypeName} {\n' + fieldDefinitions + "}";
 
 			changelist.addChange(extractData.newFileName,
-				InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)), null);
+				InsertText(fileHeader + interfaceText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0, false)), null);
 
 			final implementsText:String = ' implements ${extractData.newTypeName}';
 			final pos:Position = findImplementsPos(extractData);

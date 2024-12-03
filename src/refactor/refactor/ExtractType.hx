@@ -48,8 +48,8 @@ class ExtractType {
 		changelist.addChange(extractData.newFileName, CreateFile(extractData.newFileName), null);
 
 		// copy file header, type and doc comment into new file
-		changelist.addChange(extractData.newFileName, InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0)),
-			null);
+		changelist.addChange(extractData.newFileName,
+			InsertText(fileHeader + typeText, {fileName: extractData.newFileName, start: 0, end: 0}, Format(0, false)), null);
 
 		// find all places using type and update their imports
 		findImportLocations(context, extractData, changelist);
