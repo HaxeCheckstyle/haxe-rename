@@ -33,4 +33,24 @@ class RefactorTypedefTest extends RefactorTestBase {
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/typedefs/Types.hx", posStart: 260, posEnd: 260}, edits, async);
 	}
+
+	function testRewriteVarsToFinalsTestFormatterInputData(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 257, 260, NoFormat),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 297, 300, NoFormat),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 334, 337, NoFormat),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 382, 385, NoFormat),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 420, 423, NoFormat),
+			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "final", 452, 455, NoFormat),
+		];
+		checkRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", posStart: 245, posEnd: 473},
+			edits, async);
+	}
+
+	function testRewriteFinalsToVarsTestFormatterInputData(async:Async) {
+		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", posStart: 245, posEnd: 473},
+			"unsupported");
+		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", posStart: 245, posEnd: 473},
+			"failed to collect rewrite vars/finals data", async);
+	}
 }

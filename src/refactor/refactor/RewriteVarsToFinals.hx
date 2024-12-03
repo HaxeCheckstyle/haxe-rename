@@ -56,21 +56,26 @@ class RewriteVarsToFinals {
 
 		// find corresponding tokens in tokentree, selection start/end in whitespace
 		final tokensStart:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posStart);
-		final tokensEnd:TokensAtPos = RefactorHelper.findTokensAtPos(root, context.what.posEnd);
-		if (tokensStart.after == null || tokensEnd.before == null) {
+		if (tokensStart.after == null) {
 			return null;
 		}
 
 		final tokenStart:Null<TokenTree> = tokensStart.after;
-		final tokenEnd:Null<TokenTree> = tokensEnd.before;
 
-		if (tokenStart == null || tokenEnd == null) {
+		if (tokenStart == null) {
 			return null;
 		}
-		if (tokenStart.index >= tokenEnd.index) {
-			return null;
+		var parent = tokenStart.parent;
+		while (parent != null) {
+			switch (parent.tok) {
+				case Root:
+					break;
+				case BrOpen:
+					break;
+				default:
+					parent = parent.parent;
+			}
 		}
-		final parent = tokenStart.parent;
 		if (parent == null) {
 			return null;
 		}
