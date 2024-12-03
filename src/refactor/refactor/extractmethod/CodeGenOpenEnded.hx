@@ -22,7 +22,7 @@ class CodeGenOpenEnded extends CodeGenBase {
 
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
-				'switch ($call) {\n' + "case Some(data):\n" + "return data;\n" + "case None:\n" + "}\n";
+				'switch ($call) {\n' + "case Some(data):\n" + "return data;\n" + "case None:\n" + "}";
 			case [1, 0]:
 				'{\nfinal result = $call;\n'
 				+ "switch (result.ret) {\n"
@@ -31,7 +31,7 @@ class CodeGenOpenEnded extends CodeGenBase {
 				+ "case None:\n"
 				+ '${assignments[0].name} = result.data;\n'
 				+ "}\n"
-				+ "}\n";
+				+ "}";
 			case [0, 1]:
 				'var ${vars[0].name};\n'
 				+ '{\nfinal result = $call;\n'
@@ -41,7 +41,7 @@ class CodeGenOpenEnded extends CodeGenBase {
 				+ "case None:\n"
 				+ '${vars[0].name} = result.data;\n'
 				+ "}\n"
-				+ "}\n";
+				+ "}";
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
 				final assignData = assignments.concat(vars).map(a -> '${a.name} = result.data.${a.name};').join("\n");
@@ -53,7 +53,7 @@ class CodeGenOpenEnded extends CodeGenBase {
 				+ "case None:\n"
 				+ '${assignData}\n'
 				+ "}\n"
-				+ "}\n";
+				+ "}";
 		}
 	}
 

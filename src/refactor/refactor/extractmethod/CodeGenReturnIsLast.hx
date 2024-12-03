@@ -14,9 +14,9 @@ class CodeGenReturnIsLast extends CodeGenBase {
 		final callParams:String = neededIdentifiers.map(i -> i.name).join(", ");
 		final call = '${extractData.newMethodName}($callParams)';
 		if (returnEmpty) {
-			return '$call;\n';
+			return '$call;';
 		} else {
-			return 'return $call;\n';
+			return 'return $call;';
 		}
 	}
 

@@ -13,7 +13,7 @@ class CodeGenAsExpression extends CodeGenBase {
 
 		return switch (extractData.endToken.tok) {
 			case Semicolon | BrClose:
-				'$call;\n';
+				'$call;';
 			default:
 				'$call';
 		}

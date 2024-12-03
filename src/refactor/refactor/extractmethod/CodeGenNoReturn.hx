@@ -20,15 +20,15 @@ class CodeGenNoReturn extends CodeGenBase {
 
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
-				'$call;\n';
+				'$call;';
 			case [0, 1]:
-				'var ${vars[0].name} = $call;\n';
+				'var ${vars[0].name} = $call;';
 			case [1, 0]:
-				'${assignments[0].name} = $call;\n';
+				'${assignments[0].name} = $call;';
 			case [_, _]:
 				final dataVars = vars.map(v -> 'var ${v.name};').join("\n");
 				final assignData = assignments.concat(vars).map(a -> '${a.name} = data.${a.name};').join("\n");
-				'$dataVars\n{\nfinal data = $call;\n' + assignData + "\n}\n";
+				'$dataVars\n{\nfinal data = $call;\n' + assignData + "\n}";
 		}
 	}
 

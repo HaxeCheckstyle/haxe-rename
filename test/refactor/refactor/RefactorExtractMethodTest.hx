@@ -40,7 +40,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testSimpleNoReturns(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsExtract();\n", 94, 131, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsExtract();", 94, 131, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function noReturnsExtract():Void {\n"
 				+ "trace(\"hello 2\");\n"
@@ -52,7 +52,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testSimpleNoReturnsStatic(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsStaticExtract();\n", 222, 259, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "noReturnsStaticExtract();", 222, 259, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"static function noReturnsStaticExtract():Void {\n"
 				+ "trace(\"hello 2\");\n"
@@ -64,7 +64,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testEmptyReturns(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "if (!emptyReturnsExtract(cond1, cond2)) {\n" + "return;\n" + "}\n", 342, 439, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "if (!emptyReturnsExtract(cond1, cond2)) {\n" + "return;\n" + "}", 342, 439, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function emptyReturnsExtract(cond1:Bool, cond2:Bool):Bool {\n"
 				+ "if (cond1) {\n"
@@ -84,7 +84,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalculateTotal(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "total = calculateTotalExtract(items, total);\n", 569, 720, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "total = calculateTotalExtract(items, total);", 569, 720, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calculateTotalExtract(items:Array<Item>, total:Float):Float {\n"
 				+ "// Selected code block to extract\n"
@@ -108,7 +108,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "{\nfinal data = calculateTotalExtract(item);\n"
 				+ "price = data.price;\n"
 				+ "quantity = data.quantity;\n"
-				+ "}\n",
+				+ "}",
 				630, 686, Format(3)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calculateTotalExtract(item:Item):{price:Float, quantity:Float} {\n"
@@ -129,7 +129,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalculateTotalWithLastReturn(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotalExtract(items, total);\n", 569, 737, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotalExtract(items, total);", 569, 737, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calculateTotalExtract(items:Array<Item>, total:Float):Float {\n"
 				+ "// Selected code block to extract\n"
@@ -150,7 +150,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testProcessUserWithLastReturn(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotal2Extract(items, total);\n", 1081, 1295, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "return calculateTotal2Extract(items, total);", 1081, 1295, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calculateTotal2Extract(items:Array<Item>, total:Float) {\n"
 				+ "// Selected code block to extract\n"
@@ -180,7 +180,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "case None:\n"
 				+ "total = result.data;\n"
 				+ "}\n"
-				+ "}\n",
+				+ "}",
 				1081, 1278, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calculateTotal2Extract(items:Array<Item>, total:Float):{ret:haxe.ds.Option<Float>, ?data:Float} {\n"
@@ -203,7 +203,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalcConditionalLevel(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "count = calcConditionalLevelExtract(token, count);\n", 1388, 1543, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "count = calcConditionalLevelExtract(token, count);", 1388, 1543, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calcConditionalLevelExtract(token:tokentree.TokenTree, count:Int):Int {\n"
 				+ "while ((token != null) && (token.tok != Root)) {\n"
@@ -223,7 +223,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalcConditionalLevelWithVar(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "var count = calcConditionalLevelExtract(token);\n", 1366, 1543, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "var count = calcConditionalLevelExtract(token);", 1366, 1543, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function calcConditionalLevelExtract(token:tokentree.TokenTree):Int {\n"
 				+ "var count:Int = -1;\n"
@@ -244,7 +244,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testAllEmptyReturns(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "allEmptyReturnsExtract();\n", 1722, 1809, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "allEmptyReturnsExtract();", 1722, 1809, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"function allEmptyReturnsExtract():Void {\n"
 				+ "trace(\"hello 1\");\n"
@@ -260,7 +260,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testStringInterpolation(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Main.hx", "return interpolationExtract(data);\n", 1884, 1937, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Main.hx", "return interpolationExtract(data);", 1884, 1937, Format(2)),
 			makeInsertTestEdit("testcases/methods/Main.hx",
 				"static function interpolationExtract(data:Dynamic):String {\n" + "return cast '${data.a}_${data.b}_${data.c}_${false}';\n" + "}\n", 1941,
 				Format(1)),
@@ -271,7 +271,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testDemoSimple(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract();\n", 161, 252, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract();", 161, 252, Format(2)),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
 				"function doSomethingExtract():Void {\n"
 				+ "doNothing();\n"
@@ -287,7 +287,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testDemoSwitch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract(cond, val, text);\n", 262, 463, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "doSomethingExtract(cond, val, text);", 262, 463, Format(2)),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
 				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "return switch [cond, val] {\n"
@@ -309,7 +309,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testDemoReturnSwitch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 255, 463, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);", 255, 463, Format(2)),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
 				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "return switch [cond, val] {\n"
@@ -331,7 +331,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testDemoCodeAndSwitch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);\n", 161, 463, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Demo.hx", "return doSomethingExtract(cond, val, text);", 161, 463, Format(2)),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
 				"function doSomethingExtract(cond:Bool, val:Int, text:Null<String>):Float {\n"
 				+ "doNothing();\n"
@@ -363,7 +363,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "case Some(data):\n"
 				+ "return data;\n"
 				+ "case None:\n"
-				+ "}\n", 112, 252, Format(2)),
+				+ "}", 112, 252, Format(2)),
 			makeInsertTestEdit("testcases/methods/Demo.hx",
 				"function doSomethingExtract(cond:Bool, text:Null<String>):haxe.ds.Option<Float> {\n"
 				+ "if (cond && text == null) {\n"
@@ -384,7 +384,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalculateMath(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Math.hx", "calculateExtract(a, b);\n", 106, 122, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Math.hx", "calculateExtract(a, b);", 106, 122, Format(2)),
 			makeInsertTestEdit("testcases/methods/Math.hx", "function calculateExtract(a:Int, b:Int):Int {\n" + "return a * b + (a - b);\n" + "}\n", 143,
 				Format(1)),
 		];
@@ -396,7 +396,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testCalculateMathWithVar(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Math.hx", "var result = calculateExtract(a, b);\n", 93, 122, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Math.hx", "var result = calculateExtract(a, b);", 93, 122, Format(2)),
 			makeInsertTestEdit("testcases/methods/Math.hx",
 				"function calculateExtract(a:Int, b:Int):Int {\n"
 				+ "var result = a * b + (a - b);\n"
@@ -411,7 +411,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testNameProcessor(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/NameProcessor.hx", "var upperNames = processExtract(names);\n", 113, 201, Format(2)),
+			makeReplaceTestEdit("testcases/methods/NameProcessor.hx", "var upperNames = processExtract(names);", 113, 201, Format(2)),
 			makeInsertTestEdit("testcases/methods/NameProcessor.hx",
 				"function processExtract(names:Array<String>):Array<?> {\n"
 				+ "var upperNames = [];\n"
@@ -429,7 +429,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testArrayHandler(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ArrayHandler.hx", "var sum = handleExtract(numbers);\n", 105, 157, Format(2)),
+			makeReplaceTestEdit("testcases/methods/ArrayHandler.hx", "var sum = handleExtract(numbers);", 105, 157, Format(2)),
 			makeInsertTestEdit("testcases/methods/ArrayHandler.hx",
 				"function handleExtract(numbers:Array<Int>):Int {\n"
 				+ "var sum = 0;\n"
@@ -447,7 +447,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testAgeChecker(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/AgeChecker.hx", "message = checkExtract(age, message);\n", 105, 179, Format(2)),
+			makeReplaceTestEdit("testcases/methods/AgeChecker.hx", "message = checkExtract(age, message);", 105, 179, Format(2)),
 			makeInsertTestEdit("testcases/methods/AgeChecker.hx",
 				"function checkExtract(age:Int, message:String):String {\n"
 				+ "if (age < 18) {\n"
@@ -466,7 +466,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testPersonHandler(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "handleExtract(person);\n", 113, 161, Format(2)),
+			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "handleExtract(person);", 113, 161, Format(2)),
 			makeInsertTestEdit("testcases/methods/PersonHandler.hx",
 				"function handleExtract(person:Any) {\n" + "return \"Name: \" + person.name + \", Age: \" + person.age;\n" + "}\n", 180, Format(1)),
 		];
@@ -477,7 +477,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testPersonHandlerWithVar(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "var info = handleExtract(person);\n", 102, 161, Format(2)),
+			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "var info = handleExtract(person);", 102, 161, Format(2)),
 			makeInsertTestEdit("testcases/methods/PersonHandler.hx",
 				"function handleExtract(person:Any) {\n"
 				+ "var info = \"Name: \" + person.name + \", Age: \" + person.age;\n"
@@ -492,7 +492,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testContainer(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Container.hx", "var result = processExtract(items, converter);\n", 108, 239, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Container.hx", "var result = processExtract(items, converter);", 108, 239, Format(2)),
 			makeInsertTestEdit("testcases/methods/Container.hx",
 				"function processExtract<T>(items:Array<T>, converter:T -> String):Array<String> {\n"
 				+ "var result = new Array<String>();\n"
@@ -511,7 +511,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMacroTools(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/MacroTools.hx", "return buildExtract(fields);\n", 195, 353, Format(2)),
+			makeReplaceTestEdit("testcases/methods/MacroTools.hx", "return buildExtract(fields);", 195, 353, Format(2)),
 			makeInsertTestEdit("testcases/methods/MacroTools.hx",
 				"static function buildExtract(fields:Array<Field>):Array<Field> {\n"
 				+ "for (field in fields) {\n"
@@ -534,7 +534,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMatcherOnlySwitch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Matcher.hx", "processExtract(value);\n", 84, 284, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Matcher.hx", "processExtract(value);", 84, 284, Format(2)),
 			makeInsertTestEdit("testcases/methods/Matcher.hx",
 				"function processExtract(value:Any) {\n"
 				+ "return switch value {\n"
@@ -551,7 +551,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMatcherWithReturn(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/Matcher.hx", "return processExtract(value);\n", 77, 284, Format(2)),
+			makeReplaceTestEdit("testcases/methods/Matcher.hx", "return processExtract(value);", 77, 284, Format(2)),
 			makeInsertTestEdit("testcases/methods/Matcher.hx",
 				"function processExtract(value:Any) {\n"
 				+ "return switch value {\n"
@@ -568,7 +568,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testTypeProcessor(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/TypeProcessor.hx", "processExtract(item, compare);\n", 114, 221, Format(2)),
+			makeReplaceTestEdit("testcases/methods/TypeProcessor.hx", "processExtract(item, compare);", 114, 221, Format(2)),
 			makeInsertTestEdit("testcases/methods/TypeProcessor.hx",
 				"function processExtract<T:Base, U:IComparable>(item:T, compare:U):Void {\n"
 				+ "var result = item.process();\n"
@@ -583,7 +583,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testFunctionProcessor(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/FunctionProcessor.hx", "processExtract(callback, value, text);\n", 143, 211, Format(2)),
+			makeReplaceTestEdit("testcases/methods/FunctionProcessor.hx", "processExtract(callback, value, text);", 143, 211, Format(2)),
 			makeInsertTestEdit("testcases/methods/FunctionProcessor.hx",
 				"function processExtract(callback:(Int, String) -> Bool, value:Int, text:String):Void {\n"
 				+ "if (callback(value, text)) {\n"
@@ -601,7 +601,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testArrayTools(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ArrayTools.hx", "return processItemsExtract(arr, fn);\n", 117, 231, Format(2)),
+			makeReplaceTestEdit("testcases/methods/ArrayTools.hx", "return processItemsExtract(arr, fn);", 117, 231, Format(2)),
 			makeInsertTestEdit("testcases/methods/ArrayTools.hx",
 				"static function processItemsExtract<T>(arr:Array<T>, fn:T -> Bool):Array<T> {\n"
 				+ "var results = new Array<T>();\n"
@@ -620,7 +620,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testExceptionHandlerTry(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 86, 152, Format(3)),
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();", 86, 152, Format(3)),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
 				"function processExtract():Void {\n"
 				+ "var data = getData();\n"
@@ -634,7 +634,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testExceptionHandlerCatch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 193, 250, Format(3)),
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();", 193, 250, Format(3)),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
 				"function processExtract():Void {\n"
 				+ "logError(e);\n"
@@ -647,7 +647,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testExceptionHandlerTryWithThrow(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 266, 404, Format(3)),
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();", 266, 404, Format(3)),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
 				"function processExtract():Void {\n"
 				+ "var data = getData();\n"
@@ -663,7 +663,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testExceptionHandlerTryWithThrowNotLast(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();\n", 518, 689, Format(3)),
+			makeReplaceTestEdit("testcases/methods/ExceptionHandler.hx", "processExtract();", 518, 689, Format(3)),
 			makeInsertTestEdit("testcases/methods/ExceptionHandler.hx",
 				"function processExtract():Void {\n"
 				+ "var data = getData();\n"
@@ -681,7 +681,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMetadataProcessor(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(meta, results);\n", 220, 575, Format(2)),
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(meta, results);", 220, 575, Format(2)),
 			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
 				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>, results:Map<String, Array<String>>):Void {\n"
 				+ "for (field in Reflect.fields(meta)) {\n"
@@ -709,7 +709,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMetadataProcessorWithResults(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "var results = processExtract(meta);\n", 169, 575, Format(2)),
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "var results = processExtract(meta);", 169, 575, Format(2)),
 			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
 				"function processExtract(meta:Dynamic<Dynamic<Array<Dynamic>>>):Map<String, Array<String>> {\n"
 				+ "var results = new Map<String, Array<String>>();\n\n"
@@ -739,7 +739,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testMetadataProcessorPrint(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(results);\n", 579, 672, Format(2)),
+			makeReplaceTestEdit("testcases/methods/MetadataProcessor.hx", "processExtract(results);", 579, 672, Format(2)),
 			makeInsertTestEdit("testcases/methods/MetadataProcessor.hx",
 				"function processExtract(results:Map<String, Array<String>>):Void {\n"
 				+ "for (field => values in results) {\n"
@@ -824,7 +824,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testEditDocInner(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "text = addChangeExtract(range, text);\n", 388, 485, Format(4)),
+			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "text = addChangeExtract(range, text);", 388, 485, Format(4)),
 			makeInsertTestEdit("testcases/methods/TestEditDoc.hx",
 				"function addChangeExtract(range:TestRange, text:String):String {\n"
 				+ "if (range.start.character != 0) {\n"
@@ -842,7 +842,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testEditDocInnerWithEdit(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "text = addChangeExtract(text, filePath, range);\n", 346, 485, Format(4)),
+			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "text = addChangeExtract(text, filePath, range);", 346, 485, Format(4)),
 			makeInsertTestEdit("testcases/methods/TestEditDoc.hx",
 				"function addChangeExtract(text:String, filePath:String, range:TestRange):String {\n"
 				+ "text = formatSnippet(filePath, text);\n"
@@ -862,7 +862,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testEditDocInnerWithSwitch(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "var text = addChangeExtract(range);\n", 193, 489, Format(2)),
+			makeReplaceTestEdit("testcases/methods/TestEditDoc.hx", "var text = addChangeExtract(range);", 193, 489, Format(2)),
 			makeInsertTestEdit("testcases/methods/TestEditDoc.hx",
 				"function addChangeExtract(range:TestRange):String {\n"
 				+ "final f:FormatType = Format(10);\n"
@@ -895,7 +895,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "final data = addChangeExtract();\n"
 				+ "range = data.range;\n"
 				+ "text = data.text;\n"
-				+ "}\n", 160,
+				+ "}", 160,
 				489, Format(2)),
 			makeInsertTestEdit("testcases/methods/TestEditDoc.hx",
 				"function addChangeExtract():{range:TestRange, text:String} {\n"
