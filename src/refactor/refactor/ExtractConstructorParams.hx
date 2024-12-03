@@ -222,7 +222,7 @@ class ExtractConstructorParams {
 		if (brOpen == null) {
 			return -1;
 		}
-		return brOpen.pos.max + 1;
+		return brOpen.pos.max;
 	}
 }
 

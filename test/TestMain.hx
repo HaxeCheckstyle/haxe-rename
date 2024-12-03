@@ -1,4 +1,5 @@
 import refactor.refactor.RefactorClassTest;
+import refactor.refactor.RefactorExtractConstructorParams;
 import refactor.refactor.RefactorExtractMethodTest;
 import refactor.refactor.RefactorTypedefTest;
 import refactor.rename.RenameClassTest;
@@ -26,6 +27,7 @@ class TestMain {
 			new RefactorClassTest(),
 			new RefactorTypedefTest(),
 			new RefactorExtractMethodTest(),
+			new RefactorExtractConstructorParams(),
 		];
 		var runner:Runner = new Runner();
 
