@@ -88,6 +88,9 @@ class RewriteVarsToFinals {
 			}
 			return switch (token.tok) {
 				case Kwd(KwdVar) if (toFinals):
+					if (token.access().firstChild().firstOf(POpen).exists()) {
+						return SkipSubtree;
+					}
 					FoundSkipSubtree;
 				case Kwd(KwdVar):
 					SkipSubtree;

@@ -129,12 +129,12 @@ class RefactorClassTest extends RefactorTestBase {
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "final", 84, 87, NoFormat),
 			makeReplaceTestEdit("testcases/classes/JsonClass.hx", "final", 301, 304, NoFormat),
 		];
-		checkRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 658}, edits, async);
+		checkRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696}, edits, async);
 	}
 
 	function testRewriteFinalsToVarsJsonClass(async:Async) {
-		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 658}, "unsupported");
-		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 658},
+		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696}, "unsupported");
+		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696},
 			"failed to collect rewrite vars/finals data", async);
 	}
 }

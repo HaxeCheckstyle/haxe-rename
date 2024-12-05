@@ -31,6 +31,8 @@ class JsonClass {
 			maxWidth: maxWidth
 		};
 	}
+
+	public var prop(default, null):Int;
 }
 
 typedef JsonData = Any;
