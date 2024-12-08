@@ -94,12 +94,12 @@ class TypingHelper {
 					}
 				}
 				return true;
-			case [LibType(_, "Null", params1), _]:
+			case [LibType("Null", _, params1), _]:
 				if (params1.length != 1) {
 					return false;
 				}
 				return typeHintsEqual(params1[0], typeHint2);
-			case [_, LibType(_, "Null", params2)]:
+			case [_, LibType("Null", _, params2)]:
 				if (params2.length != 1) {
 					return false;
 				}
