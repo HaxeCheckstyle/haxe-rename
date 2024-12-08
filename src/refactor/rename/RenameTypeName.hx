@@ -54,6 +54,12 @@ class RenameTypeName {
 					}
 				case Global | SamePackage | Imported | StarImported:
 			}
+			switch (use.type) {
+				case Abstract | Class | Enum | Interface | Typedef:
+					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
+					continue;
+				default:
+			}
 			final searchName:String = if (use.name.startsWith(identifier.name)) identifier.name; else identifier.defineType.fullModuleName;
 			changes.push(TypingHelper.findTypeOfIdentifier(context, {
 				name: searchName,

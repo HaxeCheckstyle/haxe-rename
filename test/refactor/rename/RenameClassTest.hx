@@ -366,4 +366,15 @@ class RenameClassTest extends RenameTestBase {
 		];
 		checkRename({fileName: "testcases/classes/Printer.hx", toName: "resultRenamed", pos: 833}, edits, async);
 	}
+
+	public function testRenameNotDocModule(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/DocModule.hx", "RenamedDocModule", 68, 80),
+			makeReplaceTestEdit("testcases/classes/ForceRenameCrash.hx", "RenamedDocModule", 104, 116),
+			makeReplaceTestEdit("testcases/classes/ForceRenameCrash.hx", "RenamedDocModule", 642, 654),
+			makeReplaceTestEdit("testcases/classes/pack/UseDocModule.hx", "RenamedDocModule", 95, 107),
+			makeReplaceTestEdit("testcases/classes/pack/UseDocModule.hx", "RenamedDocModule", 150, 162),
+		];
+		checkRename({fileName: "testcases/classes/DocModule.hx", toName: "RenamedDocModule", pos: 69}, edits, async);
+	}
 }

@@ -6,4 +6,8 @@ class UseDocModule {
 	function new() {
 		new NotDocModule();
 	}
+
+	function factory(name) {
+		return NotDocModule.new;
+	}
 }

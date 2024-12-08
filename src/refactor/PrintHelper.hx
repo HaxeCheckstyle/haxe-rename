@@ -45,7 +45,7 @@ class PrintHelper {
 		}
 	}
 
-	public static function typeHintToString(hintType:TypeHintType):String {
+	public static function typeHintToString(hintType:Null<TypeHintType>):String {
 		if (hintType == null) {
 			return "null";
 		}
