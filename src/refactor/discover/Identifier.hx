@@ -8,7 +8,6 @@ class Identifier {
 	public var file:File;
 	public var parent:Null<Identifier>;
 	public var defineType:Null<Type>;
-	public var edited:Bool;
 
 	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>) {
 		this.type = type;
@@ -17,16 +16,11 @@ class Identifier {
 		this.file = file;
 		this.defineType = defineType;
 		parent = null;
-		edited = false;
 
 		if (defineType != null) {
 			defineType.addIdentifier(this);
 		}
 		nameMap.addIdentifier(this);
-	}
-
-	public function reset() {
-		edited = false;
 	}
 
 	public function addUse(identifier:Null<Identifier>) {

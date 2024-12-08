@@ -52,6 +52,11 @@ class RenameHelper {
 
 						var innerChanges:Array<Promise<Void>> = [];
 						for (use in allUses) {
+							switch (use.type) {
+								case PackageName | ImportModul | ImportAlias | UsingModul:
+									continue;
+								default:
+							}
 							var object:String = "";
 							if (use.name == identifier.name) {
 								if (use.parent != null) {

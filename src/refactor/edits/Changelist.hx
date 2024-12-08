@@ -10,18 +10,20 @@ import refactor.rename.RenameContext;
 class Changelist {
 	var changes:Map<String, Array<FileEdit>>;
 	var context:EditContext;
+	var editedIdentifiers:Array<Identifier>;
 
 	public function new(context:EditContext) {
 		changes = new Map<String, Array<FileEdit>>();
 		this.context = context;
+		editedIdentifiers = [];
 	}
 
 	public function addChange(fileName:String, change:FileEdit, identifier:Null<Identifier>) {
 		if (identifier != null) {
-			if (identifier.edited) {
+			if (editedIdentifiers.contains(identifier)) {
 				return;
 			}
-			identifier.edited = true;
+			editedIdentifiers.push(identifier);
 		}
 		var fileChanges:Null<Array<FileEdit>> = changes.get(fileName);
 		if (fileChanges == null) {

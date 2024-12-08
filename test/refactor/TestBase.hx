@@ -49,11 +49,6 @@ class TestBase implements ITest {
 	@:access(refactor.discover.NameMap)
 	function setup() {
 		typer.clear();
-		for (key => list in usageContext.nameMap.names) {
-			for (identifier in list) {
-				identifier.edited = false;
-			}
-		}
 	}
 
 	public function addTypeHint(fileName:String, pos:Int, typeHint:TypeHintType) {

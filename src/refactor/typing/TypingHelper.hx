@@ -190,6 +190,9 @@ class TypingHelper {
 	}
 
 	public static function findFieldOrScopedLocal(context:CacheAndTyperContext, containerType:Type, name:String, pos:Int):Promise<TypeHintType> {
+		if (containerType == null) {
+			return Promise.resolve(null);
+		}
 		return findTypeWithTyper(context, containerType.file.name, pos).catchError(function(msg):Promise<TypeHintType> {
 			// trace("Haxe typer failed for " + name);
 			var allUses:Array<Identifier> = containerType.getIdentifiers(name);
