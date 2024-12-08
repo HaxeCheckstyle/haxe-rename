@@ -194,7 +194,9 @@ class TypingHelper {
 			return Promise.resolve(null);
 		}
 		return findTypeWithTyper(context, containerType.file.name, pos).catchError(function(msg):Promise<TypeHintType> {
-			// trace("Haxe typer failed for " + name);
+			#if debug
+			trace("Haxe typer failed for " + '$name in ${containerType.file.name}@$pos');
+			#end
 			var allUses:Array<Identifier> = containerType.getIdentifiers(name);
 			var candidate:Null<Identifier> = null;
 			var fieldCandidate:Null<Identifier> = null;

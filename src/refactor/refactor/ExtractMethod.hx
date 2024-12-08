@@ -633,7 +633,6 @@ class ExtractMethod {
 				continue;
 			}
 			scopedVarUses.push(scopedVar);
-			trace("leaking " + varsValidAfterSelection.get(part));
 		}
 		return scopedVarUses;
 	}
@@ -642,7 +641,9 @@ class ExtractMethod {
 		var promises:Array<Promise<String>> = [];
 		for (identifier in neededIdentifiers) {
 			final promise = findTypeOfIdentifier(context, identifier).then(function(typeHint):Promise<String> {
+				#if debug
 				trace("typehint resolved: " + identifier + " " + PrintHelper.typeHintToString(typeHint));
+				#end
 				return Promise.resolve(buildParameter(identifier, typeHint));
 			});
 

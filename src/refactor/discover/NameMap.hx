@@ -72,7 +72,6 @@ class NameMap {
 			return [];
 		}
 		if (unused) {
-			// results = results.filter(i -> !i.edited);
 			results.sort(Identifier.sortIdentifier);
 		}
 		return results;

@@ -184,9 +184,13 @@ class RenameHelper {
 						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);
 					}
 				case LibType(_, _) | UnknownType(_):
+					#if debug
 					trace("TODO " + typeHint.typeHintToString());
+					#end
 				case FunctionType(_, _) | StructType(_):
+					#if debug
 					trace("TODO " + typeHint.typeHintToString());
+					#end
 			}
 		});
 	}
