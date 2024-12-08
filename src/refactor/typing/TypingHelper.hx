@@ -94,6 +94,16 @@ class TypingHelper {
 					}
 				}
 				return true;
+			case [LibType(_, "Null", params1), _]:
+				if (params1.length != 1) {
+					return false;
+				}
+				return typeHintsEqual(params1[0], typeHint2);
+			case [_, LibType(_, "Null", params2)]:
+				if (params2.length != 1) {
+					return false;
+				}
+				return typeHintsEqual(typeHint1, params2[0]);
 			case [ClasspathType(type1, params1), ClasspathType(type2, params2)]:
 				if (type1.fullModuleName != type2.fullModuleName) {
 					return false;
