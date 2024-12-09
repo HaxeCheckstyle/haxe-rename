@@ -67,7 +67,7 @@ class RefactorClassTest extends RefactorTestBase {
 
 	function testExtractTypeNotDocModule(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeRemoveTestEdit("testcases/classes/DocModule.hx", 62, 110),
+			makeRemoveTestEdit("testcases/classes/DocModule.hx", 62, 169),
 			makeReplaceTestEdit("testcases/classes/ForceRenameCrash.hx", "classes.NotDocModule", 86, 116),
 			makeCreateTestEdit("testcases/classes/NotDocModule.hx"),
 			makeInsertTestEdit("testcases/classes/NotDocModule.hx",
@@ -76,9 +76,12 @@ class RefactorClassTest extends RefactorTestBase {
 				+ " */\n\n"
 				+ "package classes;\n\n"
 				+ "class NotDocModule {\n"
-				+ "	public function new() {}\n"
-				+ "}", 0,
-				Format(0, false)),
+				+ "	public function new() {}\n\n"
+				+ "	public function doSomething() {\n"
+				+ "		trace(\"something\");\n"
+				+ "	}\n"
+				+ "}",
+				0, Format(0, false)),
 			makeInsertTestEdit("testcases/classes/pack/UseDocModule.hx", "import classes.NotDocModule;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/DocModule.hx", posStart: 73, posEnd: 73}, edits, async);

@@ -609,7 +609,7 @@ class UsageCollector {
 				var prev:Null<TokenTree> = parent.previousSibling;
 				if (prev != null) {
 					switch (prev.tok) {
-						case BkClose | PClose:
+						case BkOpen | BkClose | POpen | PClose:
 							makeIdentifier(context, token, ArrayAccess(prev.pos.min), identifier);
 						default:
 					}

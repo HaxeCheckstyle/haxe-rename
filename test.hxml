@@ -16,4 +16,6 @@
 
 # -D dump-dependencies
 
+-debug
+
 --cmd node out/tests.js

@@ -55,7 +55,7 @@ class PrintHelper {
 					final params = paramList.map(p -> typeHintToString(p));
 					return 'ClasspathType(${type.name.name}<${params.join(", ")}>)';
 				}
-				'ClasspathType(${type.name.name}, <>)';
+				'ClasspathType(${type?.name.name}, <>)';
 			case LibType(name, fullName, paramList):
 				if (paramList.length > 0) {
 					final params = paramList.map(p -> typeHintToString(p));

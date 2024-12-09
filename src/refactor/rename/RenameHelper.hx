@@ -162,6 +162,20 @@ class RenameHelper {
 			posClosing:Int):Promise<Void> {
 		var name:String = use.name;
 
+		function addChanges(type:Type) {
+			for (t in types) {
+				if (t != type) {
+					continue;
+				}
+				var pos:IdentifierPos = {
+					fileName: use.pos.fileName,
+					start: use.pos.start,
+					end: use.pos.end
+				};
+				pos.end = pos.start + fromName.length;
+				changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);
+			}
+		}
 		var search:SearchTypeOf = {
 			name: name,
 			pos: posClosing,
@@ -171,26 +185,30 @@ class RenameHelper {
 			switch (typeHint) {
 				case null:
 				case ClasspathType(type, _):
-					for (t in types) {
-						if (t != type) {
-							continue;
-						}
-						var pos:IdentifierPos = {
-							fileName: use.pos.fileName,
-							start: use.pos.start,
-							end: use.pos.end
-						};
-						pos.end = pos.start + fromName.length;
-						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);
+					addChanges(type);
+				case LibType("Null", _, [ClasspathType(type, _)]):
+					addChanges(type);
+				case LibType(_, _):
+					return;
+				case FunctionType(_, retVal):
+					if (retVal == null) {
+						return;
 					}
-				case LibType(_, _) | UnknownType(_):
+					switch (retVal) {
+						case ClasspathType(type, _):
+							addChanges(type);
+						case LibType("Null", _, [ClasspathType(type, _)]):
+							addChanges(type);
+						default:
+							#if debug
+							trace("TODO " + typeHint.typeHintToString());
+							#end
+					}
+				case StructType(_):
 					#if debug
 					trace("TODO " + typeHint.typeHintToString());
 					#end
-				case FunctionType(_, _) | StructType(_):
-					#if debug
-					trace("TODO " + typeHint.typeHintToString());
-					#end
+				case UnknownType(_):
 			}
 		});
 	}
