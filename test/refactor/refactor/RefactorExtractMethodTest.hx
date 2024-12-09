@@ -926,4 +926,29 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		addTypeHint("testcases/methods/TestEditDoc.hx", 235, LibType("String", "String", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/TestEditDoc.hx", posStart: 159, posEnd: 489}, edits, async);
 	}
+
+	function testSomeHelper(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/SomeHelper.hx", "arrayAccessExtract(types, type, use, fromName, changelist, context);", 808, 1155,
+				Format(5, true)),
+			makeInsertTestEdit("testcases/methods/SomeHelper.hx",
+				"static function arrayAccessExtract(types:Array<Type>, type:Type, use:Identifier, fromName:String, changelist:Changelist, context:RenameContext):Void {\n"
+				+ "for (t in types) {\n"
+				+ "						if (t != type) {\n"
+				+ "							continue;\n"
+				+ "						}\n"
+				+ "						var pos:IdentifierPos = {\n"
+				+ "							fileName: use.pos.fileName,\n"
+				+ "							start: use.pos.start,\n"
+				+ "							end: use.pos.end\n"
+				+ "						};\n"
+				+ "						pos.end = pos.start + fromName.length;\n"
+				+ "						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);\n"
+				+ "					}\n"
+				+ "}\n",
+				1277, Format(1, false)),
+		];
+		addTypeHint("testcases/methods/SomeHelper.hx", 794, LibType("Type", "Type", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/SomeHelper.hx", posStart: 806, posEnd: 1155}, edits, async);
+	}
 }

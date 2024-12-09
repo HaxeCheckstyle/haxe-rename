@@ -94,7 +94,7 @@ class Rename {
 				context.verboseLog('rename ${isStatic ? "static" : ""} field "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case Method(isStatic):
-				context.verboseLog('rename ${isStatic ? "static" : ""} class method "${identifier.name}" to "${context.what.toName}"');
+				context.verboseLog('rename ${isStatic ? "static " : ""}class method "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case TypedParameter:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());

@@ -33,7 +33,9 @@ class Identifier {
 		if (!uses.contains(identifier)) {
 			uses.push(identifier);
 		}
-		identifier.parent = this;
+		if (identifier.parent == null) {
+			identifier.parent = this;
+		}
 	}
 
 	public function containsPos(offset:Int):Bool {
