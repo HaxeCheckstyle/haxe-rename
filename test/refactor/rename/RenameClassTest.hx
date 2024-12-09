@@ -78,6 +78,9 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 412, 422),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 499, 509),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 612, 622),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 978, 988),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 1039, 1049),
+			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "ItemClass", 1081, 1091),
 		];
 		checkRename({fileName: "testcases/classes/ChildClass.hx", toName: "ItemClass", pos: 28}, edits, async);
 	}

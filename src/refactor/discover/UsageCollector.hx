@@ -974,6 +974,8 @@ class UsageCollector {
 			return null;
 		}
 		switch (nameToken.tok) {
+			case Const(CIdent("is")):
+				return null;
 			case Kwd(KwdNew) | Kwd(KwdThis) | Kwd(KwdNull) | Const(CIdent(_)):
 			default:
 				return null;
@@ -994,6 +996,8 @@ class UsageCollector {
 			}
 			for (child in parentPart.children) {
 				switch (child.tok) {
+					case Const(CIdent("is")):
+						return;
 					case Kwd(KwdNew) | Kwd(KwdThis) | Kwd(KwdNull) | Const(_):
 						pack.push(child.toString());
 					case Dot:
@@ -1108,8 +1112,12 @@ class UsageCollector {
 					makeIdentifier(context, child, TypedParameter, identifier);
 				case POpen:
 					readParameter(context, identifier, child, token.getPos().max);
+				case BrOpen:
+					readBlock(context, identifier, child);
 				case Binop(OpGt):
 					break;
+				case DblDot:
+					readTypeHint(context, identifier, child, TypeHint);
 				default:
 			}
 		}

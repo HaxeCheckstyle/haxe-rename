@@ -53,4 +53,14 @@ class UseChild {
 				null;
 		}
 	}
+
+	function typeCheckChildClass(child:Any) {
+		if ((child is ChildClass)) {
+			trace("yes");
+		}
+	}
+}
+
+class TypedChild<T:ChildClass> {
+	var memebers:Array<{sprite:ChildClass, originalX:Float, originalY:Float}> = null;
 }
