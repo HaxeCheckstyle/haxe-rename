@@ -94,6 +94,6 @@ class RenameTypedefTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/typedefs/TestFormatter.hx", "indentationOffset", 507, 519),
 			makeReplaceTestEdit("testcases/typedefs/codedata/TestFormatterInputData.hx", "indentationOffset", 456, 468),
 		];
-		checkRename({fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", toName: "indentationOffset", pos: 462}, edits, async, true);
+		checkRename({fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", toName: "indentationOffset", pos: 462}, edits, async);
 	}
 }

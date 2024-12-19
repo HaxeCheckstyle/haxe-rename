@@ -71,6 +71,10 @@ class File {
 				}
 			}
 		}
+		final parentPackage = '$packName.';
+		if (getPackage().startsWith(parentPackage)) {
+			return ParentPackage;
+		}
 
 		if (importHxFile == null) {
 			if (packName == getPackage()) {
@@ -169,6 +173,7 @@ enum ImportStatus {
 	None;
 	Global;
 	SamePackage;
+	ParentPackage;
 	Imported;
 	ImportedWithAlias(alias:String);
 	StarImported;

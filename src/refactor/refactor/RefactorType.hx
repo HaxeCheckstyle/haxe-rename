@@ -6,4 +6,5 @@ enum RefactorType {
 	RefactorExtractType;
 	RefactorExtractConstructorParams(asFinal:Bool);
 	RefactorRewriteVarsToFinals(toFinals:Bool);
+	RefactorRewriteWrapWithTryCatch;
 }

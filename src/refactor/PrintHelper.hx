@@ -71,6 +71,8 @@ class PrintHelper {
 			case StructType(fieldTypes):
 				final fields = fieldTypes.map(f -> typeHintToString(f));
 				'StructType({${fields.join(";")}})';
+			case NamedType(name, namedHint):
+				'NamedType($name, ${typeHintToString(namedHint)})';
 			case UnknownType(name):
 				'UnknownType($name)';
 		}
@@ -101,7 +103,9 @@ class PrintHelper {
 				return '(${args.join(", ")}) -> ${printTypeHint(retVal)}';
 			case StructType(fieldTypes):
 				final fields = fieldTypes.map(f -> printTypeHint(f));
-				'{${fields.join(";")}}';
+				'{${fields.join(", ")}}';
+			case NamedType(name, namedHint):
+				'$name:${printTypeHint(namedHint)}';
 			case UnknownType(name):
 				'$name';
 		}

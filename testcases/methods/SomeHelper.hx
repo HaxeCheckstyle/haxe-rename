@@ -20,7 +20,7 @@ class SomeHelper {
 		return TypingHelper.findTypeOfIdentifier(context, search).then(function(typeHint:TypeHintType) {
 			switch (typeHint) {
 				case null:
-				case ClasspathType(type, _):
+				case TypeHintType.ClasspathType(type, _):
 				case LibType("Null", _, [ClasspathType(type, _)]):
 					for (t in types) {
 						if (t != type) {
@@ -37,6 +37,7 @@ class SomeHelper {
 				case LibType(_, _):
 				case FunctionType(_, retVal):
 				case StructType(_):
+				case NamedType(_):
 				case UnknownType(_):
 			}
 		});

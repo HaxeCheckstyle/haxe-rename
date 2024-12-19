@@ -2,6 +2,7 @@ package refactor.typing;
 
 import refactor.discover.Identifier;
 import refactor.discover.Type;
+import refactor.discover.TypeHintFromTree;
 import refactor.discover.TypeList;
 
 class TypingHelper {
@@ -38,7 +39,7 @@ class TypingHelper {
 					var search:String = switch (use.file.importsModule(baseType.file.getPackage(), baseType.file.getMainModulName(), baseType.name.name)) {
 						case None:
 							continue;
-						case Global | SamePackage | Imported | StarImported:
+						case Global | ParentPackage | SamePackage | Imported | StarImported:
 							baseType.name.name;
 						case ImportedWithAlias(alias):
 							alias;
@@ -131,6 +132,11 @@ class TypingHelper {
 					}
 				}
 				return true;
+			case [NamedType(name1, hint1), NamedType(name2, hint2)]:
+				if (name1 != name2) {
+					return false;
+				}
+				return typeHintsEqual(hint1, hint2);
 			case [UnknownType(name1), UnknownType(name2)]:
 				return (name1 == name2);
 			default:
@@ -153,13 +159,50 @@ class TypingHelper {
 
 	public static function findTypeOfIdentifier(context:CacheAndTyperContext, searchTypeOf:SearchTypeOf):Promise<TypeHintType> {
 		var parts:Array<String> = searchTypeOf.name.split(".");
+		if (parts.length > 1) {
+			final type = context.typeList.getType(searchTypeOf.name);
+			if (type != null) {
+				return Promise.resolve(ClasspathType(type, []));
+			}
+		}
 		var part:String = parts.shift();
+		switch (part) {
+			case "super":
+				final containerType = searchTypeOf.defineType;
+				if (containerType == null) {
+					return Promise.reject("cannot resolve super");
+				}
+				final baseClasses = containerType.findAllIdentifiers(i -> i.type == Extends);
+				if (baseClasses.length != 1) {
+					return Promise.reject("cannot resolve super");
+				}
+				final type = TypeHintFromTree.findTypeFromImports(baseClasses[0].name, context.typeList, containerType.file);
+				if (type == null) {
+					return Promise.reject("cannot resolve super");
+				}
+				return Promise.resolve(ClasspathType(type, []));
+			case "this":
+				if (searchTypeOf.defineType == null) {
+					return Promise.reject("cannot resolve this");
+				}
+				if (parts.length > 0) {
+					return findTypeOfIdentifier(context, {
+						name: parts.join("."),
+						pos: searchTypeOf.pos,
+						defineType: searchTypeOf.defineType
+					});
+				}
+				return Promise.resolve(ClasspathType(searchTypeOf.defineType, []));
+			default:
+		}
+
 		return findFieldOrScopedLocal(context, searchTypeOf.defineType, part, searchTypeOf.pos).then(function(type:Null<TypeHintType>):Promise<TypeHintType> {
 			var index:Int = 0;
 			function findFieldForPart(partType:TypeHintType):Promise<TypeHintType> {
 				if (index >= parts.length) {
 					return Promise.resolve(partType);
 				}
+
 				var part:String = parts[index++];
 				switch (partType) {
 					case null:
@@ -167,29 +210,33 @@ class TypingHelper {
 						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType?.file.name}@${searchTypeOf.pos}');
 					case ClasspathType(t, params):
 						return findField(context, t, part).then(findFieldForPart);
-					case LibType(t, fullPath, params):
-						if (t != "Null") {
-							return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
-						}
-						if (params == null || params.length != 1) {
-							return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
-						}
-						switch (params[0]) {
-							case ClasspathType(t, typeParams):
-								return findField(context, t, part).then(findFieldForPart);
-							case LibType(_) | FunctionType(_) | StructType(_) | UnknownType(_):
-								return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
-						}
+					case LibType("Null", _, [nullType]):
+						return findFieldForPart(nullType);
+					case LibType(t, _, params):
+						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
 					case StructType(fields):
+						for (field in fields) {
+							switch (field) {
+								case NamedType(name, typeHint):
+									if (name == part) {
+										return findFieldForPart(typeHint);
+									}
+								default:
+							}
+						}
 						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
-					case FunctionType(args, retVal):
-						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+					case FunctionType(_, retVal):
+						return findFieldForPart(retVal);
 					case UnknownType(name):
+						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
+					case NamedType(_):
 						return Promise.reject('unable to determine type of "$part" in ${searchTypeOf.defineType.name.name}@${searchTypeOf.pos}');
 				}
 			}
 
-			return findFieldForPart(type);
+			return findFieldForPart(type).then(function(typeHint) {
+				return Promise.resolve(typeHint);
+			});
 		});
 	}
 
@@ -197,144 +244,237 @@ class TypingHelper {
 		if (containerType == null) {
 			return Promise.resolve(null);
 		}
-		return findTypeWithTyper(context, containerType.file.name, pos).catchError(function(msg):Promise<TypeHintType> {
-			#if debug
-			trace("Haxe typer failed for " + '$name in ${containerType.file.name}@$pos');
-			#end
-			var allUses:Array<Identifier> = containerType.getIdentifiers(name);
-			var candidate:Null<Identifier> = null;
-			var fieldCandidate:Null<Identifier> = null;
-			for (use in allUses) {
-				switch (use.type) {
-					case Property | FieldVar(_) | Method(_):
-						fieldCandidate = use;
-					case TypedefField(_):
-						fieldCandidate = use;
-					case EnumField(_):
-						return Promise.resolve(ClasspathType(use.defineType, []));
-					case ScopedLocal(scopeStart, scopeEnd, _):
-						if ((pos >= scopeStart) && (pos <= scopeEnd)) {
-							candidate = use;
-						}
-						if (pos == use.pos.start) {
-							candidate = use;
-						}
-					case CaseLabel(switchIdentifier):
-						if (use.pos.start == pos) {
-							return findFieldOrScopedLocal(context, containerType, switchIdentifier.name, switchIdentifier.pos.start);
-						}
-					default:
-				}
-			}
-			if (candidate == null) {
-				candidate = fieldCandidate;
-			}
-			if (candidate == null) {
-				var typeCandidates = context.typeList.findTypeName(name);
-				for (candidateType in typeCandidates) {
-					switch (containerType.file.importsModule(candidateType.file.getPackage(), candidateType.file.getMainModulName(), candidateType.name.name)) {
-						case None:
-						case ImportedWithAlias(_):
-						case Global | SamePackage | Imported | StarImported:
-							return Promise.resolve(ClasspathType(candidateType, []));
-					}
-				}
-				if (candidate == null) {
-					return Promise.resolve(null);
-				}
-			}
-			var typeHint:Null<Identifier> = candidate.getTypeHint();
-			switch (candidate.type) {
-				case ScopedLocal(_, _, ForLoop(loopIdent)):
-					var index:Int = loopIdent.indexOf(candidate);
-					var changes:Array<Promise<TypeHintType>> = [];
-					for (child in loopIdent) {
-						switch (child.type) {
-							case ScopedLocal(_, _, ForLoop(_)):
-								continue;
-							default:
-								changes.push(findTypeOfIdentifier(context, {
-									name: child.name,
-									pos: child.pos.start,
-									defineType: containerType
-								}).then(function(data:TypeHintType):Promise<TypeHintType> {
-									switch (data) {
-										case null:
-										case ClasspathType(_, typeParams) | LibType(_, _, typeParams):
-											if (typeParams.length <= index) {
-												return Promise.reject("not enough type parameters");
-											}
-											return Promise.resolve(typeParams[index]);
-										case UnknownType(_):
-										case StructType(_) | FunctionType(_):
-									}
-									return Promise.reject("not found");
-								}));
-						}
-					}
 
-					var winner:Promise<TypeHintType> = cast Promise.race(changes);
-					return winner.catchError(function(data:TypeHintType):Promise<TypeHintType> {
-						if (typeHint != null) {
-							return typeFromTypeHint(context, typeHint);
-						}
-						return Promise.reject("type not found");
-					});
-				case ScopedLocal(_, _, Parameter(params)):
-					if (typeHint != null) {
-						return typeFromTypeHint(context, typeHint).then(function(hint) {
-							return Promise.resolve(hint);
+		return findTypeWithBuiltIn(containerType, name, pos, context).then(function(hint) {
+			return Promise.resolve(hint);
+		}).catchError(function(msg):Promise<TypeHintType> {
+			// built-in failed, let's try external typer
+			return findTypeWithTyper(context, containerType.file.name, pos).catchError(function(msg):Promise<TypeHintType> {
+				#if debug
+				trace("built-in and external typers failed for " + '$name in ${containerType.file.name} @$pos');
+				#end
+				return Promise.resolve(null);
+			});
+		});
+	}
+
+	static function findTypeWithBuiltIn(containerType:Type, name:String, pos:Int, context:CacheAndTyperContext):Promise<TypeHintType> {
+		if (containerType == null) {
+			return Promise.reject("missing containing type");
+		}
+		var allUses:Array<Identifier> = containerType.getIdentifiers(name);
+		var candidate:Null<Identifier> = null;
+		var fieldCandidate:Null<Identifier> = null;
+		for (use in allUses) {
+			switch (use.type) {
+				case Property | FieldVar(_) | Method(_):
+					fieldCandidate = use;
+				case TypedefField(_):
+					fieldCandidate = use;
+				case EnumField(_):
+					return Promise.resolve(ClasspathType(use.defineType, []));
+				case ScopedLocal(scopeStart, scopeEnd, _):
+					if ((pos >= scopeStart) && (pos <= scopeEnd)) {
+						candidate = use;
+					}
+					if (pos == use.pos.start) {
+						candidate = use;
+					}
+				case CaseLabel(switchIdentifier):
+					if (use.pos.start <= pos && use.pos.end > pos) {
+						return findTypeOfIdentifier(context, {
+							name: switchIdentifier.name,
+							pos: switchIdentifier.pos.start,
+							defineType: containerType
 						});
 					}
-					var index:Int = params.indexOf(candidate);
-					switch (candidate.parent.type) {
-						case CaseLabel(switchIdentifier):
-							return findFieldOrScopedLocal(context, containerType, switchIdentifier.name,
-								switchIdentifier.pos.start).then(function(enumType:TypeHintType) {
-								switch (enumType) {
-									case null:
-										return Promise.resolve(null);
-									case ClasspathType(type, typeParams):
-										switch (type.name.type) {
-											case Enum:
-												var enumFields:Array<Identifier> = type.findAllIdentifiers((i) -> i.name == candidate.parent.name);
-												for (field in enumFields) {
-													switch (field.type) {
-														case EnumField(params):
-															if (params.length <= index) {
-																return Promise.resolve(null);
-															}
-															typeHint = params[index].getTypeHint();
-															if (typeHint == null) {
-																return Promise.resolve(null);
-															}
-															return typeFromTypeHint(context, typeHint);
-														default:
-															return Promise.reject("not an enum field");
-													}
-												}
-											default:
-										}
-									case LibType(_, _, _):
-										return Promise.resolve(null);
-									case FunctionType(_, _):
-										return Promise.resolve(null);
-									case StructType(_):
-										return Promise.resolve(null);
-									case UnknownType(_):
-										return Promise.resolve(null);
-								}
-								return Promise.resolve(enumType);
-							});
-						default:
+				case Call(true):
+					if (use.pos.start <= pos && use.pos.end > pos) {
+						var typeCandidates = context.typeList.findTypeName(name);
+						for (candidateType in typeCandidates) {
+							switch (containerType.file.importsModule(candidateType.file.getPackage(), candidateType.file.getMainModulName(),
+								candidateType.name.name)) {
+								case None:
+								case ImportedWithAlias(_):
+								case Global | ParentPackage | SamePackage | Imported | StarImported:
+									return Promise.resolve(ClasspathType(candidateType, []));
+							}
+						}
 					}
 				default:
 			}
-			if (typeHint != null) {
-				return typeFromTypeHint(context, typeHint);
+		}
+		if (candidate == null) {
+			candidate = fieldCandidate;
+		}
+		if (candidate == null) {
+			return findGlobalIdentifiers(context, name, containerType);
+		}
+
+		final candidateTypeHint = candidate.getTypeHintNew(context.typeList);
+
+		if (candidateTypeHint != null) {
+			return Promise.resolve(candidateTypeHint);
+		}
+		// return Promise.reject("cannot find type hint");
+
+		var typeHint:Null<Identifier> = candidate.getTypeHint();
+		switch (candidate.type) {
+			case ScopedLocal(_, _, ForLoop(loopIdent)):
+				var index:Int = loopIdent.indexOf(candidate);
+				var changes:Array<Promise<TypeHintType>> = [];
+				for (child in loopIdent) {
+					switch (child.type) {
+						case ScopedLocal(_, _, ForLoop(_)):
+							continue;
+						default:
+							changes.push(findTypeOfIdentifier(context, {
+								name: child.name,
+								pos: child.pos.start,
+								defineType: containerType
+							}).then(function(data:TypeHintType):Promise<TypeHintType> {
+								switch (data) {
+									case null:
+									case ClasspathType(_, typeParams) | LibType(_, _, typeParams):
+										if (typeParams.length <= index) {
+											return Promise.reject("not enough type parameters");
+										}
+										return Promise.resolve(typeParams[index]);
+									case UnknownType(_):
+									case StructType(_) | FunctionType(_):
+									case NamedType(_, _):
+								}
+								return Promise.reject("not found");
+							}));
+					}
+				}
+
+				var winner:Promise<TypeHintType> = cast Promise.race(changes);
+				return winner.catchError(function(data:TypeHintType):Promise<TypeHintType> {
+					if (typeHint != null) {
+						return typeFromTypeHint(context, typeHint);
+					}
+					return Promise.reject("type not found");
+				});
+			case ScopedLocal(_, _, Parameter(params)):
+				if (typeHint != null) {
+					return typeFromTypeHint(context, typeHint).then(function(hint) {
+						return Promise.resolve(hint);
+					});
+				}
+				var index:Int = params.indexOf(candidate);
+				switch (candidate.parent.type) {
+					case CaseLabel(switchIdentifier):
+						return findFieldOrScopedLocal(context, containerType, switchIdentifier.name,
+							switchIdentifier.pos.start).then(function(enumType:TypeHintType) {
+							switch (enumType) {
+								case null:
+									return Promise.resolve(null);
+								case ClasspathType(type, typeParams):
+									switch (type.name.type) {
+										case Enum:
+											var enumFields:Array<Identifier> = type.findAllIdentifiers((i) -> i.name == candidate.parent.name);
+											for (field in enumFields) {
+												switch (field.type) {
+													case EnumField(params):
+														if (params.length <= index) {
+															return Promise.resolve(null);
+														}
+														return Promise.resolve(params[index].getTypeHintNew(context.typeList));
+													default:
+														return Promise.reject("not an enum field");
+												}
+											}
+										default:
+									}
+								case LibType(_, _, _):
+									return Promise.resolve(enumType);
+								case FunctionType(_, _):
+									return Promise.reject("");
+								case StructType(_):
+									return Promise.reject("");
+								case UnknownType(_):
+									return Promise.reject("");
+								case NamedType(_):
+									return Promise.reject("");
+							}
+							return Promise.resolve(enumType);
+						});
+					default:
+				}
+			case ScopedLocal(_, _, CaseCapture(origin, index)):
+				return findFieldOrScopedLocal(context, containerType, origin.name, origin.pos.start).then(function(enumType:TypeHintType) {
+					switch (enumType) {
+						case ClasspathType(type, typeParams):
+							var fieldName = origin.name;
+							if (fieldName.startsWith(type.name.name + ".")) {
+								fieldName = fieldName.substr(type.name.name.length + 1);
+							}
+							if (fieldName.startsWith(type.fullModuleName + ".")) {
+								fieldName = fieldName.substr(type.fullModuleName.length + 1);
+							}
+							var uses = type.getIdentifiers(fieldName);
+							for (use in uses) {
+								switch (use.type) {
+									case EnumField(params):
+										if (params.length < index) {
+											return Promise.reject("not found");
+										}
+										return Promise.resolve(params[index].getTypeHintNew(context.typeList));
+									default:
+								}
+							}
+						default:
+					}
+					return Promise.reject("cannot resolve type of " + origin.name);
+				});
+
+			default:
+		}
+		if (typeHint != null) {
+			return typeFromTypeHint(context, typeHint);
+		}
+		return Promise.reject("cannot resolve type of " + name);
+	}
+
+	static function findGlobalIdentifiers(context:CacheAndTyperContext, name:String, containerType:Type):Promise<TypeHintType> {
+		final matches:Array<TypeHintType> = [];
+		var typeCandidates = context.typeList.findTypeName(name);
+		for (candidateType in typeCandidates) {
+			switch (containerType.file.importsModule(candidateType.file.getPackage(), candidateType.file.getMainModulName(), candidateType.name.name)) {
+				case None:
+				case ImportedWithAlias(_):
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
+					matches.push(ClasspathType(candidateType, []));
+					break;
 			}
-			return Promise.resolve(null);
-		});
+		}
+		final allUses = context.nameMap.getIdentifiers(name);
+		for (use in allUses) {
+			switch (use.type) {
+				case ModuleLevelStaticVar:
+				case ModuleLevelStaticMethod:
+				case FieldVar(false) | Method(false):
+					// TODO: is it a base class of using type?
+				case EnumField(_):
+					switch (containerType.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), use.defineType.name.name)) {
+						case None:
+						case ImportedWithAlias(_):
+						case Global | ParentPackage | SamePackage | Imported | StarImported:
+							matches.push(ClasspathType(use.defineType, []));
+							break;
+					}
+				default:
+			}
+		}
+		return switch (matches.length) {
+			case 0:
+				Promise.reject("no candidate found");
+			case 1:
+				Promise.resolve(matches[0]);
+			default:
+				Promise.reject("too many candidates found " + matches.length);
+		}
 	}
 
 	public static function findField(context:CacheAndTyperContext, containerType:Type, name:String):Promise<TypeHintType> {
@@ -350,7 +490,6 @@ class TypingHelper {
 		}
 		if ((candidate == null) || (candidate.uses == null)) {
 			switch (containerType.name.type) {
-				// case Abstract:
 				case Class:
 					var baseType:Null<Type> = findBaseClass(context.typeList, containerType);
 					if (baseType == null) {
@@ -362,6 +501,10 @@ class TypingHelper {
 				default:
 			}
 			return Promise.resolve(null);
+		}
+		final typeHint = candidate.getTypeHintNew(context.typeList);
+		if (typeHint != null) {
+			return Promise.resolve(typeHint);
 		}
 		for (use in candidate.uses) {
 			switch (use.type) {
@@ -381,7 +524,7 @@ class TypingHelper {
 				switch (type.file.importsModule(candidate.file.getPackage(), candidate.file.getMainModulName(), candidate.name.name)) {
 					case None:
 					case ImportedWithAlias(_):
-					case Global | SamePackage | Imported | StarImported:
+					case Global | ParentPackage | SamePackage | Imported | StarImported:
 						return candidate;
 				}
 			}
@@ -416,7 +559,7 @@ class TypingHelper {
 							switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
 								case None:
 								case ImportedWithAlias(_):
-								case Global | SamePackage | Imported | StarImported:
+								case Global | ParentPackage | SamePackage | Imported | StarImported:
 									// TODO recursive type params!!!
 									typeParams.push(ClasspathType(type, []));
 							}
@@ -441,7 +584,7 @@ class TypingHelper {
 			switch (hint.file.importsModule(type.file.getPackage(), type.file.getMainModulName(), type.name.name)) {
 				case None:
 				case ImportedWithAlias(_):
-				case Global | SamePackage | Imported | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
 					return Promise.resolve(ClasspathType(type, typeParams));
 			}
 		}

@@ -13,7 +13,7 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractType {
-	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, isRangeSameScope:Bool):CanRefactorResult {
 		final extractData = makeExtractTypeData(context);
 		if (extractData == null) {
 			return Unsupported;
@@ -24,7 +24,7 @@ class ExtractType {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractTypeData(context);
 		if (extractData == null) {
-			return Promise.reject("failed to collect extract type data");
+			return Promise.reject("failed to collect data for extract type");
 		}
 		// copy header + imports
 		final fileHeader = makeHeader(extractData, context);

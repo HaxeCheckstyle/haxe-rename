@@ -9,7 +9,7 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractInterface {
-	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, isRangeSameScope:Bool):CanRefactorResult {
 		final extractData = makeExtractInterfaceData(context);
 		if (extractData == null) {
 			return Unsupported;
@@ -20,7 +20,7 @@ class ExtractInterface {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractInterfaceData(context);
 		if (extractData == null) {
-			return Promise.reject("failed to collect extract interface data");
+			return Promise.reject("failed to collect data for extract interface");
 		}
 
 		final changelist:Changelist = new Changelist(context);
@@ -366,6 +366,8 @@ class ExtractInterface {
 			return switch (typeHint) {
 				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
 					Promise.resolve(typeHint);
+				case NamedType(_, fieldHint):
+					Promise.resolve(fieldHint);
 				case FunctionType(args, retVal):
 					Promise.resolve(retVal);
 			}

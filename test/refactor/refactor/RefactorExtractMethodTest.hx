@@ -7,35 +7,38 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testFailCollectDataEmptyFile(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Empty.hx", posStart: 80, posEnd: 131}, "unsupported");
-		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Empty.hx", posStart: 80, posEnd: 131}, "failed to collect extract method data",
+		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Empty.hx", posStart: 80, posEnd: 131}, "failed to collect data for extract method",
 			async);
 	}
 
 	function testFailCollectDataEmptyRange(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 0, posEnd: 0}, "unsupported");
-		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 0, posEnd: 0}, "failed to collect extract method data", async);
+		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 0, posEnd: 0}, "failed to collect data for extract method",
+			async);
 	}
 
 	function testFailCollectData(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 80, posEnd: 131}, "unsupported");
-		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 80, posEnd: 131}, "failed to collect extract method data", async);
+		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 80, posEnd: 131}, "failed to collect data for extract method",
+			async);
 	}
 
 	function testFailCollectDataReverse(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 131, posEnd: 80}, "unsupported");
-		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 131, posEnd: 80}, "failed to collect extract method data", async);
+		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 131, posEnd: 80}, "failed to collect data for extract method",
+			async);
 	}
 
 	function testFailNoParentFunction(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1962, posEnd: 1999}, "unsupported");
-		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1962, posEnd: 1999}, "failed to collect extract method data",
-			async);
+		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 1962, posEnd: 1999},
+			"failed to collect data for extract method", async);
 	}
 
 	function testFailAssignmentInLocalFunction(async:Async) {
 		failCanRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 675, posEnd: 680}, "unsupported");
 		failRefactor(RefactorExtractMethod, {fileName: "testcases/methods/LambdaExample.hx", posStart: 675, posEnd: 680},
-			"failed to collect extract method data", async);
+			"failed to collect data for extract method", async);
 	}
 
 	function testSimpleNoReturns(async:Async) {
@@ -468,7 +471,8 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "handleExtract(person);", 113, 161, Format(2, true)),
 			makeInsertTestEdit("testcases/methods/PersonHandler.hx",
-				"function handleExtract(person:Any) {\n" + "return \"Name: \" + person.name + \", Age: \" + person.age;\n" + "}\n", 180, Format(1, false)),
+				"function handleExtract(person:{name:String, age:Int}) {\n" + "return \"Name: \" + person.name + \", Age: \" + person.age;\n" + "}\n", 180,
+				Format(1, false)),
 		];
 		addTypeHint("testcases/methods/PersonHandler.hx", 75, LibType("Int", "Int", []));
 		addTypeHint("testcases/methods/PersonHandler.hx", 95, LibType("String", "String", []));
@@ -479,7 +483,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/methods/PersonHandler.hx", "var info = handleExtract(person);", 102, 161, Format(2, true)),
 			makeInsertTestEdit("testcases/methods/PersonHandler.hx",
-				"function handleExtract(person:Any) {\n"
+				"function handleExtract(person:{name:String, age:Int}) {\n"
 				+ "var info = \"Name: \" + person.name + \", Age: \" + person.age;\n"
 				+ "return info;\n"
 				+ "}\n",
@@ -929,7 +933,7 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 
 	function testSomeHelper(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/methods/SomeHelper.hx", "arrayAccessExtract(types, type, use, fromName, changelist, context);", 808, 1155,
+			makeReplaceTestEdit("testcases/methods/SomeHelper.hx", "arrayAccessExtract(types, type, use, fromName, changelist, context);", 821, 1168,
 				Format(5, true)),
 			makeInsertTestEdit("testcases/methods/SomeHelper.hx",
 				"static function arrayAccessExtract(types:Array<Type>, type:Type, use:Identifier, fromName:String, changelist:Changelist, context:RenameContext):Void {\n"
@@ -946,9 +950,9 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 				+ "						changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, pos, NoFormat), use);\n"
 				+ "					}\n"
 				+ "}\n",
-				1277, Format(1, false)),
+				1313, Format(1, false)),
 		];
-		addTypeHint("testcases/methods/SomeHelper.hx", 794, LibType("Type", "Type", []));
-		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/SomeHelper.hx", posStart: 806, posEnd: 1155}, edits, async);
+		addTypeHint("testcases/methods/SomeHelper.hx", 807, LibType("Type", "Type", []));
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/SomeHelper.hx", posStart: 820, posEnd: 1168}, edits, async);
 	}
 }

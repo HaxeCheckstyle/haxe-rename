@@ -9,20 +9,23 @@ import refactor.refactor.ExtractType;
 import refactor.refactor.RefactorContext;
 import refactor.refactor.RefactorType;
 import refactor.refactor.RewriteVarsToFinals;
+import refactor.refactor.RewriteWrapWithTryCatch;
 
 class Refactoring {
-	public static function canRefactor(refactorType:RefactorType, context:CanRefactorContext):CanRefactorResult {
+	public static function canRefactor(refactorType:RefactorType, context:CanRefactorContext, isRangeSameScope:Bool):CanRefactorResult {
 		switch (refactorType) {
 			case RefactorExtractInterface:
-				return ExtractInterface.canRefactor(context);
+				return ExtractInterface.canRefactor(context, isRangeSameScope);
 			case RefactorExtractMethod:
-				return ExtractMethod.canRefactor(context);
+				return ExtractMethod.canRefactor(context, isRangeSameScope);
 			case RefactorExtractType:
-				return ExtractType.canRefactor(context);
+				return ExtractType.canRefactor(context, isRangeSameScope);
 			case RefactorExtractConstructorParams(asFinal):
-				return ExtractConstructorParams.canRefactor(context, asFinal);
+				return ExtractConstructorParams.canRefactor(context, isRangeSameScope, asFinal);
 			case RefactorRewriteVarsToFinals(toFinals):
-				return RewriteVarsToFinals.canRefactor(context, toFinals);
+				return RewriteVarsToFinals.canRefactor(context, isRangeSameScope, toFinals);
+			case RefactorRewriteWrapWithTryCatch:
+				return RewriteWrapWithTryCatch.canRefactor(context, isRangeSameScope);
 		}
 		return null;
 	}
@@ -39,6 +42,8 @@ class Refactoring {
 				return ExtractConstructorParams.doRefactor(context, asFinal);
 			case RefactorRewriteVarsToFinals(toFinals):
 				return RewriteVarsToFinals.doRefactor(context, toFinals);
+			case RefactorRewriteWrapWithTryCatch:
+				return RewriteWrapWithTryCatch.doRefactor(context);
 		}
 		return Promise.reject("no refactor type selected");
 	}

@@ -78,6 +78,8 @@ class RenameHelper {
 											continue;
 										case UnknownType(name):
 											continue;
+										case NamedType(_):
+											continue;
 									}
 								}
 								object = use.name;
@@ -110,8 +112,10 @@ class RenameHelper {
 		var index:Int = name.lastIndexOf('.$fromName');
 		if (index < 0) {
 			switch (use.type) {
-				case ArrayAccess(posClosing):
-					return replaceArrayAccess(context, changelist, use, fromName, types, posClosing);
+				case ArrayAccess(arrayIdentfier):
+					return replaceArrayAccess(context, changelist, use, fromName, types, arrayIdentfier);
+				case CaseLabel(switchIdentifier):
+					return replaceArrayAccess(context, changelist, use, fromName, types, switchIdentifier);
 				default:
 			}
 			return Promise.resolve(null);
@@ -150,16 +154,16 @@ class RenameHelper {
 					switch (params[0]) {
 						case ClasspathType(type, _):
 							addMatchToChangelist(type);
-						case LibType(_) | FunctionType(_) | StructType(_) | UnknownType(_):
+						case LibType(_) | FunctionType(_) | StructType(_) | UnknownType(_) | NamedType(_):
 					}
 
-				case UnknownType(_) | FunctionType(_, _) | StructType(_):
+				case UnknownType(_) | FunctionType(_, _) | StructType(_) | NamedType(_):
 			}
 		});
 	}
 
 	public static function replaceArrayAccess(context:RenameContext, changelist:Changelist, use:Identifier, fromName:String, types:Array<Type>,
-			posClosing:Int):Promise<Void> {
+			arrayIdentfier:Identifier):Promise<Void> {
 		var name:String = use.name;
 
 		function addChanges(type:Type) {
@@ -177,8 +181,8 @@ class RenameHelper {
 			}
 		}
 		var search:SearchTypeOf = {
-			name: name,
-			pos: posClosing,
+			name: arrayIdentfier.name,
+			pos: arrayIdentfier.pos.end,
 			defineType: use.defineType
 		};
 		return TypingHelper.findTypeOfIdentifier(context, search).then(function(typeHint:TypeHintType) {
@@ -187,6 +191,10 @@ class RenameHelper {
 				case ClasspathType(type, _):
 					addChanges(type);
 				case LibType("Null", _, [ClasspathType(type, _)]):
+					addChanges(type);
+				case LibType("Null", _, [LibType("Array", _, [ClasspathType(type, _)])]):
+					addChanges(type);
+				case LibType("Array", _, [ClasspathType(type, _)]):
 					addChanges(type);
 				case LibType(_, _):
 					return;
@@ -200,15 +208,10 @@ class RenameHelper {
 						case LibType("Null", _, [ClasspathType(type, _)]):
 							addChanges(type);
 						default:
-							#if debug
-							trace("TODO " + typeHint.typeHintToString());
-							#end
 					}
 				case StructType(_):
-					#if debug
-					trace("TODO " + typeHint.typeHintToString());
-					#end
 				case UnknownType(_):
+				case NamedType(_):
 			}
 		});
 	}

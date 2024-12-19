@@ -10,6 +10,8 @@ import refactor.rename.RenameModuleLevelStaticTest;
 import refactor.rename.RenamePackageTest;
 import refactor.rename.RenameScopedLocalTest;
 import refactor.rename.RenameTypedefTest;
+import refactor.typing.TypeHintFromTreeTest;
+import refactor.typing.TypingTest;
 import utest.Runner;
 import utest.ui.text.DiagnosticsReport;
 
@@ -18,6 +20,8 @@ class TestMain {
 		var tests:Array<ITest> = [
 			new RenameClassTest(),
 			new RenameEnumTest(),
+			new TypingTest(),
+			new TypeHintFromTreeTest(),
 			new RenameImportAliasTest(),
 			new RenameInterfaceTest(),
 			new RenameModuleLevelStaticTest(),

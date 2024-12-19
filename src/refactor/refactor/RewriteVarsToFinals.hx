@@ -4,7 +4,7 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class RewriteVarsToFinals {
-	public static function canRefactor(context:CanRefactorContext, toFinals:Bool):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, isRangeSameScope:Bool, toFinals:Bool):CanRefactorResult {
 		final extractData = makeRewriteVarsToFinalsData(context, toFinals);
 		if (extractData == null) {
 			return Unsupported;
@@ -19,7 +19,7 @@ class RewriteVarsToFinals {
 	public static function doRefactor(context:RefactorContext, toFinals:Bool):Promise<RefactorResult> {
 		final extractData = makeRewriteVarsToFinalsData(context, toFinals);
 		if (extractData == null) {
-			return Promise.reject("failed to collect rewrite vars/finals data");
+			return Promise.reject("failed to collect data for rewrite vars/finals");
 		}
 		final changelist:Changelist = new Changelist(context);
 

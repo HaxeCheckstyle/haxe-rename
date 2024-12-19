@@ -26,6 +26,8 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 453, 464),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "addData", 641, 652),
 		];
+		addTypeHint("testcases/classes/pack/UseDocModule.hx", 261,
+			FunctionType([], ClasspathType(usageContext.typeList.getType("classes.DocModule.NotDocModule"), [])));
 		checkRename({fileName: "testcases/classes/BaseClass.hx", toName: "addData", pos: 128}, edits, async);
 	}
 
@@ -66,8 +68,8 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/EnumType.hx", "ItemClass", 75, 85),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 142, 152),
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 159, 169),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 264, 274),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 355, 365),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 272, 282),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "ItemClass", 363, 373),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 38, 48),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 111, 121),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "ItemClass", 163, 173),
@@ -92,6 +94,7 @@ class RenameClassTest extends RenameTestBase {
 			makeInsertTestEdit("testcases/classes/ChildHelper.hx", "import classes.pack.ChildClass;\n", 18),
 			makeInsertTestEdit("testcases/classes/EnumType.hx", "import classes.pack.ChildClass;\n", 18),
 			makeInsertTestEdit("testcases/classes/StaticUsing.hx", "import classes.pack.ChildClass;\n", 18),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "classes.pack.ChildClass", 264, 282),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "classes.pack.ChildClass", 30, 48),
 			makeReplaceTestEdit("testcases/classes/pack/UseChild.hx", "classes.pack.ChildClass", 48, 66),
 		];
@@ -126,8 +129,8 @@ class RenameClassTest extends RenameTestBase {
 	public function testRenameStaticExtensionPrint(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 210, 215),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 368, 373),
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 386, 391),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 376, 381),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "printChild", 394, 399),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "printChild", 151, 156),
 		];
 		checkRename({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "printChild", pos: 153}, edits, async);
@@ -135,7 +138,7 @@ class RenameClassTest extends RenameTestBase {
 
 	public function testRenameStaticExtensionPrintText(async:Async) {
 		var edits:Array<TestEdit> = [
-			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 323, 332),
+			makeReplaceTestEdit("testcases/classes/StaticUsing.hx", "logText", 331, 340),
 			makeReplaceTestEdit("testcases/classes/pack/SecondChildHelper.hx", "logText", 225, 234),
 		];
 		checkRename({fileName: "testcases/classes/pack/SecondChildHelper.hx", toName: "logText", pos: 229}, edits, async);
@@ -171,13 +174,8 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/ChildClass.hx", "id", 796, 800),
 			makeReplaceTestEdit("testcases/classes/MyIdentifier.hx", "id", 228, 232),
 		];
-		addTypeHint("testcases/classes/ChildClass.hx", 448, ClasspathType(usageContext.typeList.getType("classes.MyIdentifier"), []));
-		addTypeHint("testcases/classes/ChildClass.hx", 462, ClasspathType(usageContext.typeList.getType("classes.MyIdentifier"), []));
-		addTypeHint("testcases/classes/ChildClass.hx", 510, ClasspathType(usageContext.typeList.getType("classes.MyIdentifier"), []));
-		addTypeHint("testcases/classes/ChildClass.hx", 704, ClasspathType(usageContext.typeList.getType("classes.MyIdentifier"), []));
-		addTypeHint("testcases/classes/ChildClass.hx", 794, ClasspathType(usageContext.typeList.getType("classes.MyIdentifier"), []));
 
-		checkRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "id", pos: 229}, edits, async, true);
+		checkRename({fileName: "testcases/classes/MyIdentifier.hx", toName: "id", pos: 229}, edits, async);
 	}
 
 	public function testRenameJsonClassWidth(async:Async) {
@@ -252,10 +250,10 @@ class RenameClassTest extends RenameTestBase {
 
 	public function testRenameStaticUsingConstructorCall(async:Async) {
 		var edits:Array<TestEdit> = [];
-		failCanRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
-			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))");
-		failRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 359},
-			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@355-365 (Call(true))", async);
+		failCanRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 364},
+			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@363-373 (Call(true))");
+		failRename({fileName: "testcases/classes/StaticUsing.hx", toName: "NewChildClass", pos: 364},
+			"renaming not supported for ChildClass testcases/classes/StaticUsing.hx@363-373 (Call(true))", async);
 	}
 
 	public function testRenameBaseClassParamterWithShadow2(async:Async) {
@@ -394,14 +392,9 @@ class RenameClassTest extends RenameTestBase {
 			makeReplaceTestEdit("testcases/classes/pack/UseDocModule.hx", "doMore", 224, 235),
 			makeReplaceTestEdit("testcases/classes/pack/UseDocModule.hx", "doMore", 264, 275),
 		];
-		addTypeHint("testcases/classes/pack/UseDocModule.hx", 222, ClasspathType(usageContext.typeList.getType("classes.DocModule.NotDocModule"), []));
 		addTypeHint("testcases/classes/pack/UseDocModule.hx", 261,
 			FunctionType([], ClasspathType(usageContext.typeList.getType("classes.DocModule.NotDocModule"), [])));
-		addTypeHint("testcases/classes/pack/UseChild.hx", 215, ClasspathType(usageContext.typeList.getType("classes.ChildClass"), []));
-		addTypeHint("testcases/classes/pack/UseChild.hx", 332, ClasspathType(usageContext.typeList.getType("classes.ChildClass"), []));
-		addTypeHint("testcases/classes/pack/UseChild.hx", 440, ClasspathType(usageContext.typeList.getType("classes.ChildClass"), []));
-		addTypeHint("testcases/classes/pack/UseChild.hx", 628, ClasspathType(usageContext.typeList.getType("classes.ChildClass"), []));
 
-		checkRename({fileName: "testcases/classes/DocModule.hx", toName: "doMore", pos: 128}, edits, async, true);
+		checkRename({fileName: "testcases/classes/DocModule.hx", toName: "doMore", pos: 128}, edits, async);
 	}
 }

@@ -33,17 +33,18 @@ enum IdentifierType {
 	EnumField(params:Array<Identifier>);
 	CaseLabel(switchIdentifier:Identifier);
 	Call(isNew:Bool);
-	ArrayAccess(posClosing:Int);
+	ArrayAccess(arrayIdentifier:Identifier);
 	Access;
 	ForIterator;
 	ScopedLocal(scopeStart:Int, scopeEnd:Int, scopeType:ScopedLocalType);
 	StringConst;
+	Meta;
 }
 
 enum ScopedLocalType {
 	Parameter(params:Array<Identifier>);
 	Var;
-	CaseCapture;
+	CaseCapture(origin:Null<Identifier>, index:Int);
 	ForLoop(loopIdentifiers:Array<Identifier>);
 }
 

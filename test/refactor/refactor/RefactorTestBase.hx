@@ -52,7 +52,7 @@ class RefactorTestBase extends TestBase {
 
 	function doCanRefactor(refactorType:RefactorType, what:RefactorWhat, edits:Array<TestEdit>, pos:PosInfos):Promise<RefactorResult> {
 		var editList:TestEditList = new TestEditList();
-		var result = Refactoring.canRefactor(refactorType, {
+		final context:CanRefactorContext = {
 			nameMap: usageContext.nameMap,
 			fileList: usageContext.fileList,
 			typeList: usageContext.typeList,
@@ -60,10 +60,12 @@ class RefactorTestBase extends TestBase {
 			verboseLog: function(text:String, ?pos:PosInfos) {
 				Sys.println('${pos.fileName}:${pos.lineNumber}: $text');
 			},
-			typer: null,
+			typer: typer,
 			converter: (string, byteOffset) -> byteOffset,
 			fileReader: fileReader,
-		});
+		};
+		final isRangeSameScope:Bool = RefactorHelper.rangeInSameScope(context);
+		var result = Refactoring.canRefactor(refactorType, context, isRangeSameScope);
 		return switch (result) {
 			case Unsupported:
 				Promise.reject("unsupported");

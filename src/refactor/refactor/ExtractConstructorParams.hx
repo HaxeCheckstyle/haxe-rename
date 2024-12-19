@@ -6,7 +6,7 @@ import refactor.edits.Changelist;
 import refactor.refactor.RefactorHelper.TokensAtPos;
 
 class ExtractConstructorParams {
-	public static function canRefactor(context:CanRefactorContext, asFinal:Bool):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, isRangeSameScope:Bool, asFinal:Bool):CanRefactorResult {
 		final extractData = makeExtractConstructorParamsData(context);
 		if (extractData == null) {
 			return Unsupported;
@@ -21,7 +21,7 @@ class ExtractConstructorParams {
 	public static function doRefactor(context:RefactorContext, asFinal:Bool):Promise<RefactorResult> {
 		final extractData = makeExtractConstructorParamsData(context);
 		if (extractData == null) {
-			return Promise.reject("failed to collect extract method data");
+			return Promise.reject("failed to collect data for extract constructor params");
 		}
 		final changelist:Changelist = new Changelist(context);
 

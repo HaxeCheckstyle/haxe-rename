@@ -52,7 +52,7 @@ class RenameTypeName {
 					if (alias != identifier.name) {
 						continue;
 					}
-				case Global | SamePackage | Imported | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
 			}
 			switch (use.type) {
 				case Abstract | Class | Enum | Interface | Typedef:
@@ -75,6 +75,8 @@ class RenameTypeName {
 					case LibType(_) | UnknownType(_):
 						return;
 					case StructType(_) | FunctionType(_, _):
+						return;
+					case NamedType(_):
 						return;
 				}
 				if (use.name == identifier.name) {

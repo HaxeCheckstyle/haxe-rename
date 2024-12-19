@@ -7,5 +7,6 @@ enum TypeHintType {
 	LibType(name:String, fullName:String, typeParams:Array<TypeHintType>);
 	FunctionType(args:Array<TypeHintType>, retVal:Null<TypeHintType>);
 	StructType(fields:Array<TypeHintType>);
+	NamedType(name:String, typeHint:Null<TypeHintType>);
 	UnknownType(name:String);
 }

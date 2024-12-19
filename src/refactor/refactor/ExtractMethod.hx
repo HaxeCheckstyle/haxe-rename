@@ -15,7 +15,10 @@ import refactor.refactor.extractmethod.ICodeGen;
 import refactor.typing.TypeHintType;
 
 class ExtractMethod {
-	public static function canRefactor(context:CanRefactorContext):CanRefactorResult {
+	public static function canRefactor(context:CanRefactorContext, isRangeSameScope:Bool):CanRefactorResult {
+		if (!isRangeSameScope) {
+			return Unsupported;
+		}
 		final extractData = makeExtractMethodData(context);
 		if (extractData == null) {
 			return Unsupported;
@@ -26,7 +29,7 @@ class ExtractMethod {
 	public static function doRefactor(context:RefactorContext):Promise<RefactorResult> {
 		final extractData = makeExtractMethodData(context);
 		if (extractData == null) {
-			return Promise.reject("failed to collect extract method data");
+			return Promise.reject("failed to collect data for extract method");
 		}
 		final changelist:Changelist = new Changelist(context);
 
@@ -102,6 +105,9 @@ class ExtractMethod {
 	}
 
 	static function makeExtractMethodData(context:CanRefactorContext):Null<ExtractMethodData> {
+		if (context.what.posStart >= context.what.posEnd) {
+			return null;
+		}
 		final fileContent = context.fileReader(context.what.fileName);
 		var content:String;
 		var root:TokenTree;
@@ -181,7 +187,7 @@ class ExtractMethod {
 		}
 
 		// extracting only works if parent of start token is also grand…parent of end token
-		if (!shareSameParent(tokenStart, tokenEnd)) {
+		if (!RefactorHelper.shareSameParent(tokenStart, tokenEnd)) {
 			return null;
 		}
 
@@ -235,56 +241,6 @@ class ExtractMethod {
 			functionIndent: functionIndent,
 			snippetIndent: snippetIndent,
 		};
-	}
-
-	static function shareSameParent(tokenA:TokenTree, tokenB:TokenTree):Bool {
-		var parentA = tokenA.parent;
-		if (parentA == null) {
-			return false;
-		}
-		switch (parentA.tok) {
-			case POpen:
-				final closeToken = parentA.access().firstOf(PClose).token;
-				if (closeToken == null) {
-					return false;
-				}
-				if (closeToken.index < tokenB.index) {
-					return false;
-				}
-			case BrOpen:
-				final closeToken = parentA.access().firstOf(BrClose).token;
-				if (closeToken == null) {
-					return false;
-				}
-				if (closeToken.index < tokenB.index) {
-					return false;
-				}
-			case BkOpen:
-				final closeToken = parentA.access().firstOf(BkClose).token;
-				if (closeToken == null) {
-					return false;
-				}
-				if (closeToken.index < tokenB.index) {
-					return false;
-				}
-			default:
-		}
-		var parentB = tokenB.parent;
-		var oldParentB = tokenB;
-		while (true) {
-			if (parentB == null) {
-				return false;
-			}
-			if (parentA.index == parentB.index) {
-				final lastToken = TokenTreeCheckUtils.getLastToken(oldParentB);
-				if (lastToken == null) {
-					return false;
-				}
-				return (lastToken.index <= tokenB.index);
-			}
-			oldParentB = parentB;
-			parentB = parentB.parent;
-		}
 	}
 
 	static function getFunctionIdentifier(extractData:ExtractMethodData, context:RefactorContext):Null<Identifier> {
@@ -641,9 +597,6 @@ class ExtractMethod {
 		var promises:Array<Promise<String>> = [];
 		for (identifier in neededIdentifiers) {
 			final promise = findTypeOfIdentifier(context, identifier).then(function(typeHint):Promise<String> {
-				#if debug
-				trace("typehint resolved: " + identifier + " " + PrintHelper.typeHintToString(typeHint));
-				#end
 				return Promise.resolve(buildParameter(identifier, typeHint));
 			});
 
@@ -653,6 +606,16 @@ class ExtractMethod {
 	}
 
 	public static function findTypeOfIdentifier(context:RefactorContext, identifier:Identifier):Promise<TypeHintType> {
+		final typeHint = identifier.getTypeHintNew(context.typeList);
+		if (typeHint != null) {
+			return Promise.resolve(typeHint);
+		}
+
+		var typeHint = identifier.getTypeHintNew(context.typeList);
+		if (typeHint != null) {
+			return Promise.resolve(typeHint);
+		}
+
 		var hint = identifier.getTypeHint();
 		if (hint != null) {
 			return TypingHelper.typeFromTypeHint(context, hint);

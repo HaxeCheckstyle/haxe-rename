@@ -24,7 +24,7 @@ class RenameEnumField {
 					if (alias != typeName) {
 						continue;
 					}
-				case Global | SamePackage | Imported | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
 			}
 			RenameHelper.replaceTextWithPrefix(use, typeName + ".", context.what.toName, changelist);
 		}
@@ -63,7 +63,7 @@ class RenameEnumField {
 							if (alias != typeName) {
 								continue;
 							}
-						case Global | SamePackage | Imported | StarImported:
+						case Global | ParentPackage | SamePackage | Imported | StarImported:
 					}
 				default:
 					continue;

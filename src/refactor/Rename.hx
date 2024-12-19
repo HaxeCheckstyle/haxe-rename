@@ -31,7 +31,7 @@ class Rename {
 				ScopedLocal(_, _):
 				Promise.resolve({name: identifier.name, pos: identifier.pos});
 			case ImportModul | UsingModul | Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst | TypedParameter |
-				TypedefBase | Call(true) | CaseLabel(_):
+				TypedefBase | Call(true) | CaseLabel(_) | Meta:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case Call(false) | Access | ArrayAccess(_) | ForIterator:
 				var candidate:Null<Identifier> = findActualWhat(context, file, identifier);
@@ -85,13 +85,13 @@ class Rename {
 			case ModuleLevelStaticVar | ModuleLevelStaticMethod:
 				context.verboseLog('rename module level static "${identifier.name}" to "${context.what.toName}"');
 				RenameModuleLevelStatic.refactorModuleLevelStatic(context, file, identifier);
-			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst:
+			case Extends | Implements | AbstractOver | AbstractFrom | AbstractTo | TypeHint | StringConst | Meta:
 				Promise.reject(RefactorResult.Unsupported(identifier.toString()).printRenameResult());
 			case Property:
 				context.verboseLog('rename property "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, false);
 			case FieldVar(isStatic):
-				context.verboseLog('rename ${isStatic ? "static" : ""} field "${identifier.name}" to "${context.what.toName}"');
+				context.verboseLog('rename ${isStatic ? "static " : ""}field "${identifier.name}" to "${context.what.toName}"');
 				RenameField.refactorField(context, file, identifier, isStatic);
 			case Method(isStatic):
 				context.verboseLog('rename ${isStatic ? "static " : ""}class method "${identifier.name}" to "${context.what.toName}"');

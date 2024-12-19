@@ -8,19 +8,19 @@ class RefactorExtractConstructorParams extends RefactorTestBase {
 	function testFailExtractParamsNotConstructor(async:Async) {
 		failCanRefactor(RefactorExtractConstructorParams(false), {fileName: "testcases/constructor/Point.hx", posStart: 148, posEnd: 148}, "unsupported");
 		failRefactor(RefactorExtractConstructorParams(false), {fileName: "testcases/constructor/Point.hx", posStart: 148, posEnd: 148},
-			"failed to collect extract method data", async);
+			"failed to collect data for extract constructor params", async);
 		failCanRefactor(RefactorExtractConstructorParams(true), {fileName: "testcases/constructor/Point.hx", posStart: 148, posEnd: 148}, "unsupported");
 		failRefactor(RefactorExtractConstructorParams(true), {fileName: "testcases/constructor/Point.hx", posStart: 148, posEnd: 148},
-			"failed to collect extract method data", async);
+			"failed to collect data for extract constructor params", async);
 	}
 
 	function testExtractParamsEmptyNew(async:Async) {
 		failCanRefactor(RefactorExtractConstructorParams(false), {fileName: "testcases/constructor/Point.hx", posStart: 247, posEnd: 247}, "unsupported");
 		failRefactor(RefactorExtractConstructorParams(false), {fileName: "testcases/constructor/Point.hx", posStart: 247, posEnd: 247},
-			"failed to collect extract method data", async);
+			"failed to collect data for extract constructor params", async);
 		failCanRefactor(RefactorExtractConstructorParams(true), {fileName: "testcases/constructor/Point.hx", posStart: 247, posEnd: 247}, "unsupported");
 		failRefactor(RefactorExtractConstructorParams(true), {fileName: "testcases/constructor/Point.hx", posStart: 247, posEnd: 247},
-			"failed to collect extract method data", async);
+			"failed to collect data for extract constructor params", async);
 	}
 
 	function testExtractParamsYAndTextAsVar(async:Async) {

@@ -5,16 +5,12 @@ class RefactorClassTest extends RefactorTestBase {
 		setupTestSources(["testcases/classes"]);
 	}
 
+	// Extract Type
+
 	function testFailExtractTypChildClass(async:Async) {
 		failCanRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "unsupported");
-		failRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "failed to collect extract type data",
+		failRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "failed to collect data for extract type",
 			async);
-	}
-
-	function testFailExtractInterfaceNoClass(async:Async) {
-		failCanRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875}, "unsupported");
-		failRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875},
-			"failed to collect extract interface data", async);
 	}
 
 	function testExtractTypeListOfChilds(async:Async) {
@@ -60,9 +56,9 @@ class RefactorClassTest extends RefactorTestBase {
 				+ "	public static var printFunc:PrintFunc;\n"
 				+ "}",
 				0, Format(0, false)),
-			makeRemoveTestEdit("testcases/classes/StaticUsing.hx", 484, 566),
+			makeRemoveTestEdit("testcases/classes/StaticUsing.hx", 557, 639),
 		];
-		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/StaticUsing.hx", posStart: 518, posEnd: 518}, edits, async);
+		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/StaticUsing.hx", posStart: 590, posEnd: 590}, edits, async);
 	}
 
 	function testExtractTypeNotDocModule(async:Async) {
@@ -85,6 +81,14 @@ class RefactorClassTest extends RefactorTestBase {
 			makeInsertTestEdit("testcases/classes/pack/UseDocModule.hx", "import classes.NotDocModule;\n", 23),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/DocModule.hx", posStart: 73, posEnd: 73}, edits, async);
+	}
+
+	// Extract Interface
+
+	function testFailExtractInterfaceNoClass(async:Async) {
+		failCanRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875}, "unsupported");
+		failRefactor(RefactorExtractInterface, {fileName: "testcases/classes/ChildClass.hx", posStart: 875, posEnd: 875},
+			"failed to collect data for extract interface", async);
 	}
 
 	function testExtractInterfaceBaseClass(async:Async) {
@@ -110,6 +114,14 @@ class RefactorClassTest extends RefactorTestBase {
 		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/BaseClass.hx", posStart: 27, posEnd: 27}, edits, async);
 	}
 
+	// Rewrite Finals to Vars
+
+	function testRewriteFinalsToVarsJsonClass(async:Async) {
+		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696}, "unsupported");
+		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696},
+			"failed to collect data for rewrite vars/finals", async);
+	}
+
 	function testRewriteFinalsToVarsPrinter(async:Async) {
 		var edits:Array<TestEdit> = [
 			makeReplaceTestEdit("testcases/classes/Printer.hx", "var", 147, 152, NoFormat),
@@ -118,10 +130,12 @@ class RefactorClassTest extends RefactorTestBase {
 		checkRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/Printer.hx", posStart: 129, posEnd: 1079}, edits, async);
 	}
 
+	// Rewrite Vars To Finals
+
 	function testRewriteVarsToFinalsPrinter(async:Async) {
 		failCanRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/classes/Printer.hx", posStart: 129, posEnd: 1079}, "unsupported");
 		failRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/classes/Printer.hx", posStart: 129, posEnd: 1079},
-			"failed to collect rewrite vars/finals data", async);
+			"failed to collect data for rewrite vars/finals", async);
 	}
 
 	function testRewriteVarsToFinalsJsonClass(async:Async) {
@@ -135,9 +149,31 @@ class RefactorClassTest extends RefactorTestBase {
 		checkRefactor(RefactorRewriteVarsToFinals(true), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696}, edits, async);
 	}
 
-	function testRewriteFinalsToVarsJsonClass(async:Async) {
-		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696}, "unsupported");
-		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/classes/JsonClass.hx", posStart: 18, posEnd: 696},
-			"failed to collect rewrite vars/finals data", async);
+	// Wrap with Try…Catch
+
+	function testFailTryCatchCollectDataEmptyFile(async:Async) {
+		failCanRefactor(RefactorRewriteWrapWithTryCatch, {fileName: "testcases/classes/BaseClass.hx", posStart: 156, posEnd: 263}, "unsupported");
+		failRefactor(RefactorRewriteWrapWithTryCatch, {fileName: "testcases/classes/BaseClass.hx", posStart: 156, posEnd: 263},
+			"failed to collect data for rewrite wrap with try catch", async);
+	}
+
+	function testRewriteWrapTryCatchJsonClass(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/classes/JsonClass.hx",
+				"try {\n"
+				+ "var newgroup:Null<JsonClass> = new JsonClass(group.id, group.type, group.width);\n"
+				+ "		newgroup.id = group.id;\n"
+				+ "		newgroup.type = group.type;\n"
+				+ "		newgroup.width = group.width;\n"
+				+ "		newgroup.maxWidth = group.maxWidth;\n\n"
+				+ "		return newgroup;\n"
+				+ "}\n"
+				+ "catch (e:haxe.Exception) {\n"
+				+ "// TODO: handle exception\n"
+				+ "trace (e.details());\n"
+				+ "}",
+				301, 527, Format(2, true)),
+		];
+		checkRefactor(RefactorRewriteWrapWithTryCatch, {fileName: "testcases/classes/JsonClass.hx", posStart: 300, posEnd: 527}, edits, async);
 	}
 }

@@ -51,6 +51,6 @@ class RefactorTypedefTest extends RefactorTestBase {
 		failCanRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", posStart: 245, posEnd: 473},
 			"unsupported");
 		failRefactor(RefactorRewriteVarsToFinals(false), {fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", posStart: 245, posEnd: 473},
-			"failed to collect rewrite vars/finals data", async);
+			"failed to collect data for rewrite vars/finals", async);
 	}
 }

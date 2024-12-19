@@ -25,11 +25,7 @@ class CodeGenEmptyReturn extends CodeGenBase {
 			case [0, 0]:
 				'if (!$call) {\nreturn;\n}';
 			case [1, 0]:
-				'switch ($call) {\n'
-				+ 'case None:\n'
-				+ 'return;\n'
-				+ 'case Some(data):\n'
-				+ '${assignments[0].name} = data;\n}';
+				'switch ($call) {\n' + 'case None:\n' + 'return;\n' + 'case Some(data):\n' + '${assignments[0].name} = data;\n}';
 			case [0, 1]:
 				'var ${vars[0].name};\n'
 				+ 'switch ($call) {\n'
@@ -87,9 +83,6 @@ class CodeGenEmptyReturn extends CodeGenBase {
 	}
 
 	public function makeBody():String {
-		final selectedSnippet = RefactorHelper.extractText(context.converter, extractData.content, extractData.startToken.pos.min,
-			extractData.endToken.pos.max);
-
 		return switch [assignments.length, vars.length] {
 			case [0, 0]:
 				final snippet = replaceReturnValues(returnTokens, value -> 'false');

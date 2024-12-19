@@ -45,7 +45,7 @@ abstract class CodeGenBase implements ICodeGen {
 		}
 		return TypingHelper.findTypeWithTyper(context, context.what.fileName, func.pos.max - 1).then(function(typeHint) {
 			return switch (typeHint) {
-				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_):
+				case null | ClasspathType(_) | LibType(_) | StructType(_) | UnknownType(_) | NamedType(_):
 					Promise.resolve(typeHint);
 				case FunctionType(args, retVal):
 					Promise.resolve(retVal);
