@@ -95,5 +95,6 @@ class RenamePackage {
 		pathParts.unshift(Path.removeTrailingSlashes(rootPath));
 		pathParts.push('${mainTypeName}.hx');
 		changelist.addChange(file.name, Move(Path.join(pathParts)), null);
+		context.fileList.addRecentlyRenamed(file);
 	}
 }

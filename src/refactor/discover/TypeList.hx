@@ -28,7 +28,7 @@ class TypeList implements ITypeList {
 	public function removeFile(fileName:String) {
 		var fullNames:Array<String> = [];
 		for (key => type in types) {
-			if (type.name.pos.fileName == fileName) {
+			if (type.file.name == fileName) {
 				fullNames.push(type.fullModuleName);
 			}
 		}

@@ -72,13 +72,7 @@ class RenameHelper {
 												changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 												continue;
 											}
-										case StructType(fields):
-											continue;
-										case FunctionType(args, retVal):
-											continue;
-										case UnknownType(name):
-											continue;
-										case NamedType(_):
+										case StructType(_) | FunctionType(_, _) | UnknownType(_) | NamedType(_):
 											continue;
 									}
 								}
@@ -196,8 +190,6 @@ class RenameHelper {
 					addChanges(type);
 				case LibType("Array", _, [ClasspathType(type, _)]):
 					addChanges(type);
-				case LibType(_, _):
-					return;
 				case FunctionType(_, retVal):
 					if (retVal == null) {
 						return;
@@ -209,9 +201,7 @@ class RenameHelper {
 							addChanges(type);
 						default:
 					}
-				case StructType(_):
-				case UnknownType(_):
-				case NamedType(_):
+				case LibType(_, _) | StructType(_) | UnknownType(_) | NamedType(_):
 			}
 		});
 	}

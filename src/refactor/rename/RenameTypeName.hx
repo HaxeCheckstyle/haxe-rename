@@ -16,11 +16,13 @@ class RenameTypeName {
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();
 		var path:Path = new Path(file.name);
+
 		if (mainModuleName == identifier.name) {
 			// type and filename are identical -> move file
 			var newFileName:String = Path.join([path.dir, context.what.toName]) + "." + path.ext;
 			changelist.addChange(file.name, Move(newFileName), null);
 		}
+
 		// replace self
 		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, NoFormat), identifier);
 
@@ -56,7 +58,6 @@ class RenameTypeName {
 			}
 			switch (use.type) {
 				case Abstract | Class | Enum | Interface | Typedef:
-					changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 					continue;
 				default:
 			}
@@ -72,11 +73,7 @@ class RenameTypeName {
 						if (type.fullModuleName != identifier.defineType.fullModuleName) {
 							return;
 						}
-					case LibType(_) | UnknownType(_):
-						return;
-					case StructType(_) | FunctionType(_, _):
-						return;
-					case NamedType(_):
+					case LibType(_) | UnknownType(_) | StructType(_) | FunctionType(_, _) | NamedType(_):
 						return;
 				}
 				if (use.name == identifier.name) {
@@ -95,6 +92,9 @@ class RenameTypeName {
 		}
 
 		return Promise.all(changes).then(function(_) {
+			if (mainModuleName == identifier.name) {
+				context.fileList.addRecentlyRenamed(file);
+			}
 			return Promise.resolve(changelist.execute());
 		});
 	}
