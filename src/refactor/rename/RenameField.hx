@@ -88,6 +88,7 @@ class RenameField {
 	static function replaceInTypeWithFieldAccess(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
 		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
 		var allAccess:Array<Identifier> = type.getStartsWith('$prefix$from.');
+		allAccess = allAccess.concat(type.getStartsWith('$prefix$from?.'));
 		var shadowed:Bool = false;
 		for (access in allAccess) {
 			for (use in allUses) {
