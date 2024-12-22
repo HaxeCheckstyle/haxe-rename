@@ -96,4 +96,13 @@ class RenameTypedefTest extends RenameTestBase {
 		];
 		checkRename({fileName: "testcases/typedefs/codedata/TestFormatterInputData.hx", toName: "indentationOffset", pos: 462}, edits, async);
 	}
+
+	public function testRenameForceCommandResolveSupport(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/typedefs/ExperimentalCapabilities.hx", "forceSupport", 324, 350),
+			makeReplaceTestEdit("testcases/typedefs/ExperimentalCapabilities.hx", "forceSupport", 440, 466),
+			makeReplaceTestEdit("testcases/typedefs/ExperimentalCapabilities.hx", "forceSupport", 491, 517),
+		];
+		checkRename({fileName: "testcases/typedefs/ExperimentalCapabilities.hx", toName: "forceSupport", pos: 330}, edits, async);
+	}
 }

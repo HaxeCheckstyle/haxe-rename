@@ -459,16 +459,15 @@ class UsageCollector {
 					readAnonStructure(context, identifier, child);
 				case Const(CIdent(_)):
 					final ident = makeIdentifier(context, child, TypedefBase, identifier);
-					final afterIdentifier = findIdentifierChild(child);
-					if (afterIdentifier != null) {
-						switch (afterIdentifier.tok) {
+					for (identChild in findIdentifierChilds(child)) {
+						switch (identChild.tok) {
 							case Semicolon:
 							case Binop(OpLt):
-								addTypeParameter(context, ident, afterIdentifier);
+								addTypeParameter(context, ident, identChild);
 							case Binop(OpAnd):
-								readExpression(context, identifier, afterIdentifier);
+								readExpression(context, identifier, identChild);
 							case Arrow:
-								readTypeHint(context, ident, afterIdentifier, TypeHint);
+								readTypeHint(context, ident, identChild, TypeHint);
 							default:
 						}
 					}
@@ -753,8 +752,7 @@ class UsageCollector {
 								identType = ArrayAccess(accessIdent);
 							}
 							makeIdentifier(context, token, identType, identifier);
-							var identChild = findIdentifierChild(token);
-							while (identChild != null) {
+							for (identChild in findIdentifierChilds(token)) {
 								switch (identChild.tok) {
 									case POpen:
 										readCallParams(context, identifier, identChild);
@@ -772,7 +770,6 @@ class UsageCollector {
 									case Unop(_):
 									default:
 								}
-								identChild = identChild.nextSibling;
 							}
 						default:
 					}
@@ -782,75 +779,66 @@ class UsageCollector {
 					case Parameter:
 						var posScope = parent.getPos();
 						final parameterIdent = makeIdentifier(context, token, ScopedLocal(posScope.min, posScope.max, Parameter([])), identifier);
-						var parameterChild = findIdentifierChild(token);
-						while (parameterChild != null) {
-							switch (parameterChild.tok) {
+						for (identChild in findIdentifierChilds(token)) {
+							switch (identChild.tok) {
 								case Comma:
 								case DblDot:
-									switch (TokenTreeCheckUtils.getColonType(parameterChild)) {
+									switch (TokenTreeCheckUtils.getColonType(identChild)) {
 										case TypeHint:
-											readTypeHint(context, parameterIdent, parameterChild, TypeHint);
+											readTypeHint(context, parameterIdent, identChild, TypeHint);
 											copyUsesToParent(identifier, parameterIdent);
 										case TypeCheck:
-											readExpression(context, identifier, parameterChild);
+											readExpression(context, identifier, identChild);
 										case SwitchCase | Ternary | ObjectLiteral | At:
 										case Unknown:
-											readTypeHint(context, parameterIdent, parameterChild, TypeHint);
+											readTypeHint(context, parameterIdent, identChild, TypeHint);
 											copyUsesToParent(identifier, parameterIdent);
 									}
 								case Binop(OpLt):
-									addTypeParameter(context, parameterIdent, parameterChild);
+									addTypeParameter(context, parameterIdent, identChild);
 									copyUsesToParent(identifier, parameterIdent);
 								default:
 							}
-							parameterChild = parameterChild.nextSibling;
 						}
 						return;
 
 					case At | Call | SwitchCondition | WhileCondition | IfCondition | SharpCondition | Catch | ForLoop | Expression:
 						final accessIdent = makeIdentifier(context, token, Access, identifier);
-						var accessChild = findIdentifierChild(token);
-						if (accessChild == null) {
-							accessChild = token.getFirstChild();
-						}
-						while (accessChild != null) {
-							switch (accessChild.tok) {
+						for (identChild in findIdentifierChilds(token)) {
+							switch (identChild.tok) {
 								case Comment(_) | CommentLine(_):
-								case Comma:
-								case Dot | QuestionDot:
-								case Unop(_):
+								case Comma | Dot | QuestionDot | Unop(_):
 								case Binop(_):
-									readExpression(context, identifier, accessChild);
+									readExpression(context, identifier, identChild);
 								case Arrow:
-									readExpression(context, identifier, accessChild);
+									readExpression(context, identifier, identChild);
 								case POpen:
-									readCallParams(context, identifier, accessChild);
+									readCallParams(context, identifier, identChild);
 								case BkOpen:
-									readCallParams(context, identifier, accessChild);
+									readCallParams(context, identifier, identChild);
 								case DblDot:
-									switch (TokenTreeCheckUtils.getColonType(accessChild)) {
+									switch (TokenTreeCheckUtils.getColonType(identChild)) {
 										case TypeHint:
-											readTypeHint(context, accessIdent, accessChild, TypeHint);
+											readTypeHint(context, accessIdent, identChild, TypeHint);
 											copyUsesToParent(identifier, accessIdent);
 										case TypeCheck:
-											readExpression(context, identifier, accessChild);
+											readExpression(context, identifier, identChild);
 										case SwitchCase | Ternary | ObjectLiteral | At:
 										case Unknown:
-											readTypeHint(context, accessIdent, accessChild, TypeHint);
+											readTypeHint(context, accessIdent, identChild, TypeHint);
 											copyUsesToParent(identifier, accessIdent);
 									}
 								case Const(CIdent("is")):
-									final child = accessChild.getFirstChild();
+									final child = identChild.getFirstChild();
 									if (child != null) {
 										readExpression(context, identifier, child);
 									}
 								case Question:
-									if (TokenTreeCheckUtils.isTernary(accessChild)) {
-										readExpression(context, identifier, accessChild);
+									if (TokenTreeCheckUtils.isTernary(identChild)) {
+										readExpression(context, identifier, identChild);
 									}
 								default:
 							}
-							accessChild = accessChild.nextSibling;
 						}
 						return;
 				}
@@ -859,46 +847,42 @@ class UsageCollector {
 				if (ident == null) {
 					ident = identifier;
 				}
-				var identToken = findIdentifierChild(token);
 				var directChildrenDone:Bool = false;
-				if (identToken != null && (identToken == token.getFirstChild())) {
-					directChildrenDone = true;
-				}
-				while (identToken != null) {
-					switch (identToken.tok) {
+				for (identChild in findIdentifierChilds(token)) {
+					if (identChild == token.getFirstChild()) {
+						directChildrenDone = true;
+					}
+					switch (identChild.tok) {
+						case Comment(_) | CommentLine(_):
+						case Unop(_) | Semicolon | Comma:
 						case POpen | BkOpen | Dot | QuestionDot:
-							readCallParams(context, ident, identToken);
+							readCallParams(context, ident, identChild);
 							copyUsesToParent(identifier, ident);
 						case Binop(_):
-							readExpression(context, ident, identToken);
+							readExpression(context, ident, identChild);
 							copyUsesToParent(identifier, ident);
-						case Unop(_):
-						case Semicolon:
-						case Comment(_) | CommentLine(_):
-						case Comma:
 						case DblDot:
-							switch (TokenTreeCheckUtils.getColonType(identToken)) {
+							switch (TokenTreeCheckUtils.getColonType(identChild)) {
+								case SwitchCase | Ternary | ObjectLiteral | At:
 								case TypeHint:
-									readTypeHint(context, ident, identToken, TypeHint);
+									readTypeHint(context, ident, identChild, TypeHint);
 									copyUsesToParent(identifier, ident);
 								case TypeCheck:
-									readExpression(context, identifier, identToken);
-								case SwitchCase | Ternary | ObjectLiteral | At:
+									readExpression(context, identifier, identChild);
 								case Unknown:
-									readTypeHint(context, ident, identToken, TypeHint);
+									readTypeHint(context, ident, identChild, TypeHint);
 									copyUsesToParent(identifier, ident);
 							}
 						case Question:
-							if (TokenTreeCheckUtils.isTernary(identToken)) {
-								readExpression(context, identifier, identToken);
+							if (TokenTreeCheckUtils.isTernary(identChild)) {
+								readExpression(context, identifier, identChild);
 							}
 						case Spread:
-							readExpression(context, identifier, identToken);
+							readExpression(context, identifier, identChild);
 						case Arrow:
-							readExpression(context, identifier, identToken);
+							readExpression(context, identifier, identChild);
 						default:
 					}
-					identToken = identToken.nextSibling;
 				}
 				if (directChildrenDone) {
 					return;
@@ -961,8 +945,7 @@ class UsageCollector {
 				return;
 			case Kwd(KwdThis):
 				final thisIdent = makeIdentifier(context, token, Access, identifier);
-				var identChild = findIdentifierChild(token);
-				while (identChild != null) {
+				for (identChild in findIdentifierChilds(token)) {
 					switch (identChild.tok) {
 						case Binop(_):
 							readExpression(context, identifier, identChild);
@@ -988,7 +971,6 @@ class UsageCollector {
 							}
 						default:
 					}
-					identChild = identChild.nextSibling;
 				}
 				return;
 			case BrOpen:
@@ -1267,46 +1249,42 @@ class UsageCollector {
 				case Question:
 					child = child.getFirstChild();
 					final paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Parameter(params)), identifier);
-					var paramChild = findIdentifierChild(child);
-					while (paramChild != null) {
-						switch (paramChild.tok) {
+					for (identChild in findIdentifierChilds(child)) {
+						switch (identChild.tok) {
 							case DblDot:
-								switch (TokenTreeCheckUtils.getColonType(paramChild)) {
+								switch (TokenTreeCheckUtils.getColonType(identChild)) {
 									case TypeHint:
-										readTypeHint(context, paramIdent, paramChild, TypeHint);
+										readTypeHint(context, paramIdent, identChild, TypeHint);
 										copyUsesToParent(identifier, paramIdent);
 									case TypeCheck:
-										readExpression(context, identifier, paramChild);
+										readExpression(context, identifier, identChild);
 									case Ternary:
-										readExpression(context, identifier, paramChild);
+										readExpression(context, identifier, identChild);
 									case SwitchCase | ObjectLiteral | At | Unknown:
 								}
 							case Binop(OpAssign):
-								readExpression(context, identifier, paramChild);
+								readExpression(context, identifier, identChild);
 							case Comma:
 							default:
 						}
-						paramChild = paramChild.nextSibling;
 					}
 					copyUsesToParent(identifier, paramIdent);
 					params.push(paramIdent);
 				case Const(CIdent(_)):
 					var paramIdent:Identifier = makeIdentifier(context, child, ScopedLocal(child.pos.min, scopeEnd, Parameter(params)), identifier);
 					params.push(paramIdent);
-					var paramChild = findIdentifierChild(child);
-					while (paramChild != null) {
-						switch (paramChild.tok) {
+					for (identChild in findIdentifierChilds(child)) {
+						switch (identChild.tok) {
 							case DblDot:
-								readTypeHint(context, paramIdent, paramChild, TypeHint);
+								readTypeHint(context, paramIdent, identChild, TypeHint);
 							case Comma:
-								if (paramChild.parent == child) {
+								if (identChild.parent == child) {
 									break;
 								}
 							case Binop(OpAssign):
-								readExpression(context, paramIdent, paramChild);
+								readExpression(context, paramIdent, identChild);
 							default:
 						}
-						paramChild = paramChild.nextSibling;
 					}
 					copyUsesToParent(identifier, paramIdent);
 				default:
@@ -1434,13 +1412,12 @@ class UsageCollector {
 			switch (child.tok) {
 				case Const(CIdent(_)) | Dollar(_):
 					makeIdentifier(context, child, TypedParameter, identifier);
-					final afterIdentifier = findIdentifierChild(child);
-					if (afterIdentifier != null) {
-						switch (afterIdentifier.tok) {
+					for (identChild in findIdentifierChilds(child)) {
+						switch (identChild.tok) {
 							case Binop(OpLt):
-								addTypeParameter(context, identifier, afterIdentifier);
+								addTypeParameter(context, identifier, identChild);
 							case Arrow:
-								addTypeParameter(context, identifier, afterIdentifier);
+								addTypeParameter(context, identifier, identChild);
 							default:
 						}
 					}
@@ -1478,18 +1455,17 @@ class UsageCollector {
 					if (token.matches(DblDot) && identifier != null) {
 						identifier.setTypeHint(TypeHintFromTree.makeTypeHint(child));
 					}
-					final afterIdentifier = findIdentifierChild(child);
-					if (afterIdentifier != null) {
-						switch (afterIdentifier.tok) {
+					for (identChild in findIdentifierChilds(child)) {
+						switch (identChild.tok) {
 							case Comment(_) | CommentLine(_):
 							case Semicolon:
 							case Arrow:
-								readTypeHint(context, identifier, afterIdentifier, TypeHint);
+								readTypeHint(context, identifier, identChild, TypeHint);
 							case Binop(OpLt):
-								addTypeParameter(context, identifier, afterIdentifier);
+								addTypeParameter(context, identifier, identChild);
 							case PClose:
 							case Sharp(_):
-								readExpression(context, identifier, afterIdentifier);
+								readExpression(context, identifier, identChild);
 							default:
 						}
 					}
@@ -1589,6 +1565,37 @@ class UsageCollector {
 			}
 		}
 		return null;
+	}
+
+	function findIdentifierChilds(token:TokenTree):Array<TokenTree> {
+		var childs:Array<TokenTree> = [];
+		while (token != null) {
+			if (!token.hasChildren()) {
+				return childs;
+			}
+			var identifierPart:Null<TokenTree> = null;
+			var first:Bool = true;
+			for (child in token.children) {
+				switch (child.tok) {
+					case Const(CIdent("is")):
+						childs.push(child);
+					case Const(CIdent(_)) | Dot | QuestionDot | Kwd(KwdNew) | Kwd(KwdMacro) | Dollar(_):
+						if (first) {
+							if (identifierPart == null) {
+								identifierPart = child;
+							}
+							continue;
+						}
+						childs.push(child);
+					case At | Semicolon:
+					default:
+						childs.push(child);
+				}
+				first = false;
+			}
+			token = identifierPart;
+		}
+		return childs;
 	}
 
 	function copyUsesToParent(identifier:Null<Identifier>, child:Identifier):Void {

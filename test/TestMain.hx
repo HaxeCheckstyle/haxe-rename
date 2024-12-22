@@ -1,7 +1,10 @@
-import refactor.refactor.RefactorClassTest;
 import refactor.refactor.RefactorExtractConstructorParams;
+import refactor.refactor.RefactorExtractInterfaceTest;
 import refactor.refactor.RefactorExtractMethodTest;
-import refactor.refactor.RefactorTypedefTest;
+import refactor.refactor.RefactorExtractTypeTest;
+import refactor.refactor.RewriteFinalsToVarsTest;
+import refactor.refactor.RewriteVarsToFinalsTest;
+import refactor.refactor.RewriteWrapWithTryCatchTest;
 import refactor.rename.RenameClassTest;
 import refactor.rename.RenameEnumTest;
 import refactor.rename.RenameImportAliasTest;
@@ -28,8 +31,12 @@ class TestMain {
 			new RenamePackageTest(),
 			new RenameScopedLocalTest(),
 			new RenameTypedefTest(),
-			new RefactorClassTest(),
-			new RefactorTypedefTest(),
+			new RefactorExtractTypeTest(),
+			new RefactorExtractInterfaceTest(),
+			new RewriteFinalsToVarsTest(),
+			new RewriteVarsToFinalsTest(),
+			new RewriteWrapWithTryCatchTest(),
+
 			new RefactorExtractMethodTest(),
 			new RefactorExtractConstructorParams(),
 		];

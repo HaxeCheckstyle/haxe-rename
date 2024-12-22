@@ -22,9 +22,7 @@ class TypingHelper {
 			for (type in types) {
 				for (use in type.getIdentifiers(search)) {
 					switch (use.type) {
-						case Extends | Implements:
-							pushType(use.defineType);
-						case AbstractOver:
+						case Extends | Implements | AbstractOver:
 							pushType(use.defineType);
 						default:
 					}
@@ -45,9 +43,7 @@ class TypingHelper {
 							alias;
 					}
 					searchImplementingTypes(use.file.typeList, search);
-				case Extends | Implements:
-					pushType(use.defineType);
-				case AbstractOver:
+				case Extends | Implements | AbstractOver:
 					pushType(use.defineType);
 				default:
 			}
@@ -55,9 +51,7 @@ class TypingHelper {
 		allUses = context.nameMap.getIdentifiers(baseType.name.name);
 		for (use in allUses) {
 			switch (use.type) {
-				case Extends | Implements:
-					pushType(use.defineType);
-				case AbstractOver:
+				case Extends | Implements | AbstractOver:
 					pushType(use.defineType);
 				default:
 			}
@@ -340,9 +334,7 @@ class TypingHelper {
 											return Promise.reject("not enough type parameters");
 										}
 										return Promise.resolve(typeParams[index]);
-									case UnknownType(_):
-									case StructType(_) | FunctionType(_):
-									case NamedType(_, _):
+									case UnknownType(_) | StructType(_) | FunctionType(_) | NamedType(_, _):
 								}
 								return Promise.reject("not found");
 							}));
