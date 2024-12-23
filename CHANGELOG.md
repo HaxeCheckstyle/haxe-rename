@@ -1,19 +1,34 @@
 # Version history
 
-## dev branch / next version (2.x.x)
+## dev branch / next version (3.x.x)
 
-## 2.4.0 (2024-)
+## 3.0.0 (2024-12-23)
 
-- added invalidateFile / removeFile to allow rescan in case of file changes or deletion
-- added support for create and delete file operations as edits
 - added ExtractType refactor module
 - added ExtractInterface refactor module
 - added ExtractMethod refactor module
+- added Extract Constructor Params refactor module as vars or finals
+- added Rewrite Vars to Finals and Rewrite Finals to Vars refactor module
+- added Wrap with Try…Catch refactor module
+- added invalidateFile / removeFile to allow rescan in case of file changes or deletion
+- added support for create and delete file operations as edits
+- added support for local function extraction
+- added indentation options for snippet formatting
 - changed Refactor class to Rename
 - changed getFullModulName call to fullModuleName property
+- changed order of type resolution to built-in then external typer
 - fixed type name renaming not changing in use locations
 - fixed discovery of arrow functions as type hints
+- fixed extracting from functions with type parameters
+- fixed discovery of identifiers in if conditions
+- fixed code gen for empty return or throw as last expressions of selection
+- fixed parameter collection from string interpolation
+- fixed importInsertPos for files with comment headers
+- fixed enum field rename eating dot separator
+- fixed abstract enum type resolution
+- fixed rename field with null-safe access operator
 - refactored typehint data structure
+- refactored identifier discovery
 
 ## 2.3.1 (2024-11-01)
 
