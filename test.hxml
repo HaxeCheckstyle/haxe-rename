@@ -5,13 +5,17 @@
 -lib haxeparser
 -lib tokentree
 -lib hxargs
+-lib formatter
 -lib utest
 -lib hxnodejs
 -lib test-adapter
 
-
 --main TestMain
 
 --js out/tests.js
+
+# -D dump-dependencies
+
+-debug
 
 --cmd node out/tests.js

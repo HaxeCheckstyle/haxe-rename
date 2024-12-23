@@ -24,12 +24,12 @@ class TraverseSources {
 		}
 	}
 
-	static function collectIdentifierData(usageContext:UsageContext) {
+	public static function collectIdentifierData(usageContext:UsageContext) {
 		var content:FileContentType = usageContext.fileReader(usageContext.fileName);
 		switch (content) {
 			case Text(text):
 				usageContext.usageCollector.parseFile(ByteData.ofString(text), usageContext);
-			case Token(root):
+			case Token(root, _):
 				usageContext.usageCollector.parseFileWithTokens(root, usageContext);
 		}
 	}

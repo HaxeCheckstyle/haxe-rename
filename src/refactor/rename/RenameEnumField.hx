@@ -1,20 +1,20 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameEnumField {
-	public static function refactorEnumField(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorEnumField(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, NoFormat), identifier);
 
 		var packName:String = file.getPackage();
 		var mainModuleName:String = file.getMainModulName();
 		var typeName:String = identifier.defineType.name.name;
-		var fullModuleTypeName:String = identifier.defineType.getFullModulName();
+		var fullModuleTypeName:String = identifier.defineType.fullModuleName;
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$typeName.${identifier.name}');
 		for (use in allUses) {
 			switch (use.file.importsModule(packName, mainModuleName, typeName)) {
@@ -24,14 +24,14 @@ class RenameEnumField {
 					if (alias != typeName) {
 						continue;
 					}
-				case Global | SamePackage | Imported | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
 			}
-			RenameHelper.replaceTextWithPrefix(use, typeName, context.what.toName, changelist);
+			RenameHelper.replaceTextWithPrefix(use, typeName + ".", context.what.toName, changelist);
 		}
 
 		allUses = context.nameMap.getIdentifiers('$fullModuleTypeName.${identifier.name}');
 		for (use in allUses) {
-			RenameHelper.replaceTextWithPrefix(use, fullModuleTypeName, context.what.toName, changelist);
+			RenameHelper.replaceTextWithPrefix(use, fullModuleTypeName + ".", context.what.toName, changelist);
 		}
 
 		allUses = context.nameMap.matchIdentifierPart(identifier.name, true);
@@ -40,11 +40,11 @@ class RenameEnumField {
 		for (use in allUses) {
 			switch (use.type) {
 				case CaseLabel(switchIdentifier):
-					changes.push(RenameHelper.matchesType(context, {
+					changes.push(TypingHelper.matchesType(context, {
 						name: switchIdentifier.name,
 						pos: switchIdentifier.pos.start,
 						defineType: switchIdentifier.defineType
-					}, KnownType(identifier.defineType, [])).then(function(matched:Bool) {
+					}, ClasspathType(identifier.defineType, [])).then(function(matched:Bool) {
 						if (matched) {
 							RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
 						}
@@ -63,7 +63,7 @@ class RenameEnumField {
 							if (alias != typeName) {
 								continue;
 							}
-						case Global | SamePackage | Imported | StarImported:
+						case Global | ParentPackage | SamePackage | Imported | StarImported:
 					}
 				default:
 					continue;

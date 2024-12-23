@@ -2,26 +2,28 @@ package refactor.edits;
 
 import haxe.io.Bytes;
 import sys.io.File;
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
+import refactor.rename.RenameContext;
 
 class Changelist {
 	var changes:Map<String, Array<FileEdit>>;
-	var context:RefactorContext;
+	var context:EditContext;
+	var editedIdentifiers:Array<Identifier>;
 
-	public function new(context:RefactorContext) {
+	public function new(context:EditContext) {
 		changes = new Map<String, Array<FileEdit>>();
 		this.context = context;
+		editedIdentifiers = [];
 	}
 
 	public function addChange(fileName:String, change:FileEdit, identifier:Null<Identifier>) {
 		if (identifier != null) {
-			if (identifier.edited) {
+			if (editedIdentifiers.contains(identifier)) {
 				return;
 			}
-			identifier.edited = true;
+			editedIdentifiers.push(identifier);
 		}
 		var fileChanges:Null<Array<FileEdit>> = changes.get(fileName);
 		if (fileChanges == null) {
@@ -57,13 +59,17 @@ class Changelist {
 			Sys.println('$file');
 			for (edit in edits) {
 				switch (edit) {
+					case CreateFile(newFileName):
+						Sys.println('* create file "$newFileName"');
+					case DeleteFile(fileName):
+						Sys.println('* delete file "$fileName"');
 					case Move(newFileName):
-						Sys.println('* rename to "$newFileName"');
-					case InsertText(text, pos):
-						Sys.println('* insert text "$text" @${pos.start}-${pos.end}');
+						Sys.println('* rename to file "$newFileName"');
+					case InsertText(text, pos, f):
+						Sys.println('* insert text "$text" @${pos.start}-${pos.end}${formatTypeToString(f)}');
 						Sys.println('+++ $text');
-					case ReplaceText(text, pos):
-						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}');
+					case ReplaceText(text, pos, f):
+						Sys.println('* replace text with "$text" @${pos.start}-${pos.end}${formatTypeToString(f)}');
 						printDiffLines(pos, text);
 					case RemoveText(pos):
 						Sys.println('* remove text @${pos.start}-${pos.end}');
@@ -74,17 +80,36 @@ class Changelist {
 		return (hasChanges ? DryRun : NoChange);
 	}
 
+	function formatTypeToString(format:FormatType):String {
+		return switch (format) {
+			case NoFormat:
+				"";
+			case Format(0, true):
+				" with format and rtrim";
+			case Format(0, _):
+				" with format";
+			case Format(indentOffset, true):
+				' with format +indent=$indentOffset and rtrim';
+			case Format(indentOffset, _):
+				' with format +indent=$indentOffset';
+		}
+	}
+
 	function sortFileEdits(a:FileEdit, b:FileEdit):Int {
 		var offsetA:Int = switch (a) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		var offsetB:Int = switch (b) {
+			case CreateFile(_): 0;
+			case DeleteFile(_): 9999;
 			case Move(_): 0;
-			case InsertText(_, pos): pos.start;
-			case ReplaceText(_, pos): pos.start;
+			case InsertText(_, pos, _): pos.start;
+			case ReplaceText(_, pos, _): pos.start;
 			case RemoveText(pos): pos.start;
 		};
 		if (offsetA < offsetB) {

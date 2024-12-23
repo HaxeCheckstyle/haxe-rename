@@ -6,6 +6,7 @@ class Type {
 	public var uses:Array<Identifier>;
 	public var file:File;
 	public var name:Null<Identifier>;
+	public var fullModuleName(get, null):String;
 
 	public function new(file:File) {
 		this.file = file;
@@ -13,7 +14,14 @@ class Type {
 		uses = [];
 	}
 
-	public function getFullModulName():String {
+	public function get_fullModuleName():String {
+		if (fullModuleName == null) {
+			fullModuleName = makeFullModuleName();
+		}
+		return fullModuleName;
+	}
+
+	function makeFullModuleName():String {
 		var modulName:String = '${file.getMainModulName()}.';
 		if (file.getMainModulName() == name.name) {
 			modulName = "";

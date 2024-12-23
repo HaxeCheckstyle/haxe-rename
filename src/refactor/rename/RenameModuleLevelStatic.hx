@@ -1,14 +1,14 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameModuleLevelStatic {
-	public static function refactorModuleLevelStatic(context:RefactorContext, file:File, identifier:Identifier):Promise<RefactorResult> {
+	public static function refactorModuleLevelStatic(context:RenameContext, file:File, identifier:Identifier):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packageName:String = file.getPackage();
@@ -32,7 +32,7 @@ class RenameModuleLevelStatic {
 			if ((use.pos.fileName != file.name) && (!filesWithStaticImport.contains(use.pos.fileName))) {
 				continue;
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 		}
 
 		// all uses in files importing with package.mainmodul
@@ -45,7 +45,7 @@ class RenameModuleLevelStatic {
 					for (u in uses) {
 						switch (u.type) {
 							case Call(false) | Access:
-								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos), u);
+								changelist.addChange(u.pos.fileName, ReplaceText(context.what.toName, u.pos, NoFormat), u);
 							case ScopedLocal(_):
 							default:
 						}
@@ -58,14 +58,14 @@ class RenameModuleLevelStatic {
 		});
 	}
 
-	static function refactorIdentifier(context:RefactorContext, changelist:Changelist, searchName:String, replaceName:String,
+	static function refactorIdentifier(context:RenameContext, changelist:Changelist, searchName:String, replaceName:String,
 			filesWithStaticImport:Array<String>) {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(searchName);
 		for (use in allUses) {
 			if (use.type.match(ImportModul)) {
 				filesWithStaticImport.push(use.pos.fileName);
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(replaceName, use.pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(replaceName, use.pos, NoFormat), use);
 		}
 		var searchNameDot:String = '$searchName.';
 		var replaceNameDot:String = '$replaceName.';
@@ -76,7 +76,7 @@ class RenameModuleLevelStatic {
 				start: use.pos.start,
 				end: use.pos.start + searchNameDot.length
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(replaceNameDot, pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(replaceNameDot, pos, NoFormat), use);
 		}
 	}
 }

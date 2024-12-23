@@ -4,22 +4,33 @@ import sys.FileStat;
 import sys.FileSystem;
 import refactor.discover.File;
 import refactor.discover.NameMap;
+import refactor.discover.TypeList;
 
 class MemCache implements IFileCache {
 	var files:Map<String, File>;
 
 	public function new() {
-		clear();
+		files = new Map<String, File>();
 	}
 
 	public function save() {}
 
 	public function clear() {
-		files = new Map<String, File>();
+		files.clear();
 	}
 
 	public function storeFile(file:File) {
 		files.set(file.name, file);
+	}
+
+	public function invalidateFile(name:String, nameMap:NameMap, typeList:TypeList):Void {
+		var file:File = files.get(name);
+		if (file != null) {
+			file.clear();
+			files.remove(name);
+		}
+		nameMap.removeFile(name);
+		typeList.removeFile(name);
 	}
 
 	public function getFile(name:String, nameMap:NameMap):Null<File> {

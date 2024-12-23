@@ -1,27 +1,26 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierType.TypedefFieldType;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameAnonStructField {
-	public static function refactorAnonStructField(context:RefactorContext, file:File, identifier:Identifier,
+	public static function refactorAnonStructField(context:RenameContext, file:File, identifier:Identifier,
 			fields:Array<TypedefFieldType>):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
-		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos), identifier);
+		changelist.addChange(identifier.pos.fileName, ReplaceText(context.what.toName, identifier.pos, NoFormat), identifier);
 
 		return renameFieldsOfType(context, changelist, identifier.defineType, fields, identifier.name).then(function(result):RefactorResult {
 			return changelist.execute();
 		});
 	}
 
-	public static function refactorStructureField(context:RefactorContext, file:File, identifier:Identifier,
-			fieldNames:Array<String>):Promise<RefactorResult> {
+	public static function refactorStructureField(context:RenameContext, file:File, identifier:Identifier, fieldNames:Array<String>):Promise<RefactorResult> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(identifier.name);
 		for (use in allUses) {
 			switch (use.type) {
@@ -37,8 +36,7 @@ class RenameAnonStructField {
 		return Promise.resolve(Unsupported(identifier.toString()));
 	}
 
-	static function renameFieldsOfType(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>,
-			fromName:String):Promise<Void> {
+	static function renameFieldsOfType(context:RenameContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>, fromName:String):Promise<Void> {
 		var packName:String = type.file.getPackage();
 		var mainModuleName = type.file.getMainModulName();
 		fields = fields.concat(findBaseTypes(context, type));
@@ -60,17 +58,16 @@ class RenameAnonStructField {
 			switch (use.file.importsModule(packName, mainModuleName, type.name.name)) {
 				case None:
 					continue;
-				case Global | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
 			}
-			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos), use);
+			changelist.addChange(use.pos.fileName, ReplaceText(context.what.toName, use.pos, NoFormat), use);
 		}
 
 		promises.push(findAllExtending(context, changelist, type, fields, fromName));
 		return Promise.all(promises).then(null);
 	}
 
-	static function findAllExtending(context:RefactorContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>,
-			fromName:String):Promise<Void> {
+	static function findAllExtending(context:RenameContext, changelist:Changelist, type:Type, fields:Array<TypedefFieldType>, fromName:String):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(type.name.name);
 		var promises:Array<Promise<Void>> = [];
 		for (use in allUses) {
@@ -104,7 +101,7 @@ class RenameAnonStructField {
 		return true;
 	}
 
-	static function findBaseTypes(context:RefactorContext, type:Type):Array<TypedefFieldType> {
+	static function findBaseTypes(context:RenameContext, type:Type):Array<TypedefFieldType> {
 		var fieldTypes:Array<TypedefFieldType> = [];
 		var baseTypes:Array<Identifier> = type.findAllIdentifiers((i) -> i.type.match(TypedefBase));
 		for (baseTypeName in baseTypes) {
@@ -129,7 +126,7 @@ class RenameAnonStructField {
 		return [];
 	}
 
-	static function findBase(context:RefactorContext, baseTypeName:Identifier):Null<Type> {
+	static function findBase(context:RenameContext, baseTypeName:Identifier):Null<Type> {
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers(baseTypeName.name);
 		for (use in allUses) {
 			switch (use.type) {
@@ -140,7 +137,7 @@ class RenameAnonStructField {
 			switch (baseTypeName.file.importsModule(use.file.getPackage(), use.file.getMainModulName(), baseTypeName.name)) {
 				case None:
 					continue;
-				case Global | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | ImportedWithAlias(_) | StarImported:
 			}
 			return use.defineType;
 		}

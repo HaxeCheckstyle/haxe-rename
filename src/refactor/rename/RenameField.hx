@@ -1,19 +1,19 @@
 package refactor.rename;
 
-import refactor.RefactorContext;
 import refactor.RefactorResult;
 import refactor.discover.File;
 import refactor.discover.Identifier;
 import refactor.discover.IdentifierPos;
 import refactor.discover.Type;
 import refactor.edits.Changelist;
+import refactor.rename.RenameContext;
 
 class RenameField {
-	public static function refactorField(context:RefactorContext, file:File, identifier:Identifier, isStatic:Bool):Promise<RefactorResult> {
+	public static function refactorField(context:RenameContext, file:File, identifier:Identifier, isStatic:Bool):Promise<RefactorResult> {
 		var changelist:Changelist = new Changelist(context);
 
 		var packName:String = file.getPackage();
-		var types:Array<Type> = RenameHelper.findDescendantTypes(context, packName, identifier.defineType);
+		var types:Array<Type> = TypingHelper.findDescendantTypes(context, packName, identifier.defineType);
 
 		types.push(identifier.defineType);
 		var changes:Array<Promise<Void>> = [];
@@ -38,7 +38,7 @@ class RenameField {
 			}
 
 			if (isStatic) {
-				replaceStaticUse(context, changelist, type, identifier.name);
+				changes.push(replaceStaticUse(context, changelist, type, identifier.name));
 				switch (identifier.type) {
 					case Method(true):
 						changes.push(RenameHelper.replaceStaticExtension(context, changelist, identifier));
@@ -54,7 +54,7 @@ class RenameField {
 		});
 	}
 
-	public static function replaceAccessOrCalls(context:RefactorContext, changelist:Changelist, identifier:Identifier, types:Array<Type>):Promise<Void> {
+	public static function replaceAccessOrCalls(context:RenameContext, changelist:Changelist, identifier:Identifier, types:Array<Type>):Promise<Void> {
 		var allUses:Array<Identifier> = context.nameMap.matchIdentifierPart(identifier.name, true);
 		var changes:Array<Promise<Void>> = [];
 		for (use in allUses) {
@@ -88,6 +88,7 @@ class RenameField {
 	static function replaceInTypeWithFieldAccess(changelist:Changelist, type:Type, prefix:String, from:String, to:String) {
 		var allUses:Array<Identifier> = type.getIdentifiers(prefix + from);
 		var allAccess:Array<Identifier> = type.getStartsWith('$prefix$from.');
+		allAccess = allAccess.concat(type.getStartsWith('$prefix$from?.'));
 		var shadowed:Bool = false;
 		for (access in allAccess) {
 			for (use in allUses) {
@@ -112,11 +113,11 @@ class RenameField {
 				start: access.pos.start + prefix.length,
 				end: access.pos.start + prefix.length + from.length
 			};
-			changelist.addChange(access.pos.fileName, ReplaceText(to, pos), access);
+			changelist.addChange(access.pos.fileName, ReplaceText(to, pos, NoFormat), access);
 		}
 	}
 
-	static function replaceStaticUse(context:RefactorContext, changelist:Changelist, type:Type, fromName:String) {
+	static function replaceStaticUse(context:RenameContext, changelist:Changelist, type:Type, fromName:String):Promise<Void> {
 		var packName:String = type.file.getPackage();
 		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('${type.name.name}.$fromName');
 		for (use in allUses) {
@@ -125,15 +126,37 @@ class RenameField {
 					continue;
 				case ImportedWithAlias(_):
 					continue;
-				case Global | SamePackage | Imported | StarImported:
+				case Global | ParentPackage | SamePackage | Imported | StarImported:
 			}
 			RenameHelper.replaceTextWithPrefix(use, '${type.name.name}.', context.what.toName, changelist);
 		}
 
-		var fullModuleName:String = type.getFullModulName();
-		var allUses:Array<Identifier> = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
+		var fullModuleName:String = type.fullModuleName;
+		allUses = context.nameMap.getIdentifiers('$fullModuleName.$fromName');
 		for (use in allUses) {
 			RenameHelper.replaceTextWithPrefix(use, '$fullModuleName.', context.what.toName, changelist);
 		}
+		var changes:Array<Promise<Void>> = [];
+		switch (type.name.type) {
+			case Abstract:
+				allUses = context.nameMap.matchIdentifierPart(fromName, true);
+				for (use in allUses) {
+					switch (use.type) {
+						case CaseLabel(switchIdentifier):
+							changes.push(TypingHelper.matchesType(context, {
+								name: switchIdentifier.name,
+								pos: switchIdentifier.pos.start,
+								defineType: switchIdentifier.defineType
+							}, ClasspathType(type, [])).then(function(matched:Bool) {
+								if (matched) {
+									RenameHelper.replaceTextWithPrefix(use, "", context.what.toName, changelist);
+								}
+							}));
+						default:
+					}
+				}
+			default:
+		}
+		return Promise.all(changes).then(null);
 	}
 }

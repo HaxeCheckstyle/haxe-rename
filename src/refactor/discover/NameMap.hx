@@ -1,8 +1,8 @@
 package refactor.discover;
 
 class NameMap {
-	final names:IdentifierMap;
-	final parts:IdentifierMap;
+	var names:IdentifierMap;
+	var parts:IdentifierMap;
 
 	public function new() {
 		names = new IdentifierMap();
@@ -40,10 +40,14 @@ class NameMap {
 			if (list == null) {
 				map.set(key, [identifier]);
 			} else {
+				for (id in list) {
+					if (id.pos.fileName == identifier.pos.fileName && id.pos.start == identifier.pos.start) {
+						return;
+					}
+				}
 				list.push(identifier);
 			}
 		}
-		identifier.reset();
 		addToMap(names, identifier.name);
 		var nameParts:Array<String> = identifier.name.split(".");
 		for (part in nameParts) {
@@ -68,10 +72,28 @@ class NameMap {
 			return [];
 		}
 		if (unused) {
-			results = results.filter(i -> !i.edited);
 			results.sort(Identifier.sortIdentifier);
 		}
 		return results;
+	}
+
+	public function removeFile(fileName:String) {
+		var newNames:IdentifierMap = new IdentifierMap();
+		for (key => idents in names) {
+			newNames.set(key, idents.filter(id -> id.pos.fileName != fileName));
+		}
+		names = newNames;
+
+		var newParts:IdentifierMap = new IdentifierMap();
+		for (key => idents in parts) {
+			newParts.set(key, idents.filter(id -> id.pos.fileName != fileName));
+		}
+		parts = newParts;
+	}
+
+	public function clear() {
+		names.clear();
+		parts.clear();
 	}
 }
 

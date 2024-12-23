@@ -5,6 +5,7 @@
 -lib haxeparser
 -lib tokentree
 -lib hxargs
+-lib formatter
 -lib utest
 -lib hxnodejs
 -lib instrument
@@ -12,7 +13,7 @@
 
 -D coverage-console-summary-reporter
 -D coverage-console-package-summary-reporter
-# -D coverage-console-file-summary-reporter
+-D coverage-console-file-summary-reporter
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
 
@@ -22,6 +23,8 @@
 # -D debug_instrumentation
 # -D debug_log_expression
 -D instrument-quiet
+
+# -D dump-dependencies
 
 --main TestMain
 

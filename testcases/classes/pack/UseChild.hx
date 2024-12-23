@@ -44,4 +44,23 @@ class UseChild {
 	}
 
 	function json(json:JsonClass) {}
+
+	private function doSwitch(action:String):JsonClass {
+		return switch (action) {
+			case "test":
+				new JsonClass(1, "test", 2);
+			default:
+				null;
+		}
+	}
+
+	function typeCheckChildClass(child:Any) {
+		if ((child is ChildClass)) {
+			trace("yes");
+		}
+	}
+}
+
+class TypedChild<T:ChildClass> {
+	var memebers:Array<{sprite:ChildClass, originalX:Float, originalY:Float}> = null;
 }

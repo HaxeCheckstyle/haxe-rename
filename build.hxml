@@ -4,6 +4,7 @@
 -lib tokentree
 -lib hxnodejs
 -lib hxargs
+-lib formatter
 
 -D js-es=6
 -js bin/rename.js

@@ -4,3 +4,4 @@ import utest.Async;
 import utest.ITest;
 
 using StringTools;
+using refactor.PrintHelper;

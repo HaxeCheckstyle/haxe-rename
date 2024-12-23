@@ -8,7 +8,9 @@ class Identifier {
 	public var file:File;
 	public var parent:Null<Identifier>;
 	public var defineType:Null<Type>;
-	public var edited:Bool;
+
+	var typeHint:Null<TypeHintType>;
+	var typeHintResolved:Bool;
 
 	public function new(type:IdentifierType, name:String, pos:IdentifierPos, nameMap:NameMap, file:File, defineType:Null<Type>) {
 		this.type = type;
@@ -17,16 +19,13 @@ class Identifier {
 		this.file = file;
 		this.defineType = defineType;
 		parent = null;
-		edited = false;
+		typeHint = null;
+		typeHintResolved = false;
 
 		if (defineType != null) {
 			defineType.addIdentifier(this);
 		}
 		nameMap.addIdentifier(this);
-	}
-
-	public function reset() {
-		edited = false;
 	}
 
 	public function addUse(identifier:Null<Identifier>) {
@@ -36,8 +35,12 @@ class Identifier {
 		if (uses == null) {
 			uses = [];
 		}
-		uses.push(identifier);
-		identifier.parent = this;
+		if (!uses.contains(identifier)) {
+			uses.push(identifier);
+		}
+		if (identifier.parent == null) {
+			identifier.parent = this;
+		}
 	}
 
 	public function containsPos(offset:Int):Bool {
@@ -91,6 +94,11 @@ class Identifier {
 		return 0;
 	}
 
+	public function setTypeHint(typeHint:TypeHintType) {
+		this.typeHint = typeHint;
+		typeHintResolved = false;
+	}
+
 	public function getTypeHint():Null<Identifier> {
 		if (uses == null) {
 			return null;
@@ -103,6 +111,18 @@ class Identifier {
 			}
 		}
 		return null;
+	}
+
+	public function getTypeHintNew(types:TypeList):Null<TypeHintType> {
+		if (typeHint == null) {
+			return null;
+		}
+		if (typeHintResolved) {
+			return typeHint;
+		}
+		typeHint = TypeHintFromTree.resolveTypeHint(typeHint, types, file);
+		typeHintResolved = true;
+		return typeHint;
 	}
 
 	public function toString():String {

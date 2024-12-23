@@ -12,7 +12,7 @@ class StaticUsing {
 		Sys.println(child.print());
 
 		var text:String;
-		var texts:{text:Array<ChildClass>} = {
+		var texts:{text:Array<classes.ChildClass>} = {
 			text: []
 		};
 		var index = 0;
@@ -24,8 +24,16 @@ class StaticUsing {
 		texts.text[index].print();
 		(Context.printFunc : PrintFunc).print();
 	}
+
+	function hasIdent<T, O:{}
+		& T>(name:T):T {
+		return null;
+	}
 }
 
+/**
+ * Context class
+ */
 class Context {
 	public static var printFunc:PrintFunc;
 }
