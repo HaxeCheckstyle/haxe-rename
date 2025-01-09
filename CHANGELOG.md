@@ -2,6 +2,8 @@
 
 ## dev branch / next version (3.x.x)
 
+- fixed null access on empty indentation config
+
 ## 3.0.0 (2024-12-23)
 
 - added ExtractType refactor module

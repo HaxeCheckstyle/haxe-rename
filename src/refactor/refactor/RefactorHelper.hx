@@ -163,7 +163,7 @@ class RefactorHelper {
 			return 0;
 		}
 		var match = regex.matched(1);
-		var character = config.indentation.character;
+		var character = config?.indentation?.character ?? "tab";
 		if (character.toLowerCase() == "tab") {
 			character = "\t";
 		}

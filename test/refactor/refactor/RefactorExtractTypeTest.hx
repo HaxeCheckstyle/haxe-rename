@@ -54,7 +54,7 @@ class RefactorExtractTypeTest extends RefactorTestBase {
 				+ "	public static var printFunc:PrintFunc;\n"
 				+ "}",
 				0, Format(0, false)),
-			makeRemoveTestEdit("testcases/classes/StaticUsing.hx", 557, 639),
+			makeRemoveTestEdit("testcases/classes/StaticUsing.hx", 555, 637),
 		];
 		checkRefactor(RefactorExtractType, {fileName: "testcases/classes/StaticUsing.hx", posStart: 590, posEnd: 590}, edits, async);
 	}

@@ -25,8 +25,7 @@ class StaticUsing {
 		(Context.printFunc : PrintFunc).print();
 	}
 
-	function hasIdent<T, O:{}
-		& T>(name:T):T {
+	function hasIdent<T, O:{} & T>(name:T):T {
 		return null;
 	}
 }
