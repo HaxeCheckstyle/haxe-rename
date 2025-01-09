@@ -96,22 +96,19 @@ class Changelist {
 	}
 
 	function sortFileEdits(a:FileEdit, b:FileEdit):Int {
-		var offsetA:Int = switch (a) {
-			case CreateFile(_): 0;
-			case DeleteFile(_): 9999;
-			case Move(_): 0;
-			case InsertText(_, pos, _): pos.start;
-			case ReplaceText(_, pos, _): pos.start;
-			case RemoveText(pos): pos.start;
-		};
-		var offsetB:Int = switch (b) {
-			case CreateFile(_): 0;
-			case DeleteFile(_): 9999;
-			case Move(_): 0;
-			case InsertText(_, pos, _): pos.start;
-			case ReplaceText(_, pos, _): pos.start;
-			case RemoveText(pos): pos.start;
-		};
+		function extractOffset(edit:FileEdit):Int {
+			return switch (edit) {
+				case CreateFile(_): 0;
+				case DeleteFile(_): 9999;
+				case Move(_): 0;
+				case InsertText(_, pos, _): pos.start;
+				case ReplaceText(_, pos, _): pos.start;
+				case RemoveText(pos): pos.start;
+			}
+		}
+
+		var offsetA:Int = extractOffset(a);
+		var offsetB:Int = extractOffset(b);
 		if (offsetA < offsetB) {
 			return -1;
 		}
