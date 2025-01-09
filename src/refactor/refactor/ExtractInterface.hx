@@ -328,9 +328,6 @@ class ExtractInterface {
 			modifier = modifier.replace("override", "");
 			modifier = modifier.replace("abstract", "");
 			text = comment + modifier + funcSignature;
-			if (!funcSignature.endsWith(";")) {
-				text += ";";
-			}
 		}
 		buf.add(text);
 		if (field.isSharp) {

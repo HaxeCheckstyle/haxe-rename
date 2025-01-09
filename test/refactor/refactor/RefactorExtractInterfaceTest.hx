@@ -33,4 +33,27 @@ class RefactorExtractInterfaceTest extends RefactorTestBase {
 		addTypeHint("testcases/classes/BaseClass.hx", 468, LibType("Bool", "Bool", []));
 		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/BaseClass.hx", posStart: 27, posEnd: 27}, edits, async);
 	}
+
+	function testExtractInterfaceCommentedTest(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeInsertTestEdit("testcases/classes/CommentedTest.hx", " implements ICommentedTest", 37),
+			makeCreateTestEdit("testcases/classes/ICommentedTest.hx"),
+			makeInsertTestEdit("testcases/classes/ICommentedTest.hx",
+				"package classes;\n\n"
+				+ "interface ICommentedTest {\n"
+				+ "/**\n"
+				+ "\t\t[Description]\n"
+				+ "\t**/\n"
+				+ "\t function run():Void;\n"
+				+ "/**\n"
+				+ "\t\t[Description]\n"
+				+ "\t**/\n"
+				+ "\t function run2():Int;\n"
+				+ "}",
+				0, Format(0, false)),
+
+		];
+		addTypeHint("testcases/classes/CommentedTest.hx", 85, LibType("Void", "Void", []));
+		checkRefactor(RefactorExtractInterface, {fileName: "testcases/classes/CommentedTest.hx", posStart: 30, posEnd: 30}, edits, async);
+	}
 }
