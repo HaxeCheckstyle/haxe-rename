@@ -5,7 +5,7 @@ class RefactorExtractTypeTest extends RefactorTestBase {
 		setupTestSources(["testcases/classes", "testcases/typedefs"]);
 	}
 
-	function testFailExtractTypChildClass(async:Async) {
+	function testFailExtractTypeChildClass(async:Async) {
 		failCanRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "unsupported");
 		failRefactor(RefactorExtractType, {fileName: "testcases/classes/ChildClass.hx", posStart: 30, posEnd: 30}, "failed to collect data for extract type",
 			async);

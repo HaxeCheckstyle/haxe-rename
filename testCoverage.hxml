@@ -24,6 +24,8 @@
 # -D debug_log_expression
 -D instrument-quiet
 
+# -D dump=pretty
+
 # -D dump-dependencies
 
 --main TestMain

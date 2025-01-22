@@ -17,7 +17,7 @@ dump/
 callgrind.*
 ./debug
 lcov.info
-.unittest/**
+.unittest/
 codecov.json
 coverage.json
 core

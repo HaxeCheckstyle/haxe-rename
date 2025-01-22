@@ -27,7 +27,7 @@ class Refactoring {
 			case RefactorRewriteWrapWithTryCatch:
 				return RewriteWrapWithTryCatch.canRefactor(context, isRangeSameScope);
 		}
-		return null;
+		return Unsupported;
 	}
 
 	public static function doRefactor(refactorType:RefactorType, context:RefactorContext):Promise<RefactorResult> {
