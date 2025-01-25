@@ -8,8 +8,8 @@
 		"refactor"
 	],
 	"description": "A code renaming tool for Haxe",
-	"version": "3.0.0",
-	"releasenote": "added ExtractType, ExtractInterface and ExtracMethod refactoring and more + bugfixes - see CHANGELOG",
+	"version": "3.0.1",
+	"releasenote": "fixed null access on empty indentation config + fixed extract interface - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],

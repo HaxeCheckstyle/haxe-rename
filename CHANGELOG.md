@@ -2,6 +2,8 @@
 
 ## dev branch / next version (3.x.x)
 
+## 3.0.1 (2025-01-25)
+
 - fixed null access on empty indentation config
 - fixed extract interface misplacing resolved type hint, fixes [vshaxe/vshaxe#655](https://github.com/vshaxe/vshaxe/issues/655)
 
