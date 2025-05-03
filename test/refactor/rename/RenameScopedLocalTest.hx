@@ -174,4 +174,48 @@ class RenameScopedLocalTest extends RenameTestBase {
 		];
 		checkRename({fileName: "testcases/scopedlocal/Refactor.hx", toName: "data", pos: 2239}, edits, async);
 	}
+
+	public function testIssue13RenameUID(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "uniqueID", 150, 153),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "uniqueID", 183, 186),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "uniqueID", 266, 269),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "uniqueID", 288, 291),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Issue13.hx", toName: "uniqueID", pos: 152}, edits, async);
+	}
+
+	public function testIssue13RenameFooParameter(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "count", 324, 327),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "count", 351, 354),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Issue13.hx", toName: "count", pos: 325}, edits, async);
+	}
+
+	public function testIssue13RenameFooLocal(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "count", 408, 411),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue13.hx", "count", 433, 436),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Issue13.hx", toName: "count", pos: 409}, edits, async);
+	}
+
+	public function testIssue14RenameAnimFinal(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "myAnimation", 93, 97),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "myAnimation", 114, 118),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "myAnimation", 157, 161),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Issue14.hx", toName: "myAnimation", pos: 96}, edits, async);
+	}
+
+	public function testIssue14RenameFooInterpolation(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "value", 225, 228),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "value", 242, 245),
+			makeReplaceTestEdit("testcases/scopedlocal/Issue14.hx", "value", 258, 261),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Issue14.hx", toName: "value", pos: 227}, edits, async);
+	}
 }

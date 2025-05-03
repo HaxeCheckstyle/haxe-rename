@@ -2,6 +2,10 @@
 
 ## dev branch / next version (3.x.x)
 
+- fixed renaming names used in string interpolation failing in VSCode, fixes [#13](https://github.com/HaxeCheckstyle/haxe-rename/issues/13) and [#14](https://github.com/HaxeCheckstyle/haxe-rename/issues/14)
+- fixed renaming function parameters used in for loop ranges, fixes [#13](https://github.com/HaxeCheckstyle/haxe-rename/issues/13)
+- fixed renaming names in double quoted strings, fixes [#14](https://github.com/HaxeCheckstyle/haxe-rename/issues/14)
+
 ## 3.0.1 (2025-01-25)
 
 - fixed null access on empty indentation config
