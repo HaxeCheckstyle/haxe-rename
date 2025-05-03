@@ -27,6 +27,8 @@ class TypeHintFromTreeTest extends TestBase {
 		findAndCompareTypeHint("loopVoidIdent", FunctionType([NamedType("loop", intType)], voidType));
 		findAndCompareTypeHint("loop2VoidIdent", FunctionType([NamedType("loop", intType), NamedType("loop2", intType)], voidType));
 		findAndCompareTypeHint("intStringVoidNullIdent", FunctionType([intType, stringType], voidType));
+		findAndCompareTypeHint("intCallback", FunctionType([NamedType("value", intType)], voidType));
+		findAndCompareTypeHint("intStringCallback", FunctionType([NamedType("value1", intType), NamedType("value2", stringType)], voidType));
 	}
 
 	@:access(refactor.typing.TypingHelper)

@@ -104,6 +104,18 @@ class Main {
 	public static inline function interpolation(data:Dynamic):String {
 		return cast '${data.a}_${data.b}_${data.c}_${false}';
 	}
+
+	static function get(callback:(value:Int) -> Void):Void {
+		if (true) {
+			callback(0);
+		}
+	}
+
+	static function get2(callback:(value:Int, value2:String) -> Void):Void {
+		if (true) {
+			callback(0, "");
+		}
+	}
 }
 
 typedef Item = {

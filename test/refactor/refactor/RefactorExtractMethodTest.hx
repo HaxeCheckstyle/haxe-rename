@@ -955,4 +955,32 @@ class RefactorExtractMethodTest extends RefactorTestBase {
 		addTypeHint("testcases/methods/SomeHelper.hx", 807, LibType("Type", "Type", []));
 		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/SomeHelper.hx", posStart: 820, posEnd: 1168}, edits, async);
 	}
+
+	function testMainCallback(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "getExtract(callback);", 2002, 2033, Format(2, true)),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"static function getExtract(callback:(value:Int) -> Void):Void {\n"
+				+ "if (true) {\n"
+				+ "			callback(0);\n"
+				+ "		}\n"
+				+ "}\n", 2037,
+				Format(1, false)),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 2001, posEnd: 2033}, edits, async);
+	}
+
+	function testMainCallback2(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/methods/Main.hx", "get2Extract(callback);", 2114, 2149, Format(2, true)),
+			makeInsertTestEdit("testcases/methods/Main.hx",
+				"static function get2Extract(callback:(value:Int, value2:String) -> Void):Void {\n"
+				+ "if (true) {\n"
+				+ "			callback(0, \"\");\n"
+				+ "		}\n"
+				+ "}\n",
+				2153, Format(1, false)),
+		];
+		checkRefactor(RefactorExtractMethod, {fileName: "testcases/methods/Main.hx", posStart: 2113, posEnd: 2149}, edits, async);
+	}
 }

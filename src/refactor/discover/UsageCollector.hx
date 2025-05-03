@@ -286,20 +286,6 @@ class UsageCollector {
 		token.filterCallback(function(token:TokenTree, index:Int):FilterResult {
 			return switch (token.tok) {
 				case Const(CString(s, DoubleQuotes)):
-					var regEx:EReg = ~/^[a-z][a-zA-Z0-9]+(\.[a-z][a-zA-Z0-9]+)*(|\.[A-Z][a-zA-Z0-9]+)$/;
-					if (regEx.match(s)) {
-						var pos:IdentifierPos = {
-							fileName: context.fileName,
-							start: token.pos.min + 1,
-							end: token.pos.max - 1
-						};
-						final newIdentifier = new Identifier(StringConst, s, pos, context.nameMap, context.file, context.type);
-						final parentIdentifier = findParentIdentifier(context, token);
-						if (parentIdentifier != null) {
-							parentIdentifier.addUse(newIdentifier);
-						}
-						identifier.addUse(newIdentifier);
-					}
 					SkipSubtree;
 				case Const(CString(s, SingleQuotes)):
 					var parentIdentifier = findParentIdentifier(context, token);
@@ -341,7 +327,7 @@ class UsageCollector {
 			if (nameRegEx.match(text.substr(start))) {
 				var matchedText:String = nameRegEx.matched(0);
 				var pos:IdentifierPos = {
-					fileName: token.pos.file,
+					fileName: context.fileName,
 					start: token.pos.min + start + 1,
 					end: token.pos.min + start + matchedText.length + 1
 				};
@@ -1096,11 +1082,6 @@ class UsageCollector {
 					copyUsesToParent(identifier, ident);
 					if (ident?.uses != null) {
 						for (use in ident.uses) {
-							switch (use.type) {
-								case Access:
-									use.type = ForIterator;
-								default:
-							}
 							loopIdentifiers.push(use);
 						}
 					}

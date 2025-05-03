@@ -12,6 +12,10 @@ class Main {
 	var loopVoidIdent:(loop:Int) -> Void;
 	var loop2VoidIdent:(loop:Int, loop2:Int) -> Void;
 	var intStringVoidNullIdent:(Int, String) -> Void = null;
+
+	static function getIntCallBack(intCallback:(value:Int) -> Void):Void {}
+
+	static function getIntStringCallBack(intStringCallback:(value1:Int, value2:String) -> Void):Void {}
 }
 
 class MyType {}

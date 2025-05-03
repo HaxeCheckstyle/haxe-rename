@@ -78,7 +78,7 @@ class PrintHelper {
 		}
 	}
 
-	public static function printTypeHint(hintType:TypeHintType):String {
+	public static function printTypeHint(hintType:TypeHintType, namedParens:Bool = false):String {
 		return switch (hintType) {
 			case ClasspathType(type, paramList):
 				if (paramList.length > 0) {
@@ -93,8 +93,8 @@ class PrintHelper {
 				}
 				'$name';
 			case FunctionType(argTypes, retVal):
-				final args = argTypes.map(f -> printTypeHint(f));
-				if (argTypes == null) {
+				final args = argTypes.map(f -> printTypeHint(f, argTypes.length == 1 ? true : false));
+				if (retVal == null) {
 					return '(${args.join(", ")}) -> Void';
 				}
 				if (argTypes.length == 1) {
@@ -102,10 +102,14 @@ class PrintHelper {
 				}
 				return '(${args.join(", ")}) -> ${printTypeHint(retVal)}';
 			case StructType(fieldTypes):
-				final fields = fieldTypes.map(f -> printTypeHint(f));
+				final fields = fieldTypes.map(f -> printTypeHint(f, false));
 				'{${fields.join(", ")}}';
 			case NamedType(name, namedHint):
-				'$name:${printTypeHint(namedHint)}';
+				if (namedParens) {
+					'($name:${printTypeHint(namedHint)})';
+				} else {
+					'$name:${printTypeHint(namedHint)}';
+				}
 			case UnknownType(name):
 				'$name';
 		}

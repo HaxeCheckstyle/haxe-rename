@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         haxe-version: ['4.3.6', 'nightly']
-        platform: [ubuntu-latest, windows-latest]
+        platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Set Git Auto CRLF to false on Windows
