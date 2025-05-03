@@ -5,6 +5,7 @@
 - fixed renaming names used in string interpolation failing in VSCode, fixes [#13](https://github.com/HaxeCheckstyle/haxe-rename/issues/13) and [#14](https://github.com/HaxeCheckstyle/haxe-rename/issues/14)
 - fixed renaming function parameters used in for loop ranges, fixes [#13](https://github.com/HaxeCheckstyle/haxe-rename/issues/13)
 - fixed renaming names in double quoted strings, fixes [#14](https://github.com/HaxeCheckstyle/haxe-rename/issues/14)
+- fixed type hint print function for named parameters in arrow function types
 
 ## 3.0.1 (2025-01-25)
 
