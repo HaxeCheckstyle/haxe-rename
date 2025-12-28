@@ -95,4 +95,22 @@ class Refactor {
 		var value = value;
 		this.value = '$value';
 	}
+
+	function myDiff() {
+		var foo = (x) -> {
+			var diff = bal.total; // <----
+
+			if (diff < 0) {
+				trace(diff);
+
+				var loss_perc = Math.max(0, diff, 0);
+				lossamount.value = Std.string(diff);
+				maxloss.display.animateTo(32, 0.5);
+			} else {
+				var win_perc = Math.max(0, diff);
+				ptarget.display.animateTo(win_perc, 0.5);
+				pamount.value = '$diff';
+			}
+		}
+	}
 }

@@ -218,4 +218,17 @@ class RenameScopedLocalTest extends RenameTestBase {
 		];
 		checkRename({fileName: "testcases/scopedlocal/Issue14.hx", toName: "value", pos: 227}, edits, async);
 	}
+
+	public function testRenameDiff(async:Async) {
+		var edits:Array<TestEdit> = [
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2538, 2542),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2573, 2577),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2595, 2599),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2635, 2639),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2679, 2683),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2769, 2773),
+			makeReplaceTestEdit("testcases/scopedlocal/Refactor.hx", "difference", 2844, 2848),
+		];
+		checkRename({fileName: "testcases/scopedlocal/Refactor.hx", toName: "difference", pos: 2540}, edits, async);
+	}
 }
